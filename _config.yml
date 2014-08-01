@@ -1,0 +1,22 @@
+# Build settings
+source: source
+destination: _site
+exclude:
+  - sass
+
+# Site settings
+title: neurotischism
+description: "this is a description"
+
+domain: neurotischism.com
+url: "http://neurotischism.com"
+author: elliot hatch
+email: elliot.hatch@gmail.com
+twitter: neurotischism
+github: elliothatch
+
+permalink: /:categories/:title
+
+# Build settings
+#markdown: kramdown
+#permalink: pretty

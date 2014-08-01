@@ -1,0 +1,180 @@
+/* main.scss */
+
+@import 'reset';
+
+$primaryTextColor: white;
+$darkTextColor: black;
+$primaryBackgroundColor: black;
+
+/* Base */
+/* ----------------------------------------------------------*/
+
+html, body { height: 100%; overflow-x: hidden; }
+
+  a, p, h1, h2, h3, h4, h5, h6, form, label, li, time {
+    color: $primaryTextColor;
+    background-color: $primaryBackgroundColor;
+    font-family:"Courier New", Courier, monospace;
+    overflow-x: hidden;
+    white-space: nowrap;
+  }
+
+div {
+  font-family:"Courier New", Courier, monospace;
+}
+
+  li {
+    margin-bottom: 20px;
+  }
+
+  input, button, textarea {
+    color: $darkTextColor;
+  }
+
+body {
+  /*
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  font-weight: 300;
+  background-color: #fdfdfd;
+  */
+}
+
+h1 {
+  margin-left:-1000px;
+  margin-right: -1000px;
+  padding-left:1000px;
+  padding-right:1000px;
+  margin-bottom:20px;
+}
+
+/*
+h1, h2, h3, h4, h5, h6 { font-size: 100%; font-weight: 400; }
+*/
+/*
+a         { color: #2a7ae2; text-decoration: none; }
+a:hover   { color: #000; text-decoration: underline; }
+a:visited { color: #205caa; }
+*/
+
+/* Utility */
+
+/*
+.wrap:before,
+.wrap:after { content:""; display:table; }
+.wrap:after { clear: both; }
+.wrap {
+  max-width: 800px;
+  padding: 0 30px;
+  margin: 0 auto;
+  zoom: 1;
+}
+*/
+
+#letterSize {
+    font-family:"Courier New", Courier, monospace;
+    position: absolute;
+      visibility: hidden;
+      height: auto;
+      width: auto;
+  }
+
+  #foreground-wrapper {
+    position: absolute;
+    left: 0; top: 0;
+    width: 100%;
+  }
+
+  #bodyParagraph
+  {
+    position:absolute;
+    left: 0px;
+    /*margin: 0px 1000px 0px -100px;*/
+    width: 105%;
+  }
+
+  #gamePostBody
+  {
+    margin: 100px 100px 100px 100px;
+    position: relative;
+  }
+
+#pageTitle
+{
+  position: relative;
+}
+
+#pageTitle a {
+  color: inherit;
+  background-color: transparent;
+}
+
+#backButton
+{
+  background-color: transparent;
+  position: absolute;
+  right: 0px;
+  top: 0px;
+  margin: 0px 0px 0px 0px;
+  padding: 0px 0px 0px 0px;
+}
+  .trashLink {
+
+    /*padding: -100px, 0px, 0px, -100px;*/
+    /*position: absolute;*/
+    /*margin: 0px 1000px 0px -100px;*/
+    left: -100px;
+    white-space: nowrap;
+    width: 100%;
+    overflow: hidden;
+  }
+
+
+/* Layout Styles */
+/* ----------------------------------------------------------*/
+
+/* Site header */
+
+.site-header {
+  /*
+  border-top: 5px solid #333;
+  border-bottom: 1px solid #e8e8e8;
+  min-height: 56px;
+  background-color: white;*/
+}
+
+#site-title,
+#site-title:hover,
+#site-title:visited {
+  background-color: transparent;
+  font-family: "Times New Roman", Times, serif;
+  font-size: 64pt;
+  font-weight: bold;
+  text-shadow: -15px 0 white, 0 15px white, 15px 0 white, 0 -15px white;
+  padding: 80px 80px 20px 80px;
+  display: block;
+
+  /*display: block;
+  color: #333;
+  font-size: 26px;
+  letter-spacing: -1px;
+  float: left;
+  line-height: 56px;
+  position: relative;
+  z-index: 1;*/
+  text-decoration: none;
+}
+
+#background_canvas
+{
+  position: absolute;
+  left: 0; top: 0;
+}
+#foreground_canvas
+{
+  position: absolute;
+  left: 0; top: 0;
+  z-index: 999;
+  pointer-events: none;
+}

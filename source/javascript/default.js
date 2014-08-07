@@ -33,6 +33,11 @@ var canvas2 = document.getElementById("foreground_canvas");
 
 	var h1Hue = 0;
 
+	var corruptZoneObj = null;
+	var isCorruptZoneHovered = false;
+	var corruptZoneText;
+	var corruptZoneOriginalText;
+
 	var scrollMaxDelay = 30 * 2;
 
 	mainContext.fillStyle="#000000";
@@ -44,6 +49,7 @@ var canvas2 = document.getElementById("foreground_canvas");
 	window.setInterval(function(){updateScrollLinks();}, 1000/40);
 	window.setInterval(function(){updateH1Colors();}, 1000/10);
 	window.setInterval(function(){updateH1HoverColoring();}, 1000/30);
+	window.setInterval(function(){updateCorruptZone();}, 1000/30);
 
 	//add the mouse events to all links
 	var linkElements = document.getElementsByTagName('a');
@@ -59,6 +65,13 @@ var canvas2 = document.getElementById("foreground_canvas");
 			continue;
 		h1Elements[i].onmouseover = function() {startH1Coloring(this);};
 	    h1Elements[i].onmouseout = function() {stopH1Coloring();};
+	}
+
+	var corruptZoneElements = document.getElementsByClassName('corruptZone');
+	for(i = 0; i < corruptZoneElements.length; i++)
+	{
+		corruptZoneElements[i].onmouseenter = function() {startCorruptZone(this);};
+		corruptZoneElements[i].onmouseleave = function()  {stopCorruptZone();};
 	}
 
 	updateTrashLinkLineCharacters();
@@ -333,10 +346,55 @@ var canvas2 = document.getElementById("foreground_canvas");
 
 	function updateLinkLetterSpacing()
 	{
-		if(isLinkHovered && hoveredLink.className != "scrollLink")
+		if(isLinkHovered && hoveredLink.className != "scrollLink" && hoveredLink.id != "site-title")
 		{
 			linkLetterSpacing += 2;
 			hoveredLink.style.letterSpacing = linkLetterSpacing + "px";
+		}
+	}
+
+	function startCorruptZone(obj)
+	{
+		isCorruptZoneHovered = true;
+		corruptZoneObj = obj;
+
+		corruptZoneOriginalText = [];
+		var children = obj.children;
+		for(var i = 0; i < children.length; i++)
+		{
+			corruptZoneOriginalText.push(children[i].innerHTML);
+		}
+		corruptZoneText = corruptZoneOriginalText.slice(0);
+	}
+
+	function stopCorruptZone()
+	{
+		isCorruptZoneHovered = false;
+		var children = corruptZoneObj.children;
+		for(var i = 0; i < children.length; i++)
+		{
+			children[i].innerHTML = corruptZoneOriginalText[i];
+		}
+	}
+
+	function updateCorruptZone()
+	{
+		if(isCorruptZoneHovered)
+		{
+			var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^*_=+,./~`";
+			var children = corruptZoneObj.children;
+			var randomChild = Math.floor(Math.random() * children.length);
+			var newString = "";
+			var randomCharIndex = Math.floor(corruptZoneText[randomChild].length * Math.random());
+			for(var i = 0; i < corruptZoneText[randomChild].length; i++)
+			{
+				if(i != randomCharIndex)
+					{newString += corruptZoneText[randomChild].charAt(i);}
+				else
+					{newString += possible.charAt(Math.floor(Math.random() * possible.length));}
+			}
+			corruptZoneText[randomChild] = newString;
+			children[randomChild].innerHTML = newString;
 		}
 	}
 

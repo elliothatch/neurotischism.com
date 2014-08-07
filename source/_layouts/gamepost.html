@@ -1,25 +1,11 @@
 ---
-layout: default
+layout: post
 ---
 
-<div id="gamePostBody">
-
-  <div id="pageTitle">
-    <h1>{% if page.title %}{{ page.title }}{% endif %}</h1>
-    <h1 id="backButton"><a href="/games/">back</a></h1>
-  </div>
-
-  <div id="pageDescription">
-    {% if page.description %}<p>{{ page.description }}</p>{% endif %}
-  </div>
-
   {% for platform in page.platforms %}
-    <a href="{{ platform.url }}">
-      {% if platform.platformtype == 'browser' %}play online ({{ platform.platform }}){% elsif  platform.platformtype == 'download' %}download for {{ platform.platform }}{% endif %}</a><br>
+    <p><a href="{{ platform.url }}">
+      {% if platform.platformtype == 'browser' %}play online ({{ platform.platform }}){% elsif  platform.platformtype == 'download' %}download for {{ platform.platform }}{% endif %}</a></p>
     {% endfor %}
-  {% if page.sourceurl %}<a href="{% if page.sourceurl contains 'games_data' %}{{ site.url }}{% endif %}{{ page.sourceurl }}">{% if page.sourceurl contains 'github' %}view source (github){% else %}download source{% endif %}</a>{% endif %}
-
+  {% for thesource in page.sourceurl %}<p><a href="{{ thesource }}">{% if thesource contains 'github' %}view source (github){% else %}download source{% endif %}</a></p>{% endfor %}
+  
   {{ content }}
-  {% include comments.html %}
-
-</div>

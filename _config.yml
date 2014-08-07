@@ -3,6 +3,9 @@ source: source
 destination: _site
 exclude:
   - sass
+excerpt_separator: "
+
+"
 
 # Site settings
 title: neurotischism
@@ -11,11 +14,11 @@ description: "this is a description"
 domain: neurotischism.com
 url: "http://neurotischism.com"
 author: elliot hatch
-email: elliot.hatch@gmail.com
+email: elliot@neurotischism.com
 twitter: neurotischism
 github: elliothatch
 
-permalink: /:categories/:title
+permalink: /:categories/:title/
 
 # Build settings
 #markdown: kramdown

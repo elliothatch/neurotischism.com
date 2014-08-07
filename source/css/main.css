@@ -373,6 +373,14 @@ th {
 
 /* Base */
 /* ----------------------------------------------------------*/
+*, *:before, *:after {
+  /* Chrome 9-, Safari 5-, iOS 4.2-, Android 3-, Blackberry 7- */
+  -webkit-box-sizing: border-box;
+  /* Firefox (desktop or Android) 28- */
+  -moz-box-sizing: border-box;
+  /* Firefox 29+, IE 8+, Chrome 10+, Safari 5.1+, Opera 9.5+, iOS 5+, Opera Mini Anything, Blackberry 10+, Android 4+ */
+  box-sizing: border-box; }
+
 html, body {
   height: 100%;
   overflow-x: hidden; }
@@ -381,17 +389,39 @@ a, p, h1, h2, h3, h4, h5, h6, form, label, li, time {
   color: white;
   background-color: black;
   font-family: "Courier New", Courier, monospace;
-  overflow-x: hidden;
+  overflow-x: hidden; }
+
+a {
   white-space: nowrap; }
 
 div {
   font-family: "Courier New", Courier, monospace; }
 
+label {
+  display: inline-block;
+  float: left;
+  clear: left;
+  width: 80px;
+  text-align: right; }
+
+input, button, textarea {
+  display: inline-block;
+  float: left;
+  color: black; }
+
+button {
+  clear: left;
+  margin-left: 80px; }
+
+code {
+  background-color: #dddddd;
+  color: black; }
+
 li {
   margin-bottom: 20px; }
 
-input, button, textarea {
-  color: black; }
+article {
+  background-color: black; }
 
 body {
   /*
@@ -407,7 +437,12 @@ h1 {
   margin-right: -1000px;
   padding-left: 1000px;
   padding-right: 1000px;
-  margin-bottom: 20px; }
+  margin-bottom: 20px;
+  /*	a {
+  		color: inherit;
+  		background-color: inherit;
+  	}
+  */ }
 
 /*
 h1, h2, h3, h4, h5, h6 { font-size: 100%; font-weight: 400; }
@@ -429,6 +464,56 @@ a:visited { color: #205caa; }
   zoom: 1;
 }
 */
+.pageContent {
+  position: relative; }
+
+.pageBody {
+  max-width: 850px;
+  min-width: 320px;
+  margin: 0 40px 0 40px; }
+
+/*@media all and (min-width: 320px + 40px + 40px) {
+  .pageBody {
+    margin: 0 40px 0 40px;
+  }
+}*/
+.pageTitle {
+  position: relative; }
+  .pageTitle a {
+    color: inherit;
+    background-color: transparent; }
+
+.formInfo {
+  float: left;
+  margin-left: 40px; }
+
+.postBody {
+  background-color: black; }
+
+#backButton {
+  background-color: transparent;
+  position: absolute;
+  right: 0px;
+  top: 0px;
+  margin: 0px 0px 0px 0px;
+  padding: 0px 0px 0px 0px; }
+
+.postsList {
+  position: absolute;
+  left: 0;
+  right: 0;
+  margin-left: 0px;
+  margin-right: 0px;
+  padding-left: 0px;
+  padding-right: 0px; }
+  .postsList li {
+    margin-left: 0px;
+    margin-bottom: 0px; }
+
+.postTags {
+  color: white;
+  background-color: black; }
+
 #letterSize {
   font-family: "Courier New", Courier, monospace;
   position: absolute;
@@ -451,21 +536,6 @@ a:visited { color: #205caa; }
 #gamePostBody {
   margin: 100px 100px 100px 100px;
   position: relative; }
-
-#pageTitle {
-  position: relative; }
-
-#pageTitle a {
-  color: inherit;
-  background-color: transparent; }
-
-#backButton {
-  background-color: transparent;
-  position: absolute;
-  right: 0px;
-  top: 0px;
-  margin: 0px 0px 0px 0px;
-  padding: 0px 0px 0px 0px; }
 
 .trashLink {
   /*padding: -100px, 0px, 0px, -100px;*/
@@ -507,7 +577,7 @@ a:visited { color: #205caa; }
   text-decoration: none; }
 
 #background_canvas {
-  position: absolute;
+  position: fixed;
   left: 0;
   top: 0; }
 
@@ -517,3 +587,11 @@ a:visited { color: #205caa; }
   top: 0;
   z-index: 999;
   pointer-events: none; }
+
+.flashGamePage {
+  background-color: black;
+  text-align: center; }
+
+.flashGameTitle {
+  color: white;
+  background-color: transparent; }

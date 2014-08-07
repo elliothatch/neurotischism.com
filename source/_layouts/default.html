@@ -1,23 +1,14 @@
-<!DOCTYPE html>
-<html>
+---
+layout: bare
+---
+{% assign urlArray = page.url | remove:"index.html" | split:"/" %}
+{% capture backURL %}{% for urlSegment in urlArray %}{% if forloop.last == false %}{{ urlSegment }}/{% endif %}{% endfor %}{% endcapture %}
 
-  {% include head.html %}
+<div class="pageBody">
+  <div class="pageTitle">
+    <h1>{% if page.title %}{{ page.title }}{% endif %}</h1><h1 id="backButton"><a href="{{ backURL }}">back</a></h1>
+  </div>
 
-    <body>
-    <canvas id="background_canvas"></canvas>
-    <canvas id="foreground_canvas"></canvas>
-    <div id="letterSize">a</div>
-    <div id="foreground-wrapper">
-      {% include header.html %}
+{{ content }}
 
-      <div class="page-content">
-        <div class="wrap">
-        {{ content }}
-        </div>
-      </div>
-
-      {% include footer.html %}
-    </div>
-    <script src="/javascript/default.js"></script>
-    </body>
-</html>
+</div>

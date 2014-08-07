@@ -1,15 +1,10 @@
 ---
 layout: default
 title: games
-description: my games
 ---
 
-
-<div id="bodyParagraph">
-<div id="gamesList">
+<ul class="postsList">
 {% for post in site.categories['games'] %}
-	<a class="scrollLink" href="{{ post.url }}">{{ post.title }}</a><br>
+	<li><a class="scrollLink" href="{{ post.url }}">{{ post.title }}</a></li>
 {% endfor %}
-</div>
-</div>
-<!--<p><a href="{{ site.url }}/games/cellphone.html">cellphone</a></p>-->
+</ul>

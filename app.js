@@ -1,8 +1,10 @@
 var exec = require('child_process').exec;
+var compress = require('compression');
 var express = require('express');
 var bodyParser = require('body-parser');
 var fs = require('fs');
 var app = express();
+app.use(compress());
 app.use(express.static(__dirname + "/_site"));
 
 app.listen(8080);

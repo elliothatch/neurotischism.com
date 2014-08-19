@@ -3,6 +3,8 @@ source: source
 destination: _site
 exclude:
   - sass
+  - javascript-pretty
+  - css-pretty
 excerpt_separator: "
 
 "

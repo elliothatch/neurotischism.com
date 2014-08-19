@@ -1,3 +1,5 @@
 .sass-cache/
 *.log
 _site
+source/_data/comments
+

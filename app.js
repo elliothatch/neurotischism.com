@@ -49,5 +49,4 @@ function sendMail(sender, recipient, subject, body)
 							body +
 							'\n</body></html>\n." | sendmail -t';
 	exec(mailCommand);
-	console.log(mailCommand);
 }

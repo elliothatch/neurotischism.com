@@ -27,7 +27,7 @@ $commentLabelWidth: 80px;
 
 html, body { height: 100%; overflow-x: hidden; }
 
-  a, p, h1, h2, h3, h4, h5, h6, form, label, li, time {
+  a, p, h1, h2, h3, h4, h5, h6, form, label, li, time, section {
     color: $primaryTextColor;
     background-color: $primaryBackgroundColor;
     font-family:"Courier New", Courier, monospace;
@@ -62,6 +62,11 @@ button {
   margin-left: $commentLabelWidth; 
 }
 
+section {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
 code {
   background-color: $lightBackgroundColor;
   color: $darkTextColor;
@@ -94,11 +99,28 @@ h1 {
   padding-right:1000px;
   margin-bottom:20px;
 
-/*	a {
+	a {
 		color: inherit;
 		background-color: inherit;
 	}
-*/
+}
+
+h2 {
+  color: black;
+  background-color: white;
+   a {
+    color: inherit;
+    background-color: inherit;
+  }
+}
+
+h3 {
+  color: white;
+  background-color: #EA2E49;
+  a {
+    color: inherit;
+    background-color: inherit;
+  }
 }
 
 /*
@@ -200,7 +222,7 @@ a:visited { color: #205caa; }
       width: auto;
   }
 
-  #foreground-wrapper {
+  #foregroundWrapper {
     position: absolute;
     left: 0; top: 0;
     width: 100%;
@@ -237,7 +259,7 @@ a:visited { color: #205caa; }
 
 /* Site header */
 
-.site-header {
+.siteHeader {
   /*
   border-top: 5px solid #333;
   border-bottom: 1px solid #e8e8e8;
@@ -245,9 +267,10 @@ a:visited { color: #205caa; }
   background-color: white;*/
 }
 
-#site-title,
-#site-title:hover,
-#site-title:visited {
+#siteTitle,
+#siteTitle:hover,
+#siteTitle:visited {
+  color: $darkTextColor;
   background-color: transparent;
   font-family: "Times New Roman", Times, serif;
   font-size: 64pt;
@@ -267,12 +290,12 @@ a:visited { color: #205caa; }
   text-decoration: none;
 }
 
-#background_canvas
+#backgroundCanvas
 {
   position: fixed;
   left: 0; top: 0;
 }
-#foreground_canvas
+#foregroundCanvas
 {
   position: absolute;
   left: 0; top: 0;
@@ -291,4 +314,10 @@ a:visited { color: #205caa; }
 .flashGameTitle {
   color: white;
   background-color: transparent;
+}
+
+.tagList {
+  padding-left: 0em;
+  margin-left: 2.5em;
+  background-color: $primaryBackgroundColor;
 }

@@ -385,7 +385,7 @@ html, body {
   height: 100%;
   overflow-x: hidden; }
 
-a, p, h1, h2, h3, h4, h5, h6, form, label, li, time {
+a, p, h1, h2, h3, h4, h5, h6, form, label, li, time, section {
   color: white;
   background-color: black;
   font-family: "Courier New", Courier, monospace;
@@ -413,6 +413,10 @@ button {
   clear: left;
   margin-left: 80px; }
 
+section {
+  margin-top: 10px;
+  margin-bottom: 10px; }
+
 code {
   background-color: #dddddd;
   color: black; }
@@ -437,12 +441,24 @@ h1 {
   margin-right: -1000px;
   padding-left: 1000px;
   padding-right: 1000px;
-  margin-bottom: 20px;
-  /*	a {
-  		color: inherit;
-  		background-color: inherit;
-  	}
-  */ }
+  margin-bottom: 20px; }
+  h1 a {
+    color: inherit;
+    background-color: inherit; }
+
+h2 {
+  color: black;
+  background-color: white; }
+  h2 a {
+    color: inherit;
+    background-color: inherit; }
+
+h3 {
+  color: white;
+  background-color: #EA2E49; }
+  h3 a {
+    color: inherit;
+    background-color: inherit; }
 
 /*
 h1, h2, h3, h4, h5, h6 { font-size: 100%; font-weight: 400; }
@@ -521,7 +537,7 @@ a:visited { color: #205caa; }
   height: auto;
   width: auto; }
 
-#foreground-wrapper {
+#foregroundWrapper {
   position: absolute;
   left: 0;
   top: 0;
@@ -549,16 +565,17 @@ a:visited { color: #205caa; }
 /* Layout Styles */
 /* ----------------------------------------------------------*/
 /* Site header */
-.site-header {
+.siteHeader {
   /*
   border-top: 5px solid #333;
   border-bottom: 1px solid #e8e8e8;
   min-height: 56px;
   background-color: white;*/ }
 
-#site-title,
-#site-title:hover,
-#site-title:visited {
+#siteTitle,
+#siteTitle:hover,
+#siteTitle:visited {
+  color: black;
   background-color: transparent;
   font-family: "Times New Roman", Times, serif;
   font-size: 64pt;
@@ -576,12 +593,12 @@ a:visited { color: #205caa; }
   z-index: 1;*/
   text-decoration: none; }
 
-#background_canvas {
+#backgroundCanvas {
   position: fixed;
   left: 0;
   top: 0; }
 
-#foreground_canvas {
+#foregroundCanvas {
   position: absolute;
   left: 0;
   top: 0;
@@ -595,3 +612,8 @@ a:visited { color: #205caa; }
 .flashGameTitle {
   color: white;
   background-color: transparent; }
+
+.tagList {
+  padding-left: 0em;
+  margin-left: 2.5em;
+  background-color: black; }

@@ -3,7 +3,7 @@
 <ul>
 {% for entry in site.data.comments[commentsID] %}
 {% assign displayedDatetime = entry.datetime | date: "%A %B %-d, %Y at %-I:%M %p" | downcase %}
-	<li><h3>{{ entry.author }}{% if entry.isowner %}*{% endif %}:</h3>
+	<li><h3{% if entry.isowner %} class="commentAuthorOwner" title="verified author"{% endif %}>{{ entry.author }}:</h3>
 	    <p class="comment-message">{{ entry.message }}</p>
 	    <time title="{{ entry.datetime }}" datetime="{{ entry.datetime }}">{{ displayedDatetime }}</time></li>
 {% endfor %}

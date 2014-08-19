@@ -1,24 +1,23 @@
-var canvas1 = document.getElementById("background_canvas");
-	var mainContext = canvas1.getContext("2d");
+var canvas1 = document.getElementById("backgroundCanvas");
+	var backgroundContext = canvas1.getContext("2d");
 	var mainWidth = document.body.clientWidth;
 	var mainHeight = document.body.clientHeight;
 	canvas1.width = mainWidth;
 	canvas1.height = mainHeight;
 
-var canvas2 = document.getElementById("foreground_canvas");
+var canvas2 = document.getElementById("foregroundCanvas");
 	var foregroundContext = canvas2.getContext("2d");
 	var mainWidth = document.body.clientWidth;
 	var mainHeight = document.body.clientHeight;
 	canvas2.width = mainWidth;
 	canvas2.height = mainHeight;
 
-	var y1 = 320;
-	var lineR = 0;
-	var lineG = 0;
-	var lineB = 0;
+	var backgroundY1 = 320;
+	var backgroundR = 0;
+	var backgroundG = 0;
+	var backgroundB = 0;
 
-
-	var titleDiv = document.getElementById("site-title");
+	var titleDiv = document.getElementById("siteTitle");
 	var titleR = 0;
 	var titleG = 0;
 	var titleB = 0;
@@ -40,16 +39,23 @@ var canvas2 = document.getElementById("foreground_canvas");
 
 	var scrollMaxDelay = 30 * 2;
 
-	mainContext.fillStyle="#000000";
-	mainContext.fillRect(0,0,mainWidth,mainHeight);
-	window.setInterval(function(){y1 += 2; y1 = y1 % mainHeight; animateGeo();},1000/60);
+	var commentAuthorOwnerElements = document.getElementsByClassName('commentAuthorOwner');
+	var commentAuthorOwnerCycleSpeed = 1;
+	var commentAuthorOwnerColorStep = 0.05;
+	var commentAuthorOwnerHue = 0.0;
+
+	backgroundContext.fillStyle="#000000";
+	backgroundContext.fillRect(0,0,mainWidth,mainHeight);
+	window.onresize = onWindowResized;
+	window.setInterval(function(){backgroundY1 += 2; backgroundY1 = backgroundY1 % mainHeight; animateBackground();},1000/60);
 	window.setInterval(function(){changeTitleColor();},1000/30);
 	window.setInterval(function(){updateLinkLetterSpacing();},1000/30);
 	window.setInterval(function(){updateRandomCharacters();}, 1000/30);
 	window.setInterval(function(){updateScrollLinks();}, 1000/40);
-	window.setInterval(function(){updateH1Colors();}, 1000/10);
+	window.setInterval(function(){updateH1Colors();}, 1000/8);
 	window.setInterval(function(){updateH1HoverColoring();}, 1000/30);
 	window.setInterval(function(){updateCorruptZone();}, 1000/30);
+	window.setInterval(function(){updateCommentAuthorOwner();}, 1000/10);
 
 	//add the mouse events to all links
 	var linkElements = document.getElementsByTagName('a');
@@ -74,9 +80,62 @@ var canvas2 = document.getElementById("foreground_canvas");
 		corruptZoneElements[i].onmouseleave = function()  {stopCorruptZone();};
 	}
 
+	initCommentAuthorOwner();
 	updateTrashLinkLineCharacters();
+	updateTrashLinkLineCharacters(); //do it twice
 	initializeScrollLinks();
 	formInit();
+
+
+	function onWindowResized()
+	{
+		//resize canvas
+		mainWidth = document.body.clientWidth;
+		mainHeight = document.body.clientHeight;
+		canvas1.width = mainWidth;
+		canvas1.height = mainHeight;
+		canvas2.width = mainWidth;
+		canvas2.height = mainHeight;
+		//resize trash links
+		updateTrashLinkLineCharacters();
+		//resize scrollLinks (destructive :) )
+		initializeScrollLinks();
+	}
+
+	function initCommentAuthorOwner() 
+	{
+		for(var i = 0; i < commentAuthorOwnerElements.length; i++)
+		{
+			var message = commentAuthorOwnerElements[i].innerHTML;
+			var newMessage = "";
+			for (var j = 0; j < message.length; j++)
+			{
+				var color = HSVtoRGB(commentAuthorOwnerHue, 1.0, 1.0);
+				newMessage += "<span style=\"color:" + rgbToHex(color.r, color.g, color.b) + ";\">" + message[j] + "</span>"
+				commentAuthorOwnerHue = commentAuthorOwnerHue + commentAuthorOwnerColorStep;
+				if(commentAuthorOwnerHue > 1.0)
+					{commentAuthorOwnerHue -= 1.0;}
+			}
+			commentAuthorOwnerElements[i].innerHTML = newMessage;
+		}
+	}
+
+	function updateCommentAuthorOwner()
+	{
+		for(var i = 0; i < commentAuthorOwnerElements.length; i++)
+		{
+			var children = commentAuthorOwnerElements[i].children;
+			for(var j = 0; j < children.length - 1; j++)
+			{
+				children[j].style.color = children[j+1].style.color;
+			}
+			var color = HSVtoRGB(commentAuthorOwnerHue, 1.0, 1.0);
+			children[children.length - 1].style.color = rgbToHex(color.r, color.g, color.b);
+			commentAuthorOwnerHue = commentAuthorOwnerHue + commentAuthorOwnerColorStep;
+				if(commentAuthorOwnerHue > 1.0)
+					{commentAuthorOwnerHue -= 1.0;}
+		}
+	}
 
 	function formInit()
 	{
@@ -118,7 +177,7 @@ var canvas2 = document.getElementById("foreground_canvas");
 				foregroundContext.beginPath();
 				foregroundContext.moveTo(xPos, hoveredH1Rect.top + window.pageYOffset);
 				foregroundContext.lineTo(xPos, hoveredH1Rect.bottom + window.pageYOffset);
-				foregroundContext.strokeStyle=rgbToHex(lineR, lineG, lineB);
+				foregroundContext.strokeStyle=rgbToHex(backgroundR, backgroundG, backgroundB);
 				foregroundContext.lineWidth = Math.random() * 20;
 				foregroundContext.stroke();
 			}
@@ -346,7 +405,7 @@ var canvas2 = document.getElementById("foreground_canvas");
 
 	function updateLinkLetterSpacing()
 	{
-		if(isLinkHovered && hoveredLink.className != "scrollLink" && hoveredLink.id != "site-title")
+		if(isLinkHovered && hoveredLink.className != "scrollLink" && hoveredLink.id != "siteTitle")
 		{
 			linkLetterSpacing += 2;
 			hoveredLink.style.letterSpacing = linkLetterSpacing + "px";
@@ -398,27 +457,27 @@ var canvas2 = document.getElementById("foreground_canvas");
 		}
 	}
 
-	function animateGeo()
+	function animateBackground()
 	{
 
-			lineR += Math.floor((Math.random() - 0.5) * 50);
-			lineG += Math.floor((Math.random() - 0.5) * 50);
-			lineB += Math.floor((Math.random() - 0.5) * 50);
+			backgroundR += Math.floor((Math.random() - 0.5) * 50);
+			backgroundG += Math.floor((Math.random() - 0.5) * 50);
+			backgroundB += Math.floor((Math.random() - 0.5) * 50);
 
-			lineR = Math.max(0, lineR);
-			lineG = Math.max(0, lineG);
-			lineB = Math.max(0, lineB);
-			lineR = Math.min(255, lineR);
-			lineG = Math.min(255, lineG);
-			lineB = Math.min(255, lineB);
+			backgroundR = Math.max(0, backgroundR);
+			backgroundG = Math.max(0, backgroundG);
+			backgroundB = Math.max(0, backgroundB);
+			backgroundR = Math.min(255, backgroundR);
+			backgroundG = Math.min(255, backgroundG);
+			backgroundB = Math.min(255, backgroundB);
 
 			for(var i = 0; i < 5; i++)
 			{
-					mainContext.beginPath();
-					mainContext.moveTo(0, (y1 * i) % mainHeight);
-					mainContext.lineTo(mainWidth, (y1 * i) % mainHeight);
-					mainContext.strokeStyle=rgbToHex(lineR,lineG,lineB);
-					mainContext.stroke();
+					backgroundContext.beginPath();
+					backgroundContext.moveTo(0, (backgroundY1 * i) % mainHeight);
+					backgroundContext.lineTo(mainWidth, (backgroundY1 * i) % mainHeight);
+					backgroundContext.strokeStyle=rgbToHex(backgroundR,backgroundG,backgroundB);
+					backgroundContext.stroke();
 			}
 	}
 

@@ -115,6 +115,17 @@ h2 {
 }
 
 h3 {
+  color: $primaryTextColor;
+  background-color: $primaryBackgroundColor;
+   a {
+
+    color: inherit;
+    background-color: inherit;
+  }
+}
+
+
+h4 {
   color: white;
   background-color: #EA2E49;
   a {

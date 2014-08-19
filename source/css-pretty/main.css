@@ -455,8 +455,15 @@ h2 {
 
 h3 {
   color: white;
-  background-color: #EA2E49; }
+  background-color: black; }
   h3 a {
+    color: inherit;
+    background-color: inherit; }
+
+h4 {
+  color: white;
+  background-color: #EA2E49; }
+  h4 a {
     color: inherit;
     background-color: inherit; }
 

@@ -96,6 +96,7 @@ var canvas2 = document.getElementById("foregroundCanvas");
 		canvas1.height = mainHeight;
 		canvas2.width = mainWidth;
 		canvas2.height = mainHeight;
+		backgroundContext.fillRect(0,0,mainWidth,mainHeight);
 		//resize trash links
 		updateTrashLinkLineCharacters();
 		//resize scrollLinks (destructive :) )

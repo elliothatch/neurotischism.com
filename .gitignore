@@ -2,4 +2,4 @@
 *.log
 _site
 source/_data/comments
-
+captchaPrivateKey.txt

@@ -13,6 +13,7 @@
 	<div><label for="form-author">name</label><input id="form-author" type="text" name="author" required></div>
 	<div><label for="form-email">email</label><input id="form-email" type="text" name="email" required><span class="formInfo">your email will not be published or shared</span></div>
 	<div><label for="form-message">comment</label><textarea id="form-message" type="text" name="message" required></textarea></div>
+	<div><label for="recaptcha">captcha</label><div id="recaptcha"></div></div>
 	<input type="hidden" name="pageID" value="{{ commentsID }}">
 	<button class="form-submit-button" type="submit" name="submitButton" value="Submit">post comment</button></div>
 </form>

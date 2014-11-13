@@ -44,6 +44,8 @@ var canvas2 = document.getElementById("foregroundCanvas");
 	var commentAuthorOwnerColorStep = 0.05;
 	var commentAuthorOwnerHue = 0.0;
 
+	var recaptchaDisplayed = false;
+
 	backgroundContext.fillStyle="#000000";
 	backgroundContext.fillRect(0,0,mainWidth,mainHeight);
 	window.onresize = onWindowResized;
@@ -144,6 +146,26 @@ var canvas2 = document.getElementById("foregroundCanvas");
 		for(var i = 0; i < forms.length; i++)
 		{
 			forms[i].onsubmit = onFormSubmit;
+		}
+		var formMessage = document.getElementById("form-message");
+		if(formMessage)
+		{
+			formMessage.onfocus = function() {recaptchaInit(); };
+		}
+	}
+
+	function recaptchaInit()
+	{
+		if(!recaptchaDisplayed)
+		{
+
+			Recaptcha.create("6Lfzn_0SAAAAAAo6e0aKRbE_T5Os8EKrzhRBxDTc",
+					 "recaptcha",
+					 {
+					   theme: "clean",
+					 }
+					);
+			recaptchaDisplayed = true;
 		}
 	}
 

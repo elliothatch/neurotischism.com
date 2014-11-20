@@ -8,6 +8,7 @@ features
 -------
 ### static comments with jekyll
 nodejs receives POST requests and adds the comment info to jekyll's _data/ directory. then it runs the custom build script.  
+spam is filtered by using the recaptcha system hosted by google
 ive also set it up to email me whenever anyone leaves a comment
 
 ### tags with jekyll

@@ -42,6 +42,10 @@ div {
   font-family:"Courier New", Courier, monospace;
 }
 
+span {
+  font-family:"Courier New", Courier, monospace;
+}
+
 
 label {
   display: inline-block;
@@ -335,3 +339,21 @@ a:visited { color: #205caa; }
   margin-left: 2.5em;
   background-color: $primaryBackgroundColor;
 }
+
+.count-container {
+  color: $primaryTextColor;
+  background-color: $primaryBackgroundColor;
+}
+
+.count-stopwatch {
+  color: $primaryTextColor;
+  background-color: $primaryBackgroundColor;
+  font-size: 24pt;
+  margin-top: 2em;
+  margin-bottom: 2em;
+}
+
+.count-value {
+  width: 3em;
+}
+

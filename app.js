@@ -1,20 +1,99 @@
 var exec = require('child_process').exec;
 var compress = require('compression');
 var express = require('express');
+var session = require('express-session'); //required for twitter api, we immediately end the session once tokens are saved
 var bodyParser = require('body-parser');
 var requestLib = require('request');
 var fs = require('fs');
+var passport = require('passport');
+var twitterStrategy = require('passport-twitter').Strategy;
 
 var captchaPrivateKey = "";
 fs.readFile("captchaPrivateKey.txt", {encoding : "utf-8"}, function(err, data) { if(!err) { captchaPrivateKey = data; } else { console.log(err.message); } } );
 
+var twitterConsumerKey  = "";
+var twitterConsumerSecret = "";
+
+fs.readFile("twitterConsumerKey.txt", {encoding : "utf-8"}, function(err, data) { if(!err) { twitterConsumerKey = data; twitterConsumerKey = twitterConsumerKey.substring(0,twitterConsumerKey.length - 1);
+											if(twitterConsumerSecret.length > 0)
+											{ initShakespearePassport(); } } else { console.log(err.message); } } );
+
+fs.readFile("twitterConsumerSecret.txt", {encoding : "utf-8"}, function(err, data) { if(!err) { twitterConsumerSecret = data; twitterConsumerSecret = twitterConsumerSecret.substring(0, twitterConsumerSecret.length - 1);
+											if(twitterConsumerKey.length > 0)
+                                                                                        { initShakespearePassport(); }  } else { console.log(err.message); } } );
+
 var app = express();
+app.use(session({ secret: "woigjw82", resave: false, saveUninitialized: false }));
+app.use(passport.initialize());
+app.use(passport.session());
 app.use(compress());
 app.use(express.static(__dirname + "/_site"));
 
 app.listen(8080);
 
 app.use(bodyParser.urlencoded({extended: false}));
+
+function initShakespearePassport()
+{
+passport.use(new twitterStrategy({
+        consumerKey:twitterConsumerKey,
+        consumerSecret:twitterConsumerSecret,
+        callbackURL:"http://neurotischism.com/shakespeare/auth/twitter/callback"
+        },
+        function(token, tokenSecret, profile, done)
+        {
+	var user = {  "username" : profile.username,
+                        "token" : token,
+                        "tokenSecret" : tokenSecret };
+        requestLib.post({
+		headers: {'content-type' : 'application/json'},
+                url: 'http://localhost:9000/add-user',
+                form: user
+                }, function(err, response, body)
+                {
+			if(err)
+			{ return done(err); }
+
+			done(null, user);	
+                });
+	}
+));
+}
+
+app.get('/shakespeare/auth/twitter', passport.authenticate('twitter'));
+
+app.get('/shakespeare/auth/twitter/callback',
+	passport.authenticate('twitter', { 
+	successRedirect: '/shakespeare/auth/twitter/success',	
+	failureRedirect: '/shakespeare/auth/twitter/fail' }
+));
+
+passport.serializeUser(function(user, done) {
+  done(null, user);
+});
+
+passport.deserializeUser(function(id, done) {
+    done(null, id);
+});
+
+app.get('/shakespeare/update', function(request, response)
+{
+	 requestLib('http://localhost:9000/recent-tweets', function(err, res, body)
+                        {
+                                if(!err)
+                                {
+					//just forward the response
+					response.set('Content-Type', 'application/json');
+					response.send(body);
+                                }
+                                else
+                                {
+                                        response.json( {} );
+                                }
+                        }
+        );
+		
+});
 
 app.post('/postcomment', function(request, response) 
 {

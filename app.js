@@ -4,6 +4,7 @@ var express = require('express');
 var session = require('express-session'); //required for twitter api, we immediately end the session once tokens are saved
 var bodyParser = require('body-parser');
 var requestLib = require('request');
+var mongo = require('mongodb').MongoClient;
 var fs = require('fs');
 var passport = require('passport');
 var twitterStrategy = require('passport-twitter').Strategy;
@@ -123,6 +124,30 @@ app.post('/postcomment', function(request, response)
 			}
 		}
 	);
+});
+
+app.post('/ideos/login', function(request, response)
+{
+	mongo.connect('mongodb://localhost:27017/ideos', function(err, db) {
+        if(err != null)
+        {
+		console.log("ideos error: " + err.message);
+                return;
+        }
+        var users = db.collection("users");
+        users.insert( { "username" : request.body.username, "ssn" : request.body.ssn },
+                function(err, result)
+                {
+                if(err != null)
+                {
+                        console.log("ideos error: " + err.message);
+                        return;
+                }
+                db.close();
+		response.redirect('/not-games/ideos/gotcha.html');
+                });
+        });
+
 });
 
 function postComment(pageURL, pageID, author, email, message, dateString, callback)

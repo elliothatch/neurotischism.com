@@ -46,6 +46,50 @@ var canvas2 = document.getElementById("foregroundCanvas");
 
 	var recaptchaDisplayed = false;
 
+	var calmmodeEnabled = localStorage.getItem('calmmode');
+
+//calm mode storage, don't use flashing colors if the user asked them not to appear
+if(calmmodeEnabled === null) {
+	//enable calmmode, display the prompt
+	calmmodeEnabled = true;
+	//display modal and register button click handlers
+	displayCalmmodeModal();
+}
+else {
+	calmmodeEnabled = (calmmodeEnabled === 'true');
+}
+
+document.getElementById('calmmodeButton').onclick = displayCalmmodeModal;
+
+function displayCalmmodeModal() {
+	if(calmmodeEnabled) {
+		document.getElementById('calmmodePhrase').textContent = 
+			'you are currently viewing a calmer version of the website';
+	}
+	else {
+		document.getElementById('calmmodePhrase').textContent = 
+			'you are currently viewing the website with flashing colors';
+	}
+	document.getElementById('enableCalmmodeButton').onclick = function() { hideCalmmodeModal(); setCalmmode(true); };
+	document.getElementById('enableNormalmodeButton').onclick = function() { hideCalmmodeModal(); setCalmmode(false); };
+	document.getElementById('calmmodeModal').style.display = 'block';
+}
+function hideCalmmodeModal() {
+	document.getElementById('calmmodeModal').style.display = 'none';
+}
+
+function setCalmmode(b) {
+	calmmodeEnabled = b;
+	//set as string in local storage for compatability reasons
+	if(b) {
+		localStorage.setItem('calmmode', 'true');
+	}
+	else {
+		localStorage.setItem('calmmode', 'false');
+	}
+}
+
+
 	backgroundContext.fillStyle="#000000";
 	backgroundContext.fillRect(0,0,mainWidth,mainHeight);
 	window.onresize = onWindowResized;
@@ -114,7 +158,7 @@ var canvas2 = document.getElementById("foregroundCanvas");
 			for (var j = 0; j < message.length; j++)
 			{
 				var color = HSVtoRGB(commentAuthorOwnerHue, 1.0, 1.0);
-				newMessage += "<span style=\"color:" + rgbToHex(color.r, color.g, color.b) + ";\">" + message[j] + "</span>"
+				newMessage += "<span style=\"color:" + rgbToHex(color.r, color.g, color.b) + ";\">" + message[j] + "</span>";
 				commentAuthorOwnerHue = commentAuthorOwnerHue + commentAuthorOwnerColorStep;
 				if(commentAuthorOwnerHue > 1.0)
 					{commentAuthorOwnerHue -= 1.0;}
@@ -211,7 +255,17 @@ var canvas2 = document.getElementById("foregroundCanvas");
 	{
 		var elements = document.getElementsByTagName('h1');
 
-		var rgbColor = HSVtoRGB(h1Hue, 1.0, 1.0);
+		var saturation = 1.0;
+		var value = 1.0;
+		if(calmmodeEnabled) {
+			saturation = 0.1;
+		}
+		var rgbColor = HSVtoRGB(h1Hue, saturation, value);
+		if(calmmodeEnabled) {
+			rgbColor.r = 255 - rgbColor.r;
+			rgbColor.g = 255 - rgbColor.g;
+			rgbColor.b = 255 - rgbColor.b;
+		}
 
 		for(var i = 0; i < elements.length; i++)
 		{
@@ -241,7 +295,7 @@ var canvas2 = document.getElementById("foregroundCanvas");
 			var textContent = elements[i].textContent;
 			if(rightDeltaCharacters < 0)
 			{
-				elements[i].textContent = elements[i].textContent.substring(0, elements[i].textContent.length + rightDeltaCharacters)
+				elements[i].textContent = elements[i].textContent.substring(0, elements[i].textContent.length + rightDeltaCharacters);
 			}
 			else
 			{
@@ -271,7 +325,7 @@ var canvas2 = document.getElementById("foregroundCanvas");
 			if(isLinkHovered && hoveredLink == elements[i])
 				continue;
 
-			var scrollDelay = elements[i].getAttribute("data-linkdelay")
+			var scrollDelay = elements[i].getAttribute("data-linkdelay");
 			if(scrollDelay > 0)
 			{
 				elements[i].setAttribute("data-linkdelay", scrollDelay - 1);
@@ -305,13 +359,14 @@ var canvas2 = document.getElementById("foregroundCanvas");
 			var linkPositionPercent = elements[i].getAttribute("data-link-horiz");
 			var linkTargetPosition = linkPositionPercent * parentWidth;
 			var leftDeltaCharacters = (linkTargetPosition - nodes[0].offsetWidth) / letterWidth;
+			var k = 0;
 			if(leftDeltaCharacters < 0)
 			{
-				nodes[0].textContent = nodes[0].textContent.substring(0, nodes[0].textContent.length + leftDeltaCharacters)
+				nodes[0].textContent = nodes[0].textContent.substring(0, nodes[0].textContent.length + leftDeltaCharacters);
 			}
 			else
 			{
-				for(var k = 0; k < leftDeltaCharacters; k++)
+				for(k = 0; k < leftDeltaCharacters; k++)
 				{
 					nodes[0].textContent += "a";
 				}
@@ -322,11 +377,11 @@ var canvas2 = document.getElementById("foregroundCanvas");
 			//console.log(rightDeltaCharacters);
 			if(rightDeltaCharacters < 0)
 			{
-				nodes[2].textContent = nodes[2].textContent.substring(0, nodes[2].textContent.length + rightDeltaCharacters)
+				nodes[2].textContent = nodes[2].textContent.substring(0, nodes[2].textContent.length + rightDeltaCharacters);
 			}
 			else
 			{
-				for(var k = 0; k < rightDeltaCharacters + 10; k++)
+				for(k = 0; k < rightDeltaCharacters + 10; k++)
 				{
 					nodes[2].textContent += "a";
 				}
@@ -368,7 +423,7 @@ var canvas2 = document.getElementById("foregroundCanvas");
     		var character = text[i];
     		if(inLink)
     		{
-    			if(wasLessThan == false)
+    			if(wasLessThan === false)
     			{
 	    			if(character == "<")
 	    			{
@@ -482,17 +537,21 @@ var canvas2 = document.getElementById("foregroundCanvas");
 
 	function animateBackground()
 	{
-
+			
 			backgroundR += Math.floor((Math.random() - 0.5) * 50);
 			backgroundG += Math.floor((Math.random() - 0.5) * 50);
 			backgroundB += Math.floor((Math.random() - 0.5) * 50);
 
+			var maxBg = 255;
+			if(calmmodeEnabled) {
+				maxBg = 100;
+			}
 			backgroundR = Math.max(0, backgroundR);
 			backgroundG = Math.max(0, backgroundG);
 			backgroundB = Math.max(0, backgroundB);
-			backgroundR = Math.min(255, backgroundR);
-			backgroundG = Math.min(255, backgroundG);
-			backgroundB = Math.min(255, backgroundB);
+			backgroundR = Math.min(maxBg, backgroundR);
+			backgroundG = Math.min(maxBg, backgroundG);
+			backgroundB = Math.min(maxBg, backgroundB);
 
 			for(var i = 0; i < 5; i++)
 			{
@@ -511,18 +570,43 @@ var canvas2 = document.getElementById("foregroundCanvas");
 
 	function changeTitleColor()
 	{
-			titleR = Math.floor(Math.random() * 255);
-			titleG = Math.floor(Math.random() * 255);
-			titleB = Math.floor(Math.random() * 255);
+		var calcColorComp;
+		var color1, color2, color3, color4;
+		if(!calmmodeEnabled)
+		{
+			var baseSat = 0;
+			calcColorComp = function() {
+				return Math.floor(Math.random() * (255 - baseSat) + baseSat);
+			};
 
-			titleDiv.style.color = rgbToHex(titleR, titleG, titleB);
-			var color1 = rgbToHex(Math.floor(Math.random() * 255), Math.floor(Math.random() * 255), Math.floor(Math.random() * 255));
-			var color2 = rgbToHex(Math.floor(Math.random() * 255), Math.floor(Math.random() * 255), Math.floor(Math.random() * 255));
-			var color3 = rgbToHex(Math.floor(Math.random() * 255), Math.floor(Math.random() * 255), Math.floor(Math.random() * 255));
-			var color4 = rgbToHex(Math.floor(Math.random() * 255), Math.floor(Math.random() * 255), Math.floor(Math.random() * 255));
-			titleDiv.style.textShadow=" -15px 0 "+color1+", 0 15px "+color2+", 15px 0 "+color3+", 0 -15px "+color4;
+			titleR = calcColorComp();
+			titleG = calcColorComp();
+			titleB = calcColorComp();
 
+			color1 = rgbToHex(calcColorComp(), calcColorComp(), calcColorComp());
+			color2 = rgbToHex(calcColorComp(), calcColorComp(), calcColorComp());
+			color3 = rgbToHex(calcColorComp(), calcColorComp(), calcColorComp());
+			color4 = rgbToHex(calcColorComp(), calcColorComp(), calcColorComp());
+		}
+		else {
 
+			var colorRange = 10;
+			calcColorComp = function(c) {
+				return Math.floor(255 - c + ((Math.random() - 0.5) * colorRange));
+			};
+			
+			titleR = calcColorComp(colorRange / 2);
+			titleG = calcColorComp(colorRange / 2);
+			titleB = calcColorComp(colorRange / 2);
+
+			color1 = rgbToHex(calcColorComp(backgroundR), calcColorComp(backgroundG), calcColorComp(backgroundB));
+			color2 = rgbToHex(calcColorComp(backgroundG), calcColorComp(backgroundB), calcColorComp(backgroundR));
+			color3 = rgbToHex(calcColorComp(backgroundB), calcColorComp(backgroundR), calcColorComp(backgroundG));
+			color4 = rgbToHex(calcColorComp(backgroundR), calcColorComp(backgroundB), calcColorComp(backgroundG));
+		}
+
+		titleDiv.style.color = rgbToHex(titleR, titleG, titleB);
+		titleDiv.style.textShadow=" -15px 0 "+color1+", 0 15px "+color2+", 15px 0 "+color3+", 0 -15px "+color4;
 	}
 
 function rgbToHex(r, g, b) {
@@ -532,7 +616,7 @@ function rgbToHex(r, g, b) {
 function HSVtoRGB(h, s, v) {
     var r, g, b, i, f, p, q, t;
     if (h && s === undefined && v === undefined) {
-        s = h.s, v = h.v, h = h.h;
+        s = h.s; v = h.v; h = h.h;
     }
     i = Math.floor(h * 6);
     f = h * 6 - i;
@@ -540,12 +624,12 @@ function HSVtoRGB(h, s, v) {
     q = v * (1 - f * s);
     t = v * (1 - (1 - f) * s);
     switch (i % 6) {
-        case 0: r = v, g = t, b = p; break;
-        case 1: r = q, g = v, b = p; break;
-        case 2: r = p, g = v, b = t; break;
-        case 3: r = p, g = q, b = v; break;
-        case 4: r = t, g = p, b = v; break;
-        case 5: r = v, g = p, b = q; break;
+        case 0: r = v; g = t; b = p; break;
+        case 1: r = q; g = v; b = p; break;
+        case 2: r = p; g = v; b = t; break;
+        case 3: r = p; g = q; b = v; break;
+        case 4: r = t; g = p; b = v; break;
+        case 5: r = v; g = p; b = q; break;
     }
     return {
         r: Math.floor(r * 255),

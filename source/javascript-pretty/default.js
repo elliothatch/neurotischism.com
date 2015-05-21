@@ -48,6 +48,9 @@ var canvas2 = document.getElementById("foregroundCanvas");
 
 	var calmmodeEnabled = localStorage.getItem('calmmode');
 
+var enableCalmmodeButton = document.getElementById('enableCalmmodeButton');
+var enableNormalmodeButton = document.getElementById('enableNormalmodeButton');
+
 //calm mode storage, don't use flashing colors if the user asked them not to appear
 if(calmmodeEnabled === null) {
 	//enable calmmode, display the prompt
@@ -59,19 +62,24 @@ else {
 	calmmodeEnabled = (calmmodeEnabled === 'true');
 }
 
+
 document.getElementById('calmmodeButton').onclick = displayCalmmodeModal;
 
 function displayCalmmodeModal() {
 	if(calmmodeEnabled) {
 		document.getElementById('calmmodePhrase').textContent = 
 			'you are currently viewing a calmer version of the website';
+		enableCalmmodeButton.textContent = 'continue with calm mode';
+		enableNormalmodeButton.textContent = 'enable flashing colors';
 	}
 	else {
 		document.getElementById('calmmodePhrase').textContent = 
 			'you are currently viewing the website with flashing colors';
+		enableCalmmodeButton.textContent = 'enable calm mode';
+		enableNormalmodeButton.textContent = 'continue with flashing colors';
 	}
-	document.getElementById('enableCalmmodeButton').onclick = function() { hideCalmmodeModal(); setCalmmode(true); };
-	document.getElementById('enableNormalmodeButton').onclick = function() { hideCalmmodeModal(); setCalmmode(false); };
+	enableCalmmodeButton.onclick = function() { hideCalmmodeModal(); setCalmmode(true); };
+	enableNormalmodeButton.onclick = function() { hideCalmmodeModal(); setCalmmode(false); };
 	document.getElementById('calmmodeModal').style.display = 'block';
 }
 function hideCalmmodeModal() {
@@ -574,9 +582,8 @@ function setCalmmode(b) {
 		var color1, color2, color3, color4;
 		if(!calmmodeEnabled)
 		{
-			var baseSat = 0;
 			calcColorComp = function() {
-				return Math.floor(Math.random() * (255 - baseSat) + baseSat);
+				return Math.floor(Math.random() * 255);
 			};
 
 			titleR = calcColorComp();

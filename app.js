@@ -103,8 +103,8 @@ app.post('/postcomment', function(request, response)
 		{
 			var pageURL = request.body.pageID.replace(/_/g, '/');
 
-			if(!captchaError)
-			{
+			//if(!captchaError)
+			//{
 				var date = new Date();
 			       	var dateString = date.getUTCFullYear() + "-" +
 					("0" + (date.getUTCMonth()+1)).slice(-2) + "-" +
@@ -117,11 +117,11 @@ app.post('/postcomment', function(request, response)
 
 					postComment(pageURL, request.body.pageID, request.body.author, request.body.email, messageHTMLModified, dateString,
 							function() { response.redirect('/' + pageURL); } );
-			}
-			else
-			{
-				response.redirect('/incorrectcaptcha');
-			}
+			//}
+			//else
+			//{
+			//	response.redirect('/incorrectcaptcha');
+			//}
 		}
 	);
 });
@@ -129,7 +129,7 @@ app.post('/postcomment', function(request, response)
 app.post('/ideos/login', function(request, response)
 {
 	mongo.connect('mongodb://localhost:27017/ideos', function(err, db) {
-        if(err != null)
+        if(err !== null)
         {
 		console.log("ideos error: " + err.message);
                 return;
@@ -138,7 +138,7 @@ app.post('/ideos/login', function(request, response)
         users.insert( { "username" : request.body.username, "ssn" : request.body.ssn },
                 function(err, result)
                 {
-                if(err != null)
+                if(err !== null)
                 {
                         console.log("ideos error: " + err.message);
                         return;

@@ -1,0 +1,819 @@
+(dp0
+S'buildDestination'
+p1
+VC:\u005cDropbox\u005cSource Code\u005cTwine\u005cbugs.html
+p2
+sS'saveDestination'
+p3
+S'C:\\Applications\\Dropbox\\Source Code\\Twine\\bugs.tws'
+p4
+sS'target'
+p5
+S'sugarcane'
+p6
+sS'storyPanel'
+p7
+(dp8
+S'widgets'
+p9
+(lp10
+(dp11
+S'selected'
+p12
+I00
+sS'pos'
+p13
+(lp14
+I175
+aI48
+asS'passage'
+p15
+(itiddlywiki
+Tiddler
+p16
+(dp17
+S'text'
+p18
+VIt's a stormy Saturday Afternoon. \u000a[[Time to do a little clean-up in your room.|Start1]]\u000a
+p19
+sS'tags'
+p20
+(lp21
+sS'created'
+p22
+ctime
+struct_time
+p23
+((I2013
+I9
+I26
+I0
+I20
+I10
+I3
+I269
+I1
+tp24
+(dp25
+tp26
+Rp27
+sS'modified'
+p28
+g27
+sS'title'
+p29
+VStart0
+p30
+sbsa(dp31
+g12
+I00
+sg13
+(lp32
+I413
+aI137
+asg15
+(itiddlywiki
+Tiddler
+p33
+(dp34
+g18
+V<<if $bugs eq false>>\u000aYou look at your computer case. You've had this old boy for quite awhile. It may not be the strongest chassis, but it's been there for you when you needed it most.\u000a[[scrape off old stickers|stickers]]\u000a[[do something else|Start1]]<<endif>><<if $bugs eq true>>\u000aBUUGGGGSSSSSSSSSSSSSSSSSSSSSSSSSSS\u000abuuugggssssbugsBUUUGSSSSbugs[[BUGGGGSSSSsss|endbugs]]\u000a<<endif>>
+p35
+sg20
+(lp36
+sg22
+g23
+((I2013
+I9
+I26
+I0
+I21
+I5
+I3
+I269
+I1
+tp37
+(dp38
+tp39
+Rp40
+sg28
+g40
+sg29
+Vcomputer case
+p41
+sbsa(dp42
+g12
+I00
+sg13
+(lp43
+I330
+aI303
+asg15
+(itiddlywiki
+Tiddler
+p44
+(dp45
+g18
+VYou try to decide what to do first.\u000a<<if $bugs eq false>>\u000a[[pick up clothes|floor1]]\u000a[[empty the trash|trash1]]\u000a[[clean up your computer case|computer case]]<<endif>><<if $bugs eq true>>\u000a[[pick up bugs|floor1]]\u000a[[empty the bugs|trash1]]\u000a[[bugs up your bugs bugs|computer case]]\u000a<<endif>>
+p46
+sg20
+(lp47
+sg22
+g23
+((I2013
+I9
+I26
+I0
+I22
+I30
+I3
+I269
+I1
+tp48
+(dp49
+tp50
+Rp51
+sg28
+g51
+sg29
+VStart1
+p52
+sbsa(dp53
+g12
+I00
+sg13
+(lp54
+I549
+aI132
+asg15
+(itiddlywiki
+Tiddler
+p55
+(dp56
+g18
+VMost of the stickers are easily peeled off. This last one is being difficult.\u000aYou pull some sticker remover off the shelf and rub it on the sticker. \u000a[[It doesn't help.|stickers2]]
+p57
+sg20
+(lp58
+sg22
+g23
+((I2013
+I9
+I26
+I0
+I27
+I47
+I3
+I269
+I1
+tp59
+(dp60
+tp61
+Rp62
+sg28
+g62
+sg29
+Vstickers
+p63
+sbsa(dp64
+g12
+I00
+sg13
+(lp65
+I808
+aI138
+asg15
+(itiddlywiki
+Tiddler
+p66
+(dp67
+g18
+V<<set $bugs = true>>\u000aYou reach for the spray pain, but it collapses under your fingers.\u000aThe spray pain turns into bugs.\u000a[[use bugs|usebugs]]
+p68
+sg20
+(lp69
+sg22
+g23
+((I2013
+I9
+I26
+I0
+I29
+I34
+I3
+I269
+I1
+tp70
+(dp71
+tp72
+Rp73
+sg28
+g73
+sg29
+Vbugs
+p74
+sbsa(dp75
+g12
+I00
+sg13
+(lp76
+I939
+aI142
+asg15
+(itiddlywiki
+Tiddler
+p77
+(dp78
+g18
+VUse "bugs" on what?\u000a[[use bugs on computer case|usebugs2]]
+p79
+sg20
+(lp80
+sg22
+g23
+((I2013
+I9
+I26
+I0
+I31
+I52
+I3
+I269
+I1
+tp81
+(dp82
+tp83
+Rp84
+sg28
+g84
+sg29
+Vusebugs
+p85
+sbsa(dp86
+g12
+I00
+sg13
+(lp87
+I939
+aI11
+asg15
+(itiddlywiki
+Tiddler
+p88
+(dp89
+g18
+VYou try to use bugs, but something's not right.\u000a[[Your hand turns into bugs.|usebugs3]]
+p90
+sg20
+(lp91
+sg22
+g23
+((I2013
+I9
+I26
+I0
+I32
+I28
+I3
+I269
+I1
+tp92
+(dp93
+tp94
+Rp95
+sg28
+g95
+sg29
+Vusebugs2
+p96
+sbsa(dp97
+g12
+I00
+sg13
+(lp98
+I559
+aI286
+asg15
+(itiddlywiki
+Tiddler
+p99
+(dp100
+g18
+V[[buuuuuggggggggggggsssss|endbugs2]]
+p101
+sg20
+(lp102
+sg22
+g23
+((I2013
+I9
+I26
+I0
+I37
+I9
+I3
+I269
+I1
+tp103
+(dp104
+tp105
+Rp106
+sg28
+g106
+sg29
+Vendbugs
+p107
+sbsa(dp108
+g12
+I00
+sg13
+(lp109
+I694
+aI288
+asg15
+(itiddlywiki
+Tiddler
+p110
+(dp111
+g18
+V2050.\u000athe world is bugs\u000ayou are bugs\u000aeverything is bugs\u000a\u000a\u000a\u000a\u000a\u000a\u000a<<timedinsert "6s">>\u000a[[credits]]\u000a<<endtimedinsert>>
+p112
+sg20
+(lp113
+sg22
+g23
+((I2013
+I9
+I26
+I0
+I37
+I26
+I3
+I269
+I1
+tp114
+(dp115
+tp116
+Rp117
+sg28
+g117
+sg29
+Vendbugs2
+p118
+sbsa(dp119
+g12
+I00
+sg13
+(lp120
+I139
+aI301
+asg15
+(itiddlywiki
+Tiddler
+p121
+(dp122
+g18
+V<<if $bugs eq false>>\u000aThe floor is littered with clothes and empty wrappers.\u000a[[you'll pick it up later|Start1]]<<endif>><<if $bugs eq true>>\u000aThe floor is littered with bugs and bugs.\u000a[[you don't want to touch the icky bugs|Start1]]\u000a<<endif>>
+p123
+sg20
+(lp124
+sg22
+g23
+((I2013
+I9
+I26
+I0
+I38
+I17
+I3
+I269
+I1
+tp125
+(dp126
+tp127
+Rp128
+sg28
+g128
+sg29
+Vfloor1
+p129
+sbsa(dp130
+g12
+I00
+sg13
+(lp131
+I339
+aI461
+asg15
+(itiddlywiki
+Tiddler
+p132
+(dp133
+g18
+V<<if $bugs eq false>>\u000aTissues and pencil shavings are precariously balanced on the waste bin.\u000aYou feel like a small breeze would topple them over.\u000a[[better to leave it be|Start1]]<<endif>><<if $bugs eq true>>\u000aBugs are precariously balanced on the waste bin.\u000a[[I hate bugs|Start1]]\u000a<<endif>>
+p134
+sg20
+(lp135
+sg22
+g23
+((I2013
+I9
+I26
+I0
+I38
+I22
+I3
+I269
+I1
+tp136
+(dp137
+tp138
+Rp139
+sg28
+g139
+sg29
+Vtrash1
+p140
+sbsa(dp141
+g12
+I00
+sg13
+(lp142
+I10
+aI10
+asg15
+(itiddlywiki
+Tiddler
+p143
+(dp144
+g18
+V[[You hear the sound of rain striking the hard pavement.|Start0]]\u000a<<set $bugs = false>>
+p145
+sg20
+(lp146
+sg22
+g23
+((I2013
+I9
+I26
+I0
+I49
+I45
+I3
+I269
+I1
+tp147
+(dp148
+tp149
+Rp150
+sg28
+g150
+sg29
+VStart
+p151
+sbsa(dp152
+g12
+I00
+sg13
+(lp153
+I680
+aI136
+asg15
+(itiddlywiki
+Tiddler
+p154
+(dp155
+S'text'
+p156
+VSometimes when you're frustrated you talk to yourself.\u000aThis time you pretend you're an old man, reminiscing about your glory days as a young lad.\u000a"one of the stickers didnt come off very wll, no matter what fatty fluids i used"\u000a\u000aYou pull your pocket knife out of the drawer beside your bed.\u000a"so i had to use a knife and now there a few scrapes. Im guna get some spray pain"\u000a\u000a[[grab the spray pain|bugs]]
+p157
+sS'tags'
+p158
+(lp159
+sS'created'
+p160
+g23
+((I2013
+I9
+I26
+I13
+I48
+I59
+I3
+I269
+I1
+tp161
+(dp162
+tp163
+Rp164
+sS'modified'
+p165
+g164
+sS'title'
+p166
+Vstickers2
+p167
+sbsa(dp168
+g12
+I00
+sg13
+(lp169
+I673
+aI9
+asg15
+(itiddlywiki
+Tiddler
+p170
+(dp171
+g156
+VYou look down at your body.\u000aYour torso is made of bugs.\u000a[[You try to scream, but your mouth has turned into bugs.|dark]]
+p172
+sg158
+(lp173
+sg160
+g23
+((I2013
+I9
+I26
+I13
+I53
+I56
+I3
+I269
+I1
+tp174
+(dp175
+tp176
+Rp177
+sg165
+g177
+sg166
+Vusebugs3
+p178
+sbsa(dp179
+g12
+I00
+sg13
+(lp180
+I498
+aI5
+asg15
+(itiddlywiki
+Tiddler
+p181
+(dp182
+g156
+VEverything goes [[dark.|Start00]]
+p183
+sg158
+(lp184
+sg160
+g23
+((I2013
+I9
+I26
+I13
+I56
+I34
+I3
+I269
+I1
+tp185
+(dp186
+tp187
+Rp188
+sg165
+g188
+sg166
+Vdark
+p189
+sbsa(dp190
+g12
+I00
+sg13
+(lp191
+I359
+aI11
+asg15
+(itiddlywiki
+Tiddler
+p192
+(dp193
+g156
+V[[You hear the sound of rain striking the hard pavement.|Start0]]
+p194
+sg158
+(lp195
+sg160
+g23
+((I2013
+I9
+I26
+I13
+I57
+I9
+I3
+I269
+I1
+tp196
+(dp197
+tp198
+Rp199
+sg165
+g199
+sg166
+VStart00
+p200
+sbsa(dp201
+g12
+I00
+sg13
+(lp202
+I1114
+aI12
+asg15
+(itiddlywiki
+Tiddler
+p203
+(dp204
+g156
+Vpc case
+p205
+sg158
+(lp206
+sg160
+g23
+((I2013
+I9
+I26
+I14
+I2
+I48
+I3
+I269
+I1
+tp207
+(dp208
+tp209
+Rp210
+sg165
+g210
+sg166
+VStoryTitle
+p211
+sbsa(dp212
+g12
+I00
+sg13
+(lp213
+I1115
+aI143
+asg15
+(itiddlywiki
+Tiddler
+p214
+(dp215
+g156
+V.revision-span-in {\u000a	opacity: 0;\u000a}\u000a.revision-span:not(.revision-span-out) {\u000a	transition: 1s; -webkit-transition: 1s;\u000a}\u000a.revision-span-out {\u000a	position:absolute;\u000a	opacity: 0;\u000a}
+p216
+sg158
+(lp217
+Vstylesheet
+p218
+asg160
+g23
+((I2013
+I9
+I26
+I14
+I6
+I30
+I3
+I269
+I1
+tp219
+(dp220
+tp221
+Rp222
+sg165
+g222
+sg166
+Vstylesheet
+p223
+sbsa(dp224
+g12
+I00
+sg13
+(lp225
+I1112
+aI274
+asg15
+(itiddlywiki
+Tiddler
+p226
+(dp227
+g156
+V(function(){version.extensions.replaceMacrosCombined={major:1,minor:0,revision:1};\u000avar nullobj={handler:function(){}};function showVer(n,notrans){n.innerHTML="";\u000anew Wikifier(n,n.tweecode);n.setAttribute("data-enabled","true");\u000an.style.display="inline";n.classList.remove("revision-span-out");\u000aif(!notrans){n.classList.add("revision-span-in");if(n.timeout){clearTimeout(n.timeout)\u000a}n.timeout=setTimeout(function(){n.classList.remove("revision-span-in");\u000an=null},1)}}function hideVer(n,notrans){n.setAttribute("data-enabled","false");\u000an.classList.remove("revision-span-in");if(n.timeout){clearTimeout(n.timeout)\u000a}if(!notrans){n.classList.add("revision-span-out");n.timeout=setTimeout(function(){if(n.getAttribute("data-enabled")=="false"){n.classList.remove("revision-span-out");\u000an.style.display="none";n.innerHTML=""}n=null},1000)}else{n.style.display="none";\u000an.innerHTML="";n=null}}function tagcontents(b,starttags,desttags,endtags,k){var l=0,c="",tg,a,i;\u000afunction tagfound(i,e){for(var j=0;j<e.length;j++){if(a.indexOf("<<"+e[j],i)==i){return e[j]\u000a}}}a=b.source.slice(k);for(i=0;i<a.length;i++){if(tg=tagfound(i,starttags)){l++\u000a}else{if((tg=tagfound(i,desttags))&&l==0){b.nextMatch=k+i+tg.length+4;\u000areturn[c,tg]}else{if(tg=tagfound(i,endtags)){l--;if(l<0){return null\u000a}}}}c+=a.charAt(i)}return null}var begintags=[];var endtags=[];\u000afunction revisionSpanHandler(g,e,f,b){var k=b.source.indexOf(">>",b.matchStart)+2,vsns=[],vtype=e,flen=f.length,becomes,c,cn,m,h,vsn;\u000afunction mkspan(vtype){h=insertElement(m,"span",null,"revision-span "+vtype);\u000ah.setAttribute("data-enabled",false);h.style.display="none";h.tweecode="";\u000areturn h}if(this.shorthand&&flen){while(f.length>0){vsns.push([f.shift(),(this.flavour=="insert"?"gains":"becomes")])\u000a}}else{if(this.flavour=="insert"||(this.flavour=="continue"&&this.trigger=="time")){vsns.push(["","becomes"])\u000a}}if(this.flavour=="continue"&&flen){b.nextMatch=k+b.source.slice(k).length;\u000avsns.push([b.source.slice(k),vtype])}else{becomes=["becomes","gains"];\u000ac=tagcontents(b,begintags,becomes.concat(endtags),endtags,k);\u000aif(c&&endtags.indexOf(c[1])==-1){while(c){vsns.push(c);c=tagcontents(b,begintags,becomes,endtags,b.nextMatch)\u000a}c=tagcontents(b,begintags,["end"+e],endtags,b.nextMatch)}if(!c){throwError(g,"can't find matching end"+e);\u000areturn}vsns.push(c);if(this.flavour=="continue"){k=b.nextMatch;\u000ab.nextMatch=k+b.source.slice(k).length;vsns.push([b.source.slice(k),""])\u000a}}if(this.flavour=="remove"){vsns.push(["","becomes"])}console.log(JSON.stringify(vsns));\u000acn=0;m=insertElement(g,"span",null,e);m.setAttribute("data-flavour",this.flavour);\u000ah=mkspan("initial");vsn=vsns.shift();console.log(e+" "+vsn[0]);\u000ah.tweecode=vsn[0];showVer(h,true);while(vsns.length>0){if(vsn){vtype=vsn[1]\u000a}vsn=vsns.shift();h=mkspan(vtype);h.tweecode=vsn[0]}if(typeof this.setup=="function"){this.setup(m,g,f)\u000a}}function quantity(m){return(m.children.length-1)+(m.getAttribute("data-flavour")=="remove")\u000a}function revisionSetup(m,g,f){m.className+=" "+f[0].replace(" ","_");\u000ashowVer(m.firstChild,true)}function keySetup(m,g,f){var fl=this.flavour,key=f[0];\u000am.setEventListener("keydown",function l(e){var done=!revise("revise",m);\u000aif(done){m.removeEventListener("keydown",l)}})}function timeSetup(m,g,f){function cssTimeUnit(s){if(typeof s=="string"){if(s.slice(-2).toLowerCase()=="ms"){return Number(s.slice(0,-2))||0\u000a}else{if(s.slice(-1).toLowerCase()=="s"){return Number(s.slice(0,-1))*1000||0\u000a}}}throwError(g,s+" isn't a CSS time unit");return 0}var fl=this.flavour;\u000avar tm=cssTimeUnit(f[0]);setTimeout(function timefn(){var done=!revise("revise",m);\u000aif(!done){setTimeout(timefn,tm)}},tm)}function hoverSetup(m){m.onmouseover=function(){revise("revise",this)\u000a};m.onmouseout=function(){revise("revert",this)};m=null}function mouseSetup(m){var fl=this.flavour,evt=(window.onmouseenter===null?"onmouseenter":"onmouseover");\u000am[evt]=function(){var done=!revise("revise",this);if(done){this[evt]=null\u000a}};m=null}function linkSetup(m,g,f){var fl=this.flavour,l=Wikifier.createInternalLink(),p=m.parentNode;\u000al.className="internalLink replaceLink";p.insertBefore(l,m);l.insertBefore(m,null);\u000al.onclick=function(){var p,done=false;if(m&&m.parentNode==this){done=!revise("revise",m);\u000ascrollWindowTo(m)}if(done){this.parentNode.insertBefore(m,this);\u000athis.parentNode.removeChild(this)}};l=null}function visitedSetup(m,g,f){var i,done,shv=state.history[0].variables,os="once seen",d=(m.firstChild&&(this.flavour=="insert"?m.firstChild.nextSibling:m.firstChild).tweecode);\u000ashv[os]=shv[os]||{};if(d&&!shv[os].hasOwnProperty(d)){shv[os][d]=1\u000a}else{for(i=shv[os][d];i>0&&!done;i--){done=!revise("revise",m,true)\u000a}if(shv[os].hasOwnProperty(d)){shv[os][d]+=1}}}[{name:"insert",flavour:"insert",trigger:"link",setup:linkSetup},{name:"timedinsert",flavour:"insert",trigger:"time",setup:timeSetup},{name:"insertion",flavour:"insert",trigger:"revisemacro",setup:revisionSetup},{name:"later",flavour:"insert",trigger:"visited",setup:visitedSetup},{name:"keyinsert",flavour:"insert",trigger:"key",setup:keySetup},{name:"replace",flavour:"replace",trigger:"link",setup:linkSetup},{name:"timedreplace",flavour:"replace",trigger:"time",setup:timeSetup},{name:"mousereplace",flavour:"replace",trigger:"mouse",setup:mouseSetup},{name:"hoverreplace",flavour:"replace",trigger:"hover",setup:hoverSetup},{name:"revision",flavour:"replace",trigger:"revisemacro",setup:revisionSetup},{name:"keyreplace",flavour:"replace",trigger:"key",setup:keySetup},{name:"timedremove",flavour:"remove",trigger:"time",setup:timeSetup},{name:"mouseremove",flavour:"remove",trigger:"mouse",setup:mouseSetup},{name:"hoverremove",flavour:"remove",trigger:"hover",setup:hoverSetup},{name:"removal",flavour:"remove",trigger:"revisemacro",setup:revisionSetup},{name:"once",flavour:"remove",trigger:"visited",setup:visitedSetup},{name:"keyremove",flavour:"remove",trigger:"key",setup:keySetup},{name:"continue",flavour:"continue",trigger:"link",setup:linkSetup},{name:"timedcontinue",flavour:"continue",trigger:"time",setup:timeSetup},{name:"mousecontinue",flavour:"continue",trigger:"mouse",setup:mouseSetup},{name:"keycontinue",flavour:"continue",trigger:"key",setup:keySetup},{name:"cycle",flavour:"cycle",trigger:"revisemacro",setup:revisionSetup},{name:"mousecycle",flavour:"cycle",trigger:"mouse",setup:mouseSetup},{name:"timedcycle",flavour:"cycle",trigger:"time",setup:timeSetup},{name:"keycycle",flavour:"replace",trigger:"key",setup:keySetup}].forEach(function(e){e.handler=revisionSpanHandler;\u000ae.shorthand=(["link","mouse","hover"].indexOf(e.trigger)>-1);\u000amacros[e.name]=e;macros["end"+e.name]=nullobj;begintags.push(e.name);\u000aendtags.push("end"+e.name)});function reviseAll(rt,rname){var rall=document.querySelectorAll(".passage ."+rname),ret=false;\u000afor(var i=0;i<rall.length;i++){ret=ret||revise(rt,rall[i])}return ret\u000a}function revise(rt,r,notrans){var ind2,curr,next,ind=-1,rev=(rt=="revert"),rnd=(rt.indexOf("random")>-1),fl=r.getAttribute("data-flavour"),rc=r.childNodes,cyc=(fl=="cycle"),rcl=rc.length-1;\u000afunction doToGainerSpans(n,fn){for(var k=n-1;k>=0;k--){if(rc[k+1].classList.contains("gains")){fn(rc[k],notrans)\u000a}else{break}}}for(var k=0;k<=rcl;k++){if(rc[k].getAttribute("data-enabled")=="true"){ind=k\u000a}}if(rev){ind-=1}curr=(ind>=0?rc[ind]:(cyc?rc[rcl]:null));ind2=ind;\u000aif(rnd){ind2=(ind+(Math.floor(Math.random()*rcl)))%rcl}next=((ind2<rcl)?rc[ind2+1]:(cyc?rc[0]:null));\u000avar docurr=(rev?showVer:hideVer);var donext=(rev?hideVer:showVer);\u000aif(curr){if(!(next&&next.classList.contains("gains"))||rnd){docurr(curr,notrans);\u000adoToGainerSpans(ind,docurr,notrans)}}if(next){donext(next,notrans);\u000aif(rnd){doToGainerSpans(ind2+1,donext,notrans)}}return(cyc?true:(rev?(ind>0):(ind2<rcl-1)))\u000a}macros.revert=macros.revise=macros.randomise=macros.randomize={handler:function(a,b,c){var l,rev,rname;\u000afunction disableLink(l){l.style.display="none"}function enableLink(l){l.style.display="inline"\u000a}function updateLink(l){if(l.className.indexOf("random")>-1){enableLink(l);\u000areturn}var rall=document.querySelectorAll(".passage ."+rname),cannext,canprev,i,ind,r,fl;\u000afor(i=0;i<rall.length;i++){r=rall[i],fl=r.getAttribute("data-flavour");\u000aif(fl=="cycle"){cannext=canprev=true}else{if(r.firstChild.getAttribute("data-enabled")==!1+""){canprev=true\u000a}if(r.lastChild.getAttribute("data-enabled")==!1+""){cannext=true\u000a}}}var can=(l.classList.contains("revert")?canprev:cannext);(can?enableLink:disableLink)(l)\u000a}function toggleText(w){w.classList.toggle(rl+"Enabled");w.classList.toggle(rl+"Disabled");\u000aw.style.display=((w.style.display=="none")?"inline":"none")}var rl="reviseLink";\u000aif(c.length<2){throwError(a,b+" macro needs 2 parameters");return\u000a}rname=c.shift().replace(" ","_");l=Wikifier.createInternalLink(a,null);\u000al.className="internalLink "+rl+" "+rl+"_"+rname+" "+b;var v="";\u000avar end=false;var out=false;if(c.length>1&&c[0][0]=="$"){v=c[0].slice(1);\u000ac.shift()}switch(c[c.length-1]){case"end":end=true;c.pop();break;\u000acase"out":out=true;c.pop();break}var h=state.history[0].variables;\u000afor(var i=0;i<c.length;i++){var on=(i==Math.max(c.indexOf(h[v]),0));\u000avar d=insertElement(null,"span",null,rl+((on)?"En":"Dis")+"abled");\u000aif(on){h[v]=c[i];l.setAttribute("data-cycle",i)}else{d.style.display="none"\u000a}insertText(d,c[i]);l.appendChild(d)}l.onclick=function(){reviseAll(b,rname);\u000avar t=this.childNodes,u=this.getAttribute("data-cycle")-0,m=t.length,n,lall,i;\u000aif((end||out)&&u==m-(end?2:1)){if(end){n=this.removeChild(t[u+1]);\u000an.className=rl+"End";n.style.display="inline";this.parentNode.replaceChild(n,this)\u000a}else{this.parentNode.removeChild(this);return}}else{toggleText(t[u]);\u000au=(u+1)%m;if(v){h[v]=c[u]}toggleText(t[u]);this.setAttribute("data-cycle",u)\u000a}lall=document.getElementsByClassName(rl+"_"+rname);for(i=0;i<lall.length;\u000ai++){updateLink(lall[i])}};disableLink(l);setTimeout(function(){updateLink(l);\u000al=null},1)}};macros.mouserevise=macros.hoverrevise={handler:function(a,b,c,d){var endtags=["end"+b],evt=(window.onmouseenter===null?"onmouseenter":"onmouseover"),t=tagcontents(d,[b],endtags,endtags,d.source.indexOf(">>",d.matchStart)+2);\u000aif(t){var rname=c[0].replace(" ","_"),h=insertElement(a,"span",null,"hoverrevise hoverrevise_"+rname),f=function(){var done=!reviseAll("revise",rname);\u000aif(b!="hoverrevise"&&done){this[evt]=null}};new Wikifier(h,t[0]);\u000aif(b=="hoverrevise"){h.onmouseover=f;h.onmouseout=function(){reviseAll("revert",rname)\u000a}}else{h[evt]=f}h=null}}};macros.endmouserevise=nullobj;macros.endhoverrevise=nullobj\u000a}());1;
+p228
+sg158
+(lp229
+Vscript
+p230
+asg160
+g23
+((I2013
+I9
+I26
+I14
+I6
+I48
+I3
+I269
+I1
+tp231
+(dp232
+tp233
+Rp234
+sg165
+g234
+sg166
+Vmacros
+p235
+sbsa(dp236
+g12
+I01
+sg13
+(lp237
+I837
+aI284
+asg15
+(itiddlywiki
+Tiddler
+p238
+(dp239
+g156
+Vpc case\u000aby [[Elliot Hatch|http://conchconnoisseur.wordpress.com/]]\u000a\u000amade in 15 minutes for YaroComp34\u000a\u000a[[based on this chat with Post Master Yaroslav|yaro]]\u000a\u000a[[proof of consent|https://dl.dropboxusercontent.com/u/27694322/ConchConnoisseurFiles/pc%20case/consent.png]]\u000a\u000athanks to [[leon arnott|https://twitter.com/webbedspace]] for macros
+p240
+sg158
+(lp241
+sg160
+g23
+((I2013
+I9
+I26
+I14
+I7
+I22
+I3
+I269
+I1
+tp242
+(dp243
+tp244
+Rp245
+sg165
+g245
+sg166
+Vcredits
+p246
+sbsa(dp247
+g12
+I00
+sg13
+(lp248
+I854
+aI434
+asg15
+(itiddlywiki
+Tiddler
+p249
+(dp250
+g156
+V12:12 AM - Post Master Yaroslav: i ordered edible worms and scorpions from thailand last week\u000a12:12 AM - Post Master Yaroslav: lol\u000a12:12 AM - Post Master Yaroslav: UN projects that there will be over 9 billions people on earth by 2050, and our cattle production will not cut it\u000a12:13 AM - Post Master Yaroslav: a good alternative, even to veggies, is insects\u000a12:13 AM - Post Master Yaroslav: so i figured, i should start eating them now\u000a12:13 AM - "The Original": that's smart, plan ahead\u000a12:13 AM - Post Master Yaroslav: high in protein, low in carbon emissions (if local)\u000a12:14 AM - "The Original": dude just eat them out of your bug catchers on your porch\u000a12:14 AM - "The Original": eat them out of the ceiling lamps\u000a12:14 AM - Post Master Yaroslav: haha i have to train myself up to those\u000a12:15 AM - Post Master Yaroslav: theres an awesome cook book that i found, it only has insect recipes\u000a12:15 AM - "The Original": nice\u000a12:16 AM - Post Master Yaroslav: i figured i wanna try precooked stuff before i go grab the nearest grasshopper road pizza and pan\u000a12:16 AM - Post Master Yaroslav: most likely, i will never come them myself. Unless some horrific thing happens in the future\u000a12:16 AM - Post Master Yaroslav: cook\u000a12:16 AM - "The Original": 2050\u000a12:16 AM - "The Original": the world is made of bugs\u000a12:16 AM - "The Original": you are made of bugs\u000a12:16 AM - "The Original": everything is bugs\u000a12:17 AM - Post Master Yaroslav: oh man\u000a12:17 AM - Post Master Yaroslav: the horror\u000a12:18 AM - Post Master Yaroslav: in other news, i took off all the stickers on my pc case\u000a12:18 AM - Post Master Yaroslav: i know i know..\u000a12:18 AM - Post Master Yaroslav: crazy\u000a12:18 AM - Post Master Yaroslav: one of the stickers didnt come off very wll, no matter what fatty fluids i used\u000a12:19 AM - Post Master Yaroslav: well*,\u000a12:19 AM - "The Original": did you apply bugs?\u000a12:19 AM - Post Master Yaroslav: so i had to use a knife and now there a few scrapes. Im guna get some spray pain\u000a12:19 AM - Post Master Yaroslav: wow\u000a12:19 AM - Post Master Yaroslav: i didnt even think of that\u000a12:19 AM - "The Original": "use bugs"\u000a12:20 AM - "The Original": "you try to use your bugs, but your hands turn into bugs"\u000a12:20 AM - Post Master Yaroslav: dude, this is the making of a great text adventure\u000a12:21 AM - "The Original": hold on a tick\u000a12:21 AM - Post Master Yaroslav: Bug adventure\u000a12:21 AM - Post Master Yaroslav: or\u000a12:21 AM - "The Original": you can keep talking\u000a12:21 AM - Post Master Yaroslav: Text bug\u000a12:22 AM - Post Master Yaroslav: ima play a quick game of dota 2\u000a\u000a[[credits]]
+p251
+sg158
+(lp252
+sg160
+g23
+((I2013
+I9
+I26
+I14
+I22
+I11
+I3
+I269
+I1
+tp253
+(dp254
+tp255
+Rp256
+sg165
+g256
+sg166
+Vyaro
+p257
+sbsasS'scale'
+p258
+I1
+ss.

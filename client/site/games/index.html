@@ -1,0 +1,16 @@
+{{#layout}}
+---
+{
+	"layoutName": "default.html",
+	"page": {
+		"title": "games"
+	}
+}
+---
+
+<ul class="postsList">
+	{{#posts}}
+	<li><a class="scrollLink" href="{{url}}">{{title}}</a></li>
+	{{/posts}}
+</ul>
+{{/layout}}

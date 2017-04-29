@@ -57,12 +57,12 @@ module.exports = function(options) {
 				else if(fileEntry.type === 'dir') {
 					var indexEntry = fileEntry.contents['index.html'];
 					if(indexEntry && indexEntry.type === 'file') {
+						currentDir = fileEntry.contents;
 						fileContents = indexEntry.contents;
 					}
 				}
 			}
 		}
-
 		if(!fileContents) {
 			res.status(404).send('File not found'); //TODO: fancy 404 page
 			return;
@@ -70,7 +70,9 @@ module.exports = function(options) {
 
 		//render the page
 		var renderProperties = {
-			site: { title: 'neurotischism' } //TODO: pull this from config
+			site: { title: 'neurotischism' }, //TODO: pull this from config
+			backUrl: '/' + pathParts.slice(0, -1).join('/'),
+			posts: Object.keys(currentDir).filter(function(k) { return currentDir[k].type === 'dir' && currentDir[k].contents['index.html']; }).map(function(dirName) { return { url: dirName};})
 		};
 
 		renderProperties.layout = renderLayout(renderProperties);
@@ -84,15 +86,34 @@ module.exports = function(options) {
 	function renderLayout(renderProperties) {
 		return function() {
 			return function(text, render) {
-				var options = Object.assign({}, renderProperties, JSON.parse(text));
-				options.content = mustache.render(options.content, options, templates.partials);
-				console.log(options.content);
-				return mustache.render(templates.layouts[options.layout], options, templates.partials);
+				var layoutData = parseLayout(text);
+				Object.assign(renderProperties, layoutData.frontMatter);
+				if(!templates.layouts[renderProperties.layoutName]) {
+					throw new Error('templating/routes.js: renderLayout: layout "' + renderProperties.layoutName + '" not found');
+				}
+
+				renderProperties.content = mustache.render(layoutData.template, renderProperties, templates.partials);
+				return mustache.render(templates.layouts[renderProperties.layoutName], renderProperties, templates.partials);
 			};
 		};
 	}
 }
 
+/* Parses a properly formatted "layout" template section with front matter.
+ * text {string} - mustache template text with front matter
+ * @returns {frontMatter: {string}, template: {string}}
+ */
+function parseLayout(text) {
+	var frontMatterMatch = text.match(/---(\r\n?|\n)([\s\S]*)(\r\n?|\n)---(\r\n?|\n)/m);
+	if(!frontMatterMatch) {
+		throw new Error('templating/routes.js: parseLayout: no front matter found');
+	}
+
+	return {
+		frontMatter: JSON.parse(frontMatterMatch[2]),
+		template: text.substring(frontMatterMatch[0].length)
+	};
+}
 
 /*
  * clientPath {string}: path to client directory, which should contain site/layouts/partials
@@ -133,7 +154,7 @@ function walkDirectory(dirPath, f) {
 			out[file] = { type: 'file', contents: f(filePath)};
 		}
 		else if(stats.isDirectory()) {
-			out[file] = {type: 'dir', contents: walkDirectory(filePath)};
+			out[file] = {type: 'dir', contents: walkDirectory(filePath, f)};
 		}
 
 		return out;

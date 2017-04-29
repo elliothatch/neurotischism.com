@@ -1,0 +1,10 @@
+---
+layout: default
+title: games
+---
+
+<ul class="postsList">
+{% for post in site.categories['games'] %}
+	<li><a class="scrollLink" href="{{ post.url }}">{{ post.title }}</a></li>
+{% endfor %}
+</ul>

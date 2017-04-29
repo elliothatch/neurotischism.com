@@ -1,0 +1,11 @@
+---
+layout: post
+---
+
+  {% for platform in page.platforms %}
+    <p><a href="{{ platform.url }}">
+      {% if platform.platformtype == 'browser' %}play online ({{ platform.platform }}){% elsif  platform.platformtype == 'download' %}download for {{ platform.platform }}{% endif %}</a></p>
+    {% endfor %}
+  {% for thesource in page.sourceurl %}<p><a href="{{ thesource }}">{% if thesource contains 'github' %}view source (github){% else %}download source{% endif %}</a></p>{% endfor %}
+  
+  {{ content }}

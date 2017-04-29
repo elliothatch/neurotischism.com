@@ -1,0 +1,16 @@
+---
+layout: default
+title: blog
+---
+
+{% for post in site.categories['blog'] %}
+	<article>
+		<h2 class="corruptZone"><a href="{{ post.url }}">{{ post.title }}</a></h2>
+		<div class="corruptZone">
+		{% assign displayedDatetime = post.date | date: "%A %B %-d, %Y" | downcase %}
+	    <time title="{{ post.date }}" datetime="{{ post.date }}">{{ displayedDatetime }}</time>
+	    <p>{{ post.excerpt | truncatewords: 75 }}</p>
+	    </div>
+	    <h4 class="corruptZone"><a href="{{ post.url }}">read</a></h4>
+	</article>
+{% endfor %}

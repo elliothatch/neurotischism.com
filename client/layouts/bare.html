@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+	{{> head.html}}
+	<body>
+		<canvas id="backgroundCanvas"></canvas>
+		<canvas id="foregroundCanvas"></canvas>
+		<div id="letterSize">a</div>
+		<div id="foregroundWrapper">
+			{{> header.html}}
+
+			<div class="pageContent">
+				{{{ content }}}
+			</div>
+
+			{{> footer.html}}
+		</div>
+		<script async src="/javascript/default.js"></script>
+		<script async type="text/javascript" src="http://www.google.com/recaptcha/api/js/recaptcha_ajax.js"></script>
+	</body>
+</html>

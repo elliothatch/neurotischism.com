@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+	{{> includes/head.html}}
+	<body>
+		<canvas id="backgroundCanvas"></canvas>
+		<canvas id="foregroundCanvas"></canvas>
+		<div id="letterSize">a</div>
+		<div id="foregroundWrapper">
+			{{> includes/header.html}}
+
+			<div class="pageContent">
+				{{#> bare-contents}}
+					<!-- No layouts/bare.html contents -->
+				{{/ bare-contents}}
+			</div>
+
+			{{> includes/footer.html}}
+		</div>
+		<script async src="/javascript/default.js"></script>
+		<script async type="text/javascript" src="http://www.google.com/recaptcha/api/js/recaptcha_ajax.js"></script>
+	</body>
+</html>

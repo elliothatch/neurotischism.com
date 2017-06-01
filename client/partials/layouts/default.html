@@ -1,0 +1,12 @@
+{{#> layouts/bare.html}}
+	{{#*inline "bare-contents"}}
+		<div class="pageBody">
+			<div class="pageTitle">
+				<h1>{{page.title}}</h1><h1 id="backButton"><a href="{{backUrl}}">back</a></h1>
+			</div>
+			{{#> default-contents}}
+				<!-- No layouts/default.html contents -->
+			{{/default-contents}}
+		</div>
+	{{/inline}}
+{{/layouts/bare.html}}

@@ -23,8 +23,8 @@
     "compression": "^1.6.2",
     "config": "^1.25.1",
     "express": "^4.15.2",
+    "handlebars": "^4.0.10",
     "minimist": "^1.2.0",
-    "mustache": "^2.3.0",
     "safe-json-stringify": "^1.0.4"
   }
 }

@@ -1,9 +1,11 @@
-{{#create-context '{"page": { "title": "games" } }'}}
+{{#extend-context '{"page": { "title": "games" } }'}}
 	{{#> layouts/default.html }}
-	<ul class="postsList">
-		{{#each posts}}
-		<li><a class="scrollLink" href="{{url}}">{{title}}</a></li>
-		{{/each}}
-	</ul>
+	{{#*inline "default-contents"}}
+		<ul class="postsList">
+			{{#each posts}}
+			<li><a class="scrollLink" href="{{this.path}}">{{this.page.title}}</a></li>
+			{{/each}}
+		</ul>
+	{{/inline}}
 	{{/layouts/default.html}}
-{{/create-context}}
+{{/extend-context}}

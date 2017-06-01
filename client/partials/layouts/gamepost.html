@@ -1,0 +1,13 @@
+{{#> layouts/post.html}}
+	{{#*inline "post-contents"}}
+		{{#each page.platform}}
+		<p><a href="{{ this.url }}">test
+			{{!--{% if platform.platformtype == 'browser' %}play online ({{ platform.platform }}){% elsif  platform.platformtype == 'download' %}download for {{ platform.platform }}{% endif %}--}}</a></p>
+		{{/each}}
+		{#each page.sourceUrl}<p><a href="{{this}}">test2{{!--{% if thesource contains 'github' %}view source (github){% else %}download source{% endif %}--}}</a></p>{/each}
+	  
+	{{#> gamepost-contents}}
+		<!-- No layouts/gamepost.html contents -->
+	{{/gamepost-contents}}
+	{{/inline}}
+{{/layouts/post.html}}

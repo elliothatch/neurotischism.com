@@ -1,0 +1,15 @@
+{{#> layouts/default.html}}
+	{{#*inline "default-contents"}}
+		<div id="postDescription">
+			{{#if page.description}}<p>{{ page.description }}</p>{{/if}}
+		</div>
+
+		<div class="postBody">
+			{{#> post-contents}}
+				<!-- No layouts/post.html contents -->
+			{{/post-contents}}
+		</div>
+		<div class="postTags">tags: {{#each page.tags}}<a href="/tags#{{this}}">{{ this }}</a> {{/each}}</div>
+		{{> includes/comments.html}}
+	{{/inline}}
+{{/layouts/default.html}}

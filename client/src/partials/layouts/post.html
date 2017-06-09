@@ -1,5 +1,10 @@
 {{#> layouts/default.html}}
 	{{#*inline "default-contents"}}
+		{{#if page.date}}
+		<div id="post-date">
+			<p>{{date page.date ''}}</p>
+		</div>
+		{{/if}}
 		<div id="postDescription">
 			{{#if page.description}}<p>{{ page.description }}</p>{{/if}}
 		</div>

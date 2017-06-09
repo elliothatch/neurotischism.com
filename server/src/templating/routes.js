@@ -3,7 +3,11 @@ var fs = require('fs');
 var Url = require('url');
 var express = require('express');
 var Handlebars = require('handlebars');
+var DateFormat = require('dateformat');
 
+var CustomErrors = require('../util/custom-errors');
+
+var defaultDateFormat = 'mmmm d, yyyy h:MM TT Z'
 
 /* options (object):
  *   - clientPath {string}: path to client directory, which should contain site/layouts/partials
@@ -23,6 +27,11 @@ module.exports = function(options) {
 		return (typeof str === 'string') && (typeof target === 'string')
 		 && str.includes(target);
 	});
+
+	Handlebars.registerHelper('date', function(dateStr, formatStr, options) {
+		return new Handlebars.SafeString('<time datetime="' + DateFormat(dateStr, 'isoUtcDateTime') + '">' + DateFormat(dateStr, formatStr || defaultDateFormat) + '</time>');
+	});
+
 	var templates = loadTemplates(options.clientPath);
 
 	var router = express.Router();
@@ -84,26 +93,33 @@ function loadTemplates(clientPath) {
 	});
 
 	return walkDirectory(pagesDir, function(path) {
-		if(Path.basename(path) === 'posts.json') {
-			return {fType: 'posts', contents: JSON.parse(fs.readFileSync(path, 'utf8'))};
-		}
+		try {
+			if(Path.basename(path) === 'posts.json') {
+				return {fType: 'posts', contents: JSON.parse(fs.readFileSync(path, 'utf8'))};
+			}
 
-		if(Path.extname(path) !== '.html') {
-			return {fType: 'unknown'};
-		}
+			if(Path.extname(path) !== '.html') {
+				return {fType: 'unknown'};
+			}
 
-		var templateText = fs.readFileSync(path, 'utf8');
-		var template = Handlebars.compile(templateText);
-		//execute each template on an empty context to test for syntax errors
-		template();
+			var templateText = fs.readFileSync(path, 'utf8');
+			var template = Handlebars.compile(templateText);
+			//execute each template on an empty context to test for syntax errors
+			template();
 
-		//if the first text in the template extends the context, parse it
-		var context = null;
-		var contextMatch = templateText.match(/\s*{{#\s*extend\-context\s+'([\s\S]*)'}}/m);
-		if(contextMatch) {
-			context = JSON.parse(contextMatch[1]);
+			//if the first text in the template extends the context, parse it
+			var context = null;
+			var contextMatch = templateText.match(/\s*{{#\s*extend\-context\s+'([\s\S]*)'}}/m);
+			if(contextMatch) {
+				context = JSON.parse(contextMatch[1]);
+			}
+			return {fType: 'template', contents: template, context: context};
 		}
-		return {fType: 'template', contents: template, context: context};
+		catch(e) {
+			var err = new CustomErrors.TemplateLoadError('Failed to load template', path, e);
+			console.error(err.message);
+			throw err;
+		}
 	});
 }
 
@@ -148,7 +164,26 @@ function walkDirectory(dirPath, f, urlPath) {
 					return dirIndex && dirIndex.type === 'file' && dirIndex.data.fType === 'template';
 				}).map(function(k) { return { path: k}; });
 		}
-		postsContent.posts = postsContent.posts.map(function(post) {
+
+		if(!postsContent.ignore) {
+			postsContent.ignore = [];
+		}
+		
+		if(!postsContent.order) {
+			postsContent.order = {}
+		}
+
+		if(!postsContent.order.field) {
+			postsContent.order.field = 'path';
+		}
+
+		if(postsContent.order.descending !== false) {
+			postsContent.order.descending = true;
+		}
+
+		postsContent.posts = postsContent.posts.filter(function(post) {
+			return !postsContent.ignore.includes(post.path);
+		}).map(function(post) {
 			var f = findFile(dir, post.path);
 			if(f.file && f.file.fType === 'template') {
 				var finalPost = Object.assign(Object.assign({}, f.file.context), post);
@@ -157,6 +192,20 @@ function walkDirectory(dirPath, f, urlPath) {
 				return finalPost;
 			}
 			return post;
+		});
+
+		postsContent.posts.sort(function(a, b) {
+			//no field, sort by path
+			var aVal = postsContent.order.field.split('.').reduce(function(o,i) {return o[i];}, a);
+			var bVal = postsContent.order.field.split('.').reduce(function(o,i) {return o[i];}, b);
+
+			if(postsContent.order.descending) {
+				var temp = aVal;
+				aVal = bVal;
+				bVal = temp;
+			}
+
+			return aVal < bVal ? -1: (aVal > bVal ? 1 : 0);
 		});
 	}
 	return dir;

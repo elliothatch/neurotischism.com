@@ -1,3 +1,9 @@
 {
-	"posts": "dirs"
+	"posts": "dirs",
+	"ignore": [
+		"composure"
+	],
+	"order": {
+		"field": "page.date"
+	}
 }

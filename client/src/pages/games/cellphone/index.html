@@ -1,0 +1,8 @@
+{{#extend-context '{"page": { "title": "cellphone", "date": "2013-12-02", "platforms": [{"platform": "html [chrome only]", "platformType": "browser", "url": "cellphone.html"}], "tags": ["games", "html"]} }'}}
+	{{#> layouts/gamepost.html }}
+		{{#*inline "gamepost-contents"}}
+		<p>the only action is clicking the character</p>
+		<p>don’t leave it running because the page will constantly redownload the image assets to restart the gifs</p>
+		{{/inline}}
+	{{/layouts/gamepost.html}}
+{{/extend-context}}

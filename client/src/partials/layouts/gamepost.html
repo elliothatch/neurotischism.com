@@ -1,0 +1,30 @@
+{{#> layouts/post.html}}
+	{{#*inline "post-contents"}}
+		<div class="gamepost-contents">
+			{{#> gamepost-contents}}
+				<!-- No layouts/gamepost.html contents -->
+			{{/gamepost-contents}}
+		</div>
+		<ul class="platforms">
+			{{#each page.platforms}}
+			<li><a href="{{ this.url }}">
+				{{#if (eq this.platformType 'browser')}}
+					play online ({{ this.platform }})
+				{{else if (eq this.platformType 'download')}}
+					download for {{ this.platform }}
+				{{/if}}
+			</a></li>
+			{{/each}}
+		</ul>
+		<ul class="source-urls">
+		{{#each page.sourceUrl}}
+			<li><a href="{{this}}">
+				{{#if (contains this 'github')}}
+					view source (github)
+				{{else}}
+					download source
+				{{/if}}</a></li>
+		{{/each}}
+		</ul>
+	{{/inline}}
+{{/layouts/post.html}}

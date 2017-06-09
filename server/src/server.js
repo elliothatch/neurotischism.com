@@ -38,7 +38,7 @@ function start(options) {
 	app.use(bodyParser.json());
 
 	app.use(logger({name: 'neurotischism', reqName: loggerName, level: options.logLevel}));
-	app.use(express.static(path.join(__dirname, '../../dist')));
+	app.use(express.static(path.join(__dirname, '../../client/dist')));
 	app.use(routes({loggerName: loggerName, clientPath: options.clientPath}));
 
 	server.listen(options.port);

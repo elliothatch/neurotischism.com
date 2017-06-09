@@ -14,6 +14,15 @@ module.exports = function(options) {
 	Handlebars.registerHelper('extend-context', function(context, options) {
 		return options.fn(Object.assign(Object.assign({}, this), JSON.parse(context)));
 	});
+
+	Handlebars.registerHelper('eq', function(lhs, rhs) {
+		return lhs == rhs;
+	});
+
+	Handlebars.registerHelper('contains', function(str, target) {
+		return (typeof str === 'string') && (typeof target === 'string')
+		 && str.includes(target);
+	});
 	var templates = loadTemplates(options.clientPath);
 
 	var router = express.Router();
@@ -65,8 +74,8 @@ module.exports = function(options) {
  */
 function loadTemplates(clientPath) {
 	var templates = {};
-	var partialsDir = Path.join(clientPath, 'partials');
-	var pagesDir = Path.join(clientPath, 'pages')
+	var partialsDir = Path.join(clientPath, 'src', 'partials');
+	var pagesDir = Path.join(clientPath, 'src', 'pages')
 
 	// register all partials
 	walkDirectory(partialsDir, function(path) {

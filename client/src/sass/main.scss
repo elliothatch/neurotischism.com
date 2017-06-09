@@ -1,0 +1,415 @@
+/* main.scss */
+
+@import 'reset';
+
+$primaryTextColor: white;
+$darkTextColor: black;
+$primaryBackgroundColor: black;
+$lightBackgroundColor: #dddddd;
+
+$pageContentWidth: 500px;
+$commentLabelWidth: 80px;
+
+/* Base */
+/* ----------------------------------------------------------*/
+
+*, *:before, *:after {
+  /* Chrome 9-, Safari 5-, iOS 4.2-, Android 3-, Blackberry 7- */
+  -webkit-box-sizing: border-box; 
+
+  /* Firefox (desktop or Android) 28- */
+  -moz-box-sizing: border-box;
+
+  /* Firefox 29+, IE 8+, Chrome 10+, Safari 5.1+, Opera 9.5+, iOS 5+, Opera Mini Anything, Blackberry 10+, Android 4+ */
+  box-sizing: border-box;
+}
+
+
+html, body { height: 100%; overflow-x: hidden; }
+
+  a, p, h1, h2, h3, h4, h5, h6, form, label, li, time, section {
+    color: $primaryTextColor;
+    background-color: $primaryBackgroundColor;
+    font-family:"Courier New", Courier, monospace;
+    overflow-x: hidden;
+  }
+
+a {
+  white-space: nowrap;
+}
+
+div {
+  font-family:"Courier New", Courier, monospace;
+}
+
+span {
+  font-family:"Courier New", Courier, monospace;
+}
+
+
+label {
+  display: inline-block;
+  float: left;
+  clear: left;
+  width: $commentLabelWidth;
+  text-align: right;
+}
+
+input, button, textarea {
+  display: inline-block;
+  float: left;
+  color: $darkTextColor;
+}
+
+button {
+  clear: left;
+  margin-left: $commentLabelWidth; 
+}
+
+section {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+code {
+  background-color: $lightBackgroundColor;
+  color: $darkTextColor;
+}
+
+li {
+  margin-bottom: 20px;
+}
+
+article {
+  background-color: $primaryBackgroundColor;
+}
+
+
+
+body {
+  /*
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  font-weight: 300;
+  background-color: #fdfdfd;
+  */
+}
+
+h1 {
+  margin-left:-1000px;
+  margin-right: -1000px;
+  padding-left:1000px;
+  padding-right:1000px;
+  margin-bottom:20px;
+
+	a {
+		color: inherit;
+		background-color: inherit;
+	}
+}
+
+h2 {
+  color: black;
+  background-color: white;
+   a {
+    color: inherit;
+    background-color: inherit;
+  }
+}
+
+h3 {
+  color: $primaryTextColor;
+  background-color: $primaryBackgroundColor;
+   a {
+
+    color: inherit;
+    background-color: inherit;
+  }
+}
+
+
+h4 {
+  color: white;
+  background-color: #EA2E49;
+  a {
+    color: inherit;
+    background-color: inherit;
+  }
+}
+
+/*
+h1, h2, h3, h4, h5, h6 { font-size: 100%; font-weight: 400; }
+*/
+/*
+a         { color: #2a7ae2; text-decoration: none; }
+a:hover   { color: #000; text-decoration: underline; }
+a:visited { color: #205caa; }
+*/
+
+/* Utility */
+
+/*
+.wrap:before,
+.wrap:after { content:""; display:table; }
+.wrap:after { clear: both; }
+.wrap {
+  max-width: 800px;
+  padding: 0 30px;
+  margin: 0 auto;
+  zoom: 1;
+}
+*/
+
+.pageContent {
+  position: relative;
+}
+
+.pageBody {
+  max-width: 850px;
+  //margin: 0 auto;
+  min-width: 320px;
+  margin: 0 40px 0 40px;
+  //margin:auto;
+}
+
+/*@media all and (min-width: 320px + 40px + 40px) {
+  .pageBody {
+    margin: 0 40px 0 40px;
+  }
+}*/
+
+.pageTitle {
+  position: relative;
+  a {
+  color: inherit;
+  background-color: transparent;
+  }
+}
+
+.formInfo {
+  float: left;
+  margin-left: 40px;
+}
+
+.postBody {
+  background-color: $primaryBackgroundColor;
+}
+
+#backButton {
+  background-color: transparent;
+  position: absolute;
+  right: 0px;
+  top: 0px;
+  margin: 0px 0px 0px 0px;
+  padding: 0px 0px 0px 0px;
+}
+
+.postsList {
+  position:absolute;
+  left:0;
+  right:0;
+
+  margin-left: 0px;
+  margin-right: 0px;
+
+  padding-left: 0px;
+  padding-right: 0px;
+
+	//background-color:$primaryBackgroundColor;
+
+	li {
+		margin-left: 0px;
+		margin-bottom: 0px;
+	}
+}
+
+.postTags {
+  color: $primaryTextColor;
+  background-color: $primaryBackgroundColor;
+}
+
+#letterSize {
+    font-family:"Courier New", Courier, monospace;
+    position: absolute;
+      visibility: hidden;
+      height: auto;
+      width: auto;
+  }
+
+  #foregroundWrapper {
+    position: absolute;
+    left: 0; top: 0;
+    width: 100%;
+  }
+
+  #bodyParagraph
+  {
+    position:absolute;
+    left: 0px;
+    /*margin: 0px 1000px 0px -100px;*/
+    width: 105%;
+  }
+
+  #gamePostBody
+  {
+    margin: 100px 100px 100px 100px;
+    position: relative;
+  }
+
+  .trashLink {
+
+    /*padding: -100px, 0px, 0px, -100px;*/
+    /*position: absolute;*/
+    /*margin: 0px 1000px 0px -100px;*/
+    left: -100px;
+    white-space: nowrap;
+    width: 100%;
+    overflow: hidden;
+  }
+  #recaptcha
+  {
+    float: left;
+  }
+
+/* Layout Styles */
+/* ----------------------------------------------------------*/
+
+/* Site header */
+
+.siteHeader {
+  /*
+  border-top: 5px solid #333;
+  border-bottom: 1px solid #e8e8e8;
+  min-height: 56px;
+  background-color: white;*/
+}
+
+#siteTitle,
+#siteTitle:hover,
+#siteTitle:visited {
+  color: $darkTextColor;
+  background-color: transparent;
+  font-family: "Times New Roman", Times, serif;
+  font-size: 64pt;
+  font-weight: bold;
+  text-shadow: -15px 0 white, 0 15px white, 15px 0 white, 0 -15px white;
+  padding: 80px 80px 20px 80px;
+  display: block;
+
+  /*display: block;
+  color: #333;
+  font-size: 26px;
+  letter-spacing: -1px;
+  float: left;
+  line-height: 56px;
+  position: relative;
+  z-index: 1;*/
+  text-decoration: none;
+}
+
+#backgroundCanvas
+{
+  position: fixed;
+  left: 0; top: 0;
+}
+#foregroundCanvas
+{
+  position: absolute;
+  left: 0; top: 0;
+  z-index: 999;
+  pointer-events: none;
+}
+
+.flashGamePage {
+  background-color: black;
+  text-align: center;
+}
+
+.flashGamePageContent {
+}
+
+.flashGameTitle {
+  color: white;
+  background-color: transparent;
+}
+
+.tagList {
+  padding-left: 0em;
+  margin-left: 2.5em;
+  background-color: $primaryBackgroundColor;
+}
+
+.count-container {
+  color: $primaryTextColor;
+  background-color: $primaryBackgroundColor;
+}
+
+.count-stopwatch {
+  color: $primaryTextColor;
+  background-color: $primaryBackgroundColor;
+  font-size: 24pt;
+  margin-top: 2em;
+  margin-bottom: 2em;
+}
+
+.count-value {
+  width: 3em;
+}
+
+#calmmodeModal {
+	display: none;
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	background-color: $lightBackgroundColor;
+	color: $darkTextColor;
+	width: 90%;
+	max-width: 960px;
+	margin: 0px auto;
+	padding: 1em;
+	z-index: 1000;
+	transform: translate(-50%, -50%);
+}
+
+#calmmodeModal h3 {
+	background-color: $lightBackgroundColor;
+	color: $darkTextColor;
+}
+
+
+#enableCalmmodeButton {
+	clear: none;
+	margin-left: 1em;
+}
+
+#calmmodeButton {
+	position: absolute;
+	background-color: $primaryBackgroundColor;
+	color: $primaryTextColor;
+	top: 10px;
+	right: 0px;
+	padding: 0.5em;
+	z-index: 1001;
+	cursor: pointer;
+}
+
+.platforms {
+	padding-left: 0;
+	margin-bottom: 25px;
+	li {
+		margin-bottom: 5px;
+	}
+}
+
+.source-urls {
+	padding-left: 0;
+	margin-bottom: 25px;
+	li {
+		margin-bottom: 5px;
+	}
+}
+
+.gamepost-contents {
+	margin-bottom: 25px;
+}

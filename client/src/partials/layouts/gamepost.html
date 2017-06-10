@@ -7,7 +7,7 @@
 		</div>
 		<ul class="platforms">
 			{{#each page.platforms}}
-			<li><a href="{{ this.url }}">
+			<li><a href="{{../this.url}}/{{ this.url }}">
 				{{#if (eq this.platformType 'browser')}}
 					play online ({{ this.platform }})
 				{{else if (eq this.platformType 'download')}}

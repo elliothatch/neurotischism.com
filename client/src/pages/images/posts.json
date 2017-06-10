@@ -1,0 +1,7 @@
+{
+	"posts": "files",
+	"type": "any",
+	"ignore": [
+		"index.html"
+	]
+}

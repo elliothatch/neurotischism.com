@@ -9,6 +9,8 @@ var CustomErrors = require('../util/custom-errors');
 
 var defaultDateFormat = 'MMMM D, YYYY [at] h:mm a z';
 var timezone = 'America/Los_Angeles';
+var tagsOrderField = 'page.date';
+var tagsDescending = true;
 
 /* options (object):
  *   - clientPath {string}: path to client directory, which should contain site/layouts/partials
@@ -41,7 +43,26 @@ module.exports = function(options) {
 		return new Handlebars.SafeString('<time datetime="' + Moment(dateStr).toISOString() + '">' + contents + '</time>');
 	});
 
-	var templates = loadTemplates(options.clientPath);
+	Handlebars.registerHelper('truncate', function(str, charCount, options) {
+		if(str == undefined) {
+			return str;
+		}
+
+		if(str.length <= charCount) {
+			return str;
+		}
+
+		return str.substring(0, charCount) + '...';
+	});
+
+	var siteData = loadTemplates(options.clientPath);
+	var tagsArray = Object.keys(siteData.tags).map(function(tagName) {
+		return {name: tagName, posts: siteData.tags[tagName]};
+	});
+
+	tagsArray.sort(function(a,b) {
+		return a.name.localeCompare(b.name);
+	});
 
 	var router = express.Router();
 
@@ -58,15 +79,16 @@ module.exports = function(options) {
 			path = path.substr(1, path.length-1);
 		}
 
-		var requestedFile = findFile(templates, path);
+		var requestedFile = findFile(siteData.templates, path);
 
 		if(!requestedFile.file || requestedFile.file.fType !== 'template') {
-			res.status(404).send('File not found'); //TODO: fancy 404 page
-			return;
+			return next();
 		}
 
 		var context = {
-			backUrl: '/' + path.split('/').slice(0, -1).join('/')
+			url: '/' + path,
+			backUrl: '/' + path.split('/').slice(0, -1).join('/'),
+			tags: tagsArray
 		};
 
 		if(requestedFile.directory['posts.json']) {
@@ -142,11 +164,15 @@ function loadTemplates(clientPath) {
  * executes f for every file in dirPath, returning an object representing the file tree
  * @param dirPath {string}: target path
  * @param f {string => {fType: 'template' | 'posts', contents: string | object}}: function that takes an absolute path to a file and returns an object with the fType and contents of the file
+ * @returns {object}
+ *  - templates {object}: maps each file/directory to a file entry
+ *  - tags {object}: maps tags to arrays of posts that used that tag
  */
-function walkDirectory(dirPath, f, urlPath) {
+function walkDirectory(dirPath, f, urlPath, isInnerCall) {
 	if(!urlPath) {
 		urlPath = '';
 	}
+	var tags = {};
 	var dir = fs.readdirSync(dirPath).reduce(function(out, file) {
 		var filePath = Path.join(dirPath, file);
 		var stats = fs.lstatSync(filePath);
@@ -154,20 +180,33 @@ function walkDirectory(dirPath, f, urlPath) {
 			out[file] = {type: 'file', data: f(filePath)};
 		}
 		else if(stats.isDirectory()) {
-			out[file] = {type: 'dir', contents: walkDirectory(filePath, f, [urlPath, file].join('/'))};
+			var dirData = walkDirectory(filePath, f, [urlPath, file].join('/'), true);
+			out[file] = {type: 'dir', contents: dirData.templates};
+			//merge tags
+			Object.keys(dirData.tags).forEach(function(tagName) {
+				if(!tags[tagName]) {
+					tags[tagName] = [];
+				}
+
+				tags[tagName] = tags[tagName].concat(dirData.tags[tagName]);
+			});
 		}
 
 		return out;
 	}, {});
 
-	// populate posts.json with template contexts
+	// populate posts.json and tags with template contexts
 	var posts = dir['posts.json'];
 	if(posts) {
 		var postsContent = posts.data.contents;
+
+		if(!postsContent.type) {
+			postsContent.type = 'template';
+		}
 		if(postsContent.posts === 'files') {
 			postsContent.posts = Object.keys(dir)
-				.filter(function(k) { return dir[k].type === 'file' && dir[k].data.fType === 'template';})
-				.map(function(k) { return { path: k }; });
+				.filter(function(k) { return dir[k].type === 'file' && k !== 'posts.json' && (postsContent.type === 'any' || dir[k].data.fType === postsContent.type);})
+				.map(function(k) { return { url: k }; });
 		}
 		if(postsContent.posts === 'dirs') {
 			postsContent.posts = Object.keys(dir)
@@ -176,8 +215,8 @@ function walkDirectory(dirPath, f, urlPath) {
 						return false;
 					}
 					let dirIndex = dir[k].contents['index.html'];
-					return dirIndex && dirIndex.type === 'file' && dirIndex.data.fType === 'template';
-				}).map(function(k) { return { path: k}; });
+					return dirIndex && dirIndex.type === 'file' && (postsContent.type === 'any' || dirIndex.data.fType === postsContent.type);
+				}).map(function(k) { return { url: k}; });
 		}
 
 		if(!postsContent.ignore) {
@@ -189,7 +228,7 @@ function walkDirectory(dirPath, f, urlPath) {
 		}
 
 		if(!postsContent.order.field) {
-			postsContent.order.field = 'path';
+			postsContent.order.field = 'url';
 		}
 
 		if(postsContent.order.descending !== false) {
@@ -197,20 +236,20 @@ function walkDirectory(dirPath, f, urlPath) {
 		}
 
 		postsContent.posts = postsContent.posts.filter(function(post) {
-			return !postsContent.ignore.includes(post.path);
+			return !postsContent.ignore.includes(post.url);
 		}).map(function(post) {
-			var f = findFile(dir, post.path);
+			var f = findFile(dir, post.url);
 			if(f.file && f.file.fType === 'template') {
-				var finalPost = Object.assign(Object.assign({}, f.file.context), post);
-				//convert to absolute path
-				finalPost.path = [urlPath, finalPost.path].join('/');
-				return finalPost;
+				post = Object.assign(Object.assign({}, f.file.context), post);
 			}
+
+			post.filename = post.url;
+			//convert to absolute url
+			post.url = [urlPath, post.url].join('/');
 			return post;
 		});
 
 		postsContent.posts.sort(function(a, b) {
-			//no field, sort by path
 			var aVal = postsContent.order.field.split('.').reduce(function(o,i) {return o[i];}, a);
 			var bVal = postsContent.order.field.split('.').reduce(function(o,i) {return o[i];}, b);
 
@@ -222,8 +261,39 @@ function walkDirectory(dirPath, f, urlPath) {
 
 			return aVal < bVal ? -1: (aVal > bVal ? 1 : 0);
 		});
+
+		//add posts to tags
+		postsContent.posts.forEach(function(post) {
+			if(post.page && Array.isArray(post.page.tags)) {
+				post.page.tags.forEach(function(tag) {
+					if(!tags[tag]) {
+						tags[tag] = [];
+					}
+					tags[tag].push(post);
+				});
+			}
+		});
+
 	}
-	return dir;
+
+	//sort the tags posts once we're done
+	if(!isInnerCall) {
+		Object.keys(tags).forEach(function(tagName) {
+			tags[tagName].sort(function(a, b) {
+				var aVal = tagsOrderField.split('.').reduce(function(o,i) {return o[i];}, a);
+				var bVal = tagsOrderField.split('.').reduce(function(o,i) {return o[i];}, b);
+
+				if(tagsDescending) {
+					var temp = aVal;
+					aVal = bVal;
+					bVal = temp;
+				}
+
+				return aVal < bVal ? -1: (aVal > bVal ? 1 : 0);
+			});
+		});
+	}
+	return {templates: dir, tags: tags};
 }
 
 /* Navigates a template object to find a specified file

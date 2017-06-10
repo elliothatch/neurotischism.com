@@ -1,0 +1,6 @@
+{
+	"posts": "dirs",
+	"order": {
+		"field": "page.date"
+	}
+}

@@ -1,0 +1,10 @@
+{{#extend-context '{"page": { "title": "welcome", "date": "2014-08-19", "tags": ["blog", "welcome"]}, "excerpt": "welcome to my zone" }'}}
+	{{#> layouts/post.html }}
+		{{#*inline "post-contents"}}
+			<p>welcome to my zone</p>
+
+			<p>ill try to keep it updated with paragraphs and pixels and bytes<br>
+			i hope you like it :)</p>
+		{{/inline}}
+	{{/layouts/post.html}}
+{{/extend-context}}

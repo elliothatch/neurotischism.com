@@ -1,0 +1,16 @@
+{{#extend-context '{"page": { "title": "blog" } }'}}
+	{{#> layouts/default.html }}
+	{{#*inline "default-contents"}}
+		{{#each posts}}
+			<article>
+				<h2 class="corruptZone"><a href="{{ this.url }}">{{ this.page.title }}</a></h2>
+				<div class="corruptZone">
+					{{time-tag (downcase (date page.date '')) page.date}}
+					<p class="post-excerpt">{{truncate this.excerpt 300 }}</p>
+				</div>
+				<h4 class="corruptZone read-header"><a href="{{ this.url }}">read</a></h4>
+			</article>
+		{{/each}}
+	{{/inline}}
+	{{/layouts/default.html}}
+{{/extend-context}}

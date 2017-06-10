@@ -1,0 +1,14 @@
+{{#extend-context '{"page": { "title": "tags" } }'}}
+	{{#> layouts/default.html }}
+	{{#*inline "default-contents"}}
+		{{#each tags}}
+		<h2 id="{{ this.name }}">{{ this.name }}</h2>
+		<ul class="tagList">
+			{{#each this.posts}}
+				<li><a href="{{ this.url }}">{{ this.page.title }}</a></li>
+			{{/each}}
+		</ul>
+		{{/each}}
+	{{/inline}}
+	{{/layouts/default.html}}
+{{/extend-context}}

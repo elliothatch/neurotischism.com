@@ -1,4 +1,7 @@
+var path = require('path');
+
 var express = require('express');
+
 var templating = require('./templating/routes');
 
 /* options (object):
@@ -12,6 +15,8 @@ module.exports = function(options) {
 	var router = express.Router();
 
 	router.use(templating({clientPath: options.clientPath}));
+	router.use(express.static(path.join(__dirname, '../../client/dist')));
+	router.use(express.static(path.join(__dirname, '../../client/src/pages')));
 
 	router.use(function(err, req, res, next) {
 		if(!err.status) {
@@ -33,6 +38,8 @@ module.exports = function(options) {
 
 		res.status(err.status).send(err.message || 'Internal Server Error');
 	});
+
+
 
 	return router;
 }

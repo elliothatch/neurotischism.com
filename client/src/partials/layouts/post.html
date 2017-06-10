@@ -1,10 +1,5 @@
 {{#> layouts/default.html}}
 	{{#*inline "default-contents"}}
-		{{#if page.date}}
-		<div id="post-date">
-			<p>{{time-tag (downcase (date page.date '')) page.date}}</p>
-		</div>
-		{{/if}}
 		<div id="postDescription">
 			{{#if page.description}}<p>{{ page.description }}</p>{{/if}}
 		</div>
@@ -14,6 +9,11 @@
 				<!-- No layouts/post.html contents -->
 			{{/post-contents}}
 		</div>
+		{{#if page.date}}
+		<div id="post-date">
+			<p>{{time-tag (downcase (date page.date '')) page.date}}</p>
+		</div>
+		{{/if}}
 		<div class="postTags">tags: {{#each page.tags}}<a href="/tags#{{this}}">{{ this }}</a> {{/each}}</div>
 		{{> includes/comments.html}}
 	{{/inline}}

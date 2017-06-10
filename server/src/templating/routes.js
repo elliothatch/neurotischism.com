@@ -3,11 +3,12 @@ var fs = require('fs');
 var Url = require('url');
 var express = require('express');
 var Handlebars = require('handlebars');
-var DateFormat = require('dateformat');
+var Moment = require('moment-timezone');
 
 var CustomErrors = require('../util/custom-errors');
 
-var defaultDateFormat = 'mmmm d, yyyy h:MM TT Z'
+var defaultDateFormat = 'MMMM D, YYYY [at] h:mm a z';
+var timezone = 'America/Los_Angeles';
 
 /* options (object):
  *   - clientPath {string}: path to client directory, which should contain site/layouts/partials
@@ -28,8 +29,16 @@ module.exports = function(options) {
 		 && str.includes(target);
 	});
 
+	Handlebars.registerHelper('downcase', function(str) {
+		return str.toLowerCase();
+	});
+
 	Handlebars.registerHelper('date', function(dateStr, formatStr, options) {
-		return new Handlebars.SafeString('<time datetime="' + DateFormat(dateStr, 'isoUtcDateTime') + '">' + DateFormat(dateStr, formatStr || defaultDateFormat) + '</time>');
+		return Moment(dateStr).tz(timezone).format(formatStr || defaultDateFormat);
+	});
+
+	Handlebars.registerHelper('time-tag', function(contents, dateStr, options) {
+		return new Handlebars.SafeString('<time datetime="' + Moment(dateStr).toISOString() + '">' + contents + '</time>');
 	});
 
 	var templates = loadTemplates(options.clientPath);
@@ -63,6 +72,12 @@ module.exports = function(options) {
 		if(requestedFile.directory['posts.json']) {
 			context.posts = requestedFile.directory['posts.json'].data.contents.posts;
 		}
+
+		//TODO: load dynamically
+		context.comments = [
+			{isowner: true, author: '[neurotischism', message: 'hello there!', timestamp: Moment().toISOString()},
+			{isowner: false, author: 'sam', message: 'good game', timestamp: Moment().toISOString()}
+		];
 
 		var html = requestedFile.file.contents(context);
 		res.status(200).send(html);

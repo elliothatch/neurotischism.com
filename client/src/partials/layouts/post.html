@@ -2,7 +2,7 @@
 	{{#*inline "default-contents"}}
 		{{#if page.date}}
 		<div id="post-date">
-			<p>{{date page.date ''}}</p>
+			<p>{{time-tag (downcase (date page.date '')) page.date}}</p>
 		</div>
 		{{/if}}
 		<div id="postDescription">

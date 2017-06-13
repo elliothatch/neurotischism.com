@@ -1,7 +1,4 @@
----
-layout: flashgame
-title: oval office custodian
-embedWidth: 640
-embedHeight: 480
-embedSwf: OvalOfficeCustodian.swf
----
+{{#extend-context '{"page": { "title": "oval office custodian", "embedWidth": 640, "embedHeight": 480, "embedSwf": "OvalOfficeCustodian.swf"}}'}}
+	{{#> layouts/flashgame.html }}
+	{{/layouts/flashgame.html}}
+{{/extend-context}}

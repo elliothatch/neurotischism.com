@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+	{{> includes/head.html}}
+	<body class="flashGamePage">
+		<div class="flashGamePageContent">
+			<h1 class="flashGameTitle">{{ page.title }}</h1>
+			<object width="{{ page.embedWidth }}" height="{{ page.embedHeight }}">
+				<param name="movie" value="{{ embedSwf }}">
+				<embed src="{{ page.embedSwf }}" width="{{ page.embedWidth }}" height="{{ page.embedHeight }}"></embed>
+			</object>
+			{{#> flashgame-contents }}
+				<!-- No layouts/flashgame.html contents -->
+			{{/flashgame-contents }}
+			<p><a href="{{ backUrl }}">back</a> - <a href="/">home</a></p>
+		</div>
+	</body>
+</html>

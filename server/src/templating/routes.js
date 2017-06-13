@@ -15,8 +15,10 @@ var tagsDescending = true;
 /* options (object):
  *   - clientPath {string}: path to client directory, which should contain site/layouts/partials
  */
-module.exports = function(options) {
+module.exports = function(options, middleware) {
 	options = Object.assign({}, options);
+
+	var middlewareStack = Array.isArray(middleware) && middleware.slice() || [];
 
 	Handlebars.registerHelper('extend-context', function(context, options) {
 		return options.fn(Object.assign(Object.assign({}, this), JSON.parse(context)));
@@ -66,6 +68,10 @@ module.exports = function(options) {
 
 	var router = express.Router();
 
+	router.get('/~config', function(req, res, next) {
+		res.status(200).send('hi');
+	});
+
 	router.get('/*', function(req, res, next) {
 		var path = req.path;
 
@@ -95,11 +101,13 @@ module.exports = function(options) {
 			context.posts = requestedFile.directory['posts.json'].data.contents.posts;
 		}
 
+		context = processMiddleware(middlewareStack, context);
+
 		//TODO: load dynamically
-		context.comments = [
-			{isowner: true, author: '[neurotischism', message: 'hello there!', timestamp: Moment().toISOString()},
-			{isowner: false, author: 'sam', message: 'good game', timestamp: Moment().toISOString()}
-		];
+		//context.comments = [
+			//{isowner: true, author: '[neurotischism', message: 'hello there!', timestamp: Moment().toISOString()},
+			//{isowner: false, author: 'sam', message: 'good game', timestamp: Moment().toISOString()}
+		//];
 
 		var html = requestedFile.file.contents(context);
 		res.status(200).send(html);
@@ -339,3 +347,11 @@ function findFile(templates, path) {
 
 	return { file: requestedFile, directory: currentDir};
 }
+
+function processMiddleware(stack, context, req, res) {
+	stack.forEach(function(middleware, req, res) {
+		middleware(context);
+	});
+	return context;
+}
+

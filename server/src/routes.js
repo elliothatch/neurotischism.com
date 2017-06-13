@@ -4,6 +4,8 @@ var express = require('express');
 
 var templating = require('./templating/routes');
 
+var freshrComments = require('./freshr-comments');
+
 /* options (object):
  *   - clientPath {string}: path to client directory, which should contain site/layouts/partials
  *   - silent {boolean}: no output if truthy
@@ -14,7 +16,7 @@ module.exports = function(options) {
 
 	var router = express.Router();
 
-	router.use(templating({clientPath: options.clientPath}));
+	router.use(templating({clientPath: options.clientPath}, [freshrComments]));
 	router.use(express.static(path.join(__dirname, '../../client/dist')));
 	router.use(express.static(path.join(__dirname, '../../client/src/pages')));
 

@@ -63,9 +63,10 @@ else {
 }
 
 
-document.getElementById('calmmodeButton').onclick = displayCalmmodeModal;
+//document.getElementById('calmmodeButton').onclick = displayCalmmodeModal;
 
 function displayCalmmodeModal() {
+	/*
 	if(calmmodeEnabled) {
 		document.getElementById('calmmodePhrase').textContent = 
 			'you are currently viewing a calmer version of the website';
@@ -81,6 +82,7 @@ function displayCalmmodeModal() {
 	enableCalmmodeButton.onclick = function() { hideCalmmodeModal(); setCalmmode(true); };
 	enableNormalmodeButton.onclick = function() { hideCalmmodeModal(); setCalmmode(false); };
 	document.getElementById('calmmodeModal').style.display = 'block';
+	*/
 }
 function hideCalmmodeModal() {
 	document.getElementById('calmmodeModal').style.display = 'none';
@@ -644,3 +646,353 @@ function HSVtoRGB(h, s, v) {
         b: Math.floor(b * 255)
     };
 }
+(function() {
+	var width = window.innerWidth;
+	var height = window.innerHeight;
+	var canvas = document.getElementById("main-canvas");
+	canvas.width = width;
+	canvas.height = height;
+	var ctx = canvas.getContext("2d");
+	var t = 0;
+	window.setInterval(function() {
+		canvas.width = width;
+		drawOnce(t++);
+	}, 30/1000);
+	//draw();
+
+	function draw()
+	{
+		for(var i = 0; i < 360; i++)
+		{
+			drawOnce(i);
+		}
+	}
+
+	var mouseX = width/2;
+	var mouseY = height/2;
+
+	canvas.onmousemove = function(event) {
+		mouseX = event.clientX;
+		mouseY = event.clientY;
+
+	}
+
+	function drawOnce(t)
+	{
+		var pupilRadius = 70;
+		var innerIrisRadius = 100;
+		var outerRadius = 250;
+		
+		var angle = t * 3.1 * Math.PI / 180;
+		//var r = Math.floor((t/360) * 255);
+		//var g = Math.floor((0.5*Math.sin(angle) + 0.5) * 255);
+		//var b = Math.floor((1.0) * 255);
+
+		var lookDirection = Math.atan2(mouseY-height/2, mouseX-width/2);
+		var lookDistance = Math.pow(Math.pow(mouseX-width/2,2) + Math.pow(mouseY-height/2,2), 2/5);
+		//iris and pupil
+		var pupilCenter = {
+			x: width/2 + lookDistance*Math.cos(lookDirection),
+			y: height/2 + lookDistance*Math.sin(lookDirection)
+		};
+
+		ctx.strokeStyle = '#000';
+		ctx.lineWidth = 5;
+		//ctx.fillStyle = '#fff';
+		//ctx.arc(pupilCenter.x, pupilCenter.y, outerRadius, 0, 2*Math.PI);
+		var pupilCount = 10;
+		for(var i = 0; i < pupilCount; i++) {
+			ctx.beginPath();
+			ctx.arc(pupilCenter.x, pupilCenter.y, lerp(0,pupilRadius,i/pupilCount)+Math.random()*3, 0, 2*Math.PI);
+			ctx.stroke();
+			ctx.closePath();
+		}
+
+		ctx.lineWidth = 2;
+		var irisCount = 360;
+		//iris
+		for(var i = 0; i < irisCount; i++) {
+			var color = HSVtoRGB(Math.random() * 0.1 + 0.8, 0.8, 0.8);
+			var radius = innerIrisRadius + Math.random()*40;
+			ctx.strokeStyle = rgb(color.r, color.g, color.b);
+			ctx.beginPath();
+			ctx.moveTo(pupilCenter.x + pupilRadius*Math.cos(i*Math.PI/180), pupilCenter.y + pupilRadius*Math.sin(i*Math.PI/180));
+			ctx.lineTo(pupilCenter.x + radius*Math.cos(i*Math.PI/180), pupilCenter.y + radius*Math.sin(i*Math.PI/180));
+			ctx.closePath();
+			ctx.stroke();
+
+			radius = outerRadius + Math.random()*10;
+			color = HSVtoRGB(Math.random() * 0.1, 0.8, 0.8);
+			ctx.strokeStyle = rgb(color.r, color.g, color.b);
+			ctx.beginPath();
+			ctx.moveTo(pupilCenter.x + pupilRadius*Math.cos(i*Math.PI/180+.01), pupilCenter.y + pupilRadius*Math.sin(i*Math.PI/180));
+			ctx.lineTo(pupilCenter.x + radius*Math.cos(i*Math.PI/180+.01), pupilCenter.y + radius*Math.sin(i*Math.PI/180));
+			ctx.closePath();
+			ctx.stroke();
+		}
+
+		/*
+		var r = Math.floor(Math.random() * 255);
+		var g = Math.floor(Math.random() * 255);
+		var b = Math.floor(Math.random() * 255);
+		ctx.strokeStyle = rgb(r,g,b);
+		ctx.beginPath();
+		ctx.moveTo(pupilCenter.x, pupilCenter.y);
+		ctx.lineTo(Math.sin(angle) * outerRadius + pupilCenter.x, Math.cos(angle) * outerRadius + pupilCenter.y);
+		ctx.closePath();
+		ctx.stroke();
+		ctx.strokeStyle = rgb(Math.floor(g/15),Math.floor(b/5),Math.floor(r/5));
+		ctx.beginPath();
+		ctx.moveTo(pupilCenter.x, pupilCenter.y);
+		ctx.lineTo(Math.sin(angle) * innerRadius + pupilCenter.x, Math.cos(angle) * innerRadius + pupilCenter.y);
+		ctx.closePath();
+		ctx.stroke();
+		*/
+		//ctx.fillStyle = "#000000";
+		//ctx.arc()
+
+		//top lid
+		//var lidColor = HSVtoRGB(Math.random(), 0.8, 0.8);
+		var eyeT = t/100 / (2*Math.PI) + 0.5;
+		var blinkPeriod = 4;
+		var blinkHeight = height*0.35;
+		var squintHeight = 40;
+		var lidColor = HSVtoRGB(0, 0.0, 1.0);
+		//bottom lid
+		ctx.strokeStyle = rgb(0,0,0);
+		ctx.fillStyle = rgb(lidColor.r, lidColor.g, lidColor.b);
+		ctx.beginPath();
+		ctx.moveTo(0, height/2);
+		ctx.quadraticCurveTo(width/2, height+height/3, width, height/2);
+		if(eyeT % blinkPeriod <= 1) {
+			ctx.quadraticCurveTo(width/2, height-(-Math.cos(eyeT*2*Math.PI)*(blinkHeight/2) + (blinkHeight/2-squintHeight)), 0, height/2);
+		} else {
+			ctx.quadraticCurveTo(width/2, height-(-Math.cos(eyeT*2*Math.PI)*squintHeight), 0, height/2);
+		}
+
+		//[-b+b-s, b+b-s]
+		//[-s, 2b-s]
+		//[h-(-b+b-s), (b+b-s)]
+		//[h-(-s), h-(2b-s)]
+		ctx.closePath();
+		ctx.stroke();
+		ctx.fill();
+
+		ctx.strokeStyle = rgb(0,0,0);
+		ctx.fillStyle = rgb(lidColor.r, lidColor.g, lidColor.b);
+		ctx.beginPath();
+		ctx.moveTo(0, height/2);
+		//top lid
+		ctx.quadraticCurveTo(width/2, -height/3, width, height/2);
+		if(eyeT % blinkPeriod <= 1) {
+			ctx.quadraticCurveTo(width/2, -Math.cos(eyeT*2*Math.PI)*blinkHeight*1.1+(blinkHeight*1.1-squintHeight), 0, height/2);
+		} else {
+			ctx.quadraticCurveTo(width/2, -Math.cos(eyeT*2*Math.PI)*squintHeight, 0, height/2);
+		}
+		//ctx.quadraticCurveTo(width/2, Math.sin(t/100)*40, 0, height/2);
+		ctx.closePath();
+		ctx.stroke();
+		ctx.fill();
+
+	}
+	function rgb(r, g, b){
+	  return "rgb("+r+","+g+","+b+")";
+	}
+	function lerp(a, b, t) {
+		return (b-a)*t + a;
+	}
+	function HSVtoRGB(h, s, v) 
+	{
+		var r, g, b, i, f, p, q, t;
+		if (h && s === undefined && v === undefined) {
+			s = h.s; v = h.v; h = h.h;
+		}
+		i = Math.floor(h * 6);
+		f = h * 6 - i;
+		p = v * (1 - s);
+		q = v * (1 - f * s);
+		t = v * (1 - (1 - f) * s);https://www.dropbox.com/s/16q6nxob8e1cfbb/eye2.html?dl=0
+		switch (i % 6) {
+			case 0: r = v; g = t; b = p; break;
+			case 1: r = q; g = v; b = p; break;
+			case 2: r = p; g = v; b = t; break;
+			case 3: r = p; g = q; b = v; break;
+			case 4: r = t; g = p; b = v; break;
+			case 5: r = v; g = p; b = q; break;
+		}
+		return {
+			r: Math.floor(r * 255),
+			g: Math.floor(g * 255),
+			b: Math.floor(b * 255)
+		};
+	}
+})//();
+(function() {
+	var width = window.innerWidth;
+	var height = window.innerHeight;
+	var canvas = document.getElementById("main-canvas");
+	canvas.width = width;
+	canvas.height = height;
+	var ctx = canvas.getContext("2d");
+	var t = 0;
+
+	var mouseX = width/2;
+	var mouseY = height/2;
+	canvas.onmousemove = function(event) {
+		//mouseX = event.clientX;
+		//mouseY = event.clientY;
+		drawOnce(event.clientX, event.clientY, t++);
+
+	}
+
+	var links = document.getElementsByTagName('a')
+	var linkHovered = false;
+	var linkX = 0;
+	var linkY = 0;
+	var linkT = 0;
+	var linkText = '';
+
+	for(var i = 0; i < links.length; i++) {
+		links[i].addEventListener('mouseenter', function(event) {
+			linkHovered = true;
+			var pos = event.target.getBoundingClientRect();
+			linkX = pos.left + (pos.right - pos.left)/2;
+			linkY = pos.top + (pos.bottom - pos.top)/2;
+			linkT = 0;
+			linkText = event.target.textContent;
+		});
+		links[i].addEventListener('mouseleave', function(event) {
+			linkHovered = false;
+		});
+	}
+
+	//window.setInterval(function() {
+		//drawOnce(mouseX, mouseY, t);
+		//t++;
+	//}, 1000/60);
+	window.setInterval(function() {
+		if(linkHovered) {
+			drawText(linkX, linkY, linkT);
+			linkT++;
+		}
+	}, 1000/30);
+
+
+	function drawText(x,y,t) {
+		var fontSize = t*20;
+		ctx.font = fontSize + 'px serif';
+
+		var color = HSVtoRGB(((x+y)/(width+height)+(t*0.01))%1, 0.6, 0.9);
+		ctx.fillStyle = rgb(color.r, color.g, color.b);
+		//var intensity = (0.5*Math.sin(t/3) + 0.5)*255;
+		//ctx.fillStyle = rgb(intensity, intensity, intensity);
+		/*
+		if(t% 10 < 5) {
+			ctx.fillStyle = rgb(255,255,255);
+		}
+		else {
+			ctx.fillStyle = rgb(0,0,0);
+		}
+		*/
+		var textSize = ctx.measureText(linkText);
+		ctx.fillText(linkText, linkX - textSize.width/2, linkY + fontSize/4);
+	}
+
+	var lastX = 0;
+	var lastY = 0;
+	function drawOnce(x,y,t) {
+
+		//ctx.fillStyle = rgb(0,0,0);
+		//ctx.fillRect(0,0,width,height);
+
+		//for(var i = 1; i < 25; i *= 2) {
+		for(var i = 0; i < 50; i++) {
+			var color = HSVtoRGB(((x+y)/(width+height)+(t*0.01+i*0.005))%1, 0.8, 0.5);
+			//var color = HSVtoRGB(((x+y)/(width+height)+(t*0.01+i*0.005))%1, 0.8, 0.95);
+			ctx.beginPath();
+			ctx.strokeStyle = rgb(color.r, color.g, color.b);
+			var size = Math.pow(i+5,2);// + 100*Math.sin(t/10) + 100;
+			if(i % 2 === 0) {
+				ctx.arc(x,y, size, 0, 2*Math.PI);
+			} else {
+				ctx.rect(x-size/2,y-size/2, size, size);
+			}
+
+			//ctx.arc(x,y, size, t*2*Math.PI/20, (t+3)*2*Math.PI/20);
+
+			//if(i % 8 === 0) {
+			//	ctx.arc(x,y, size, 0, 2*Math.PI);
+			//}
+			//else {
+				//drawPolygon(x,y,size,(i % 8)+2);
+			//}
+			ctx.stroke();
+			//drawDrop(t);
+		}
+
+		lastX = x;
+		lastY = y;
+	}
+
+	function drawPolygon(x,y,size,sides) {
+		ctx.moveTo(x + size * Math.cos(0), y + size * Math.sin(0));
+		for(var i = 1; i <= sides; i++) {
+			ctx.lineTo(x + size * Math.cos(i*2*Math.PI/sides), y + size * Math.sin(i*2*Math.PI/sides));
+		}
+	}
+
+	function drawDrop(t) {
+
+		var x = Math.random() * rainWidth + rainWidth;
+		var y = Math.random() * height;
+
+		var brightness = 255 * (1-(Math.abs(x - width/2) / (rainWidth/2)));
+
+		var size = 2;
+		ctx.beginPath();
+		ctx.fillStyle = rgb(brightness, brightness / 2, brightness / 4);
+		//ctx.fillRect(x-size/2,y-size/2, size, size);
+		ctx.arc(x,y,size, 0, 2 * Math.PI);
+		ctx.fill();
+	}
+
+	function rgb(r, g, b){
+	  return "rgb("+Math.floor(r)+","+Math.floor(g)+","+Math.floor(b)+")";
+	}
+
+function HSVtoRGB(h, s, v) 
+{
+	var r, g, b, i, f, p, q, t;
+	if (h && s === undefined && v === undefined) {
+		s = h.s; v = h.v; h = h.h;
+	}
+	i = Math.floor(h * 6);
+	f = h * 6 - i;
+	p = v * (1 - s);
+	q = v * (1 - f * s);
+	t = v * (1 - (1 - f) * s);
+	switch (i % 6) {
+		case 0: r = v; g = t; b = p; break;
+		case 1: r = q; g = v; b = p; break;
+		case 2: r = p; g = v; b = t; break;
+		case 3: r = p; g = q; b = v; break;
+		case 4: r = t; g = p; b = v; break;
+		case 5: r = v; g = p; b = q; break;
+	}
+	return {
+		r: Math.floor(r * 255),
+		g: Math.floor(g * 255),
+		b: Math.floor(b * 255)
+	};
+}
+
+//0-255
+function RGBtoHex(r, g, b)
+{
+	if(r && g === undefined && b === undefined) {
+		g = r.g; b = r.b; r = r.r;
+	}
+	var decColor = (r << 16) + (g << 8) + b;
+	return "#" + decColor.toString(16);
+}
+})();

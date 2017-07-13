@@ -4,6 +4,7 @@ var Url = require('url');
 var express = require('express');
 var Handlebars = require('handlebars');
 var Moment = require('moment-timezone');
+var Promise = require('bluebird');
 
 var CustomErrors = require('../util/custom-errors');
 
@@ -101,7 +102,14 @@ module.exports = function(options, middleware) {
 			context.posts = requestedFile.directory['posts.json'].data.contents.posts;
 		}
 
-		context = processMiddleware(middlewareStack, context);
+		processMiddleware(middlewareStack, context, req, res)
+			.then(function(context) {
+				var html = requestedFile.file.contents(context);
+				res.status(200).send(html);
+			})
+			.catch(function(err) {
+				next(err);
+			});
 
 		//TODO: load dynamically
 		//context.comments = [
@@ -109,8 +117,6 @@ module.exports = function(options, middleware) {
 			//{isowner: false, author: 'sam', message: 'good game', timestamp: Moment().toISOString()}
 		//];
 
-		var html = requestedFile.file.contents(context);
-		res.status(200).send(html);
 	});
 
 	return router;
@@ -349,9 +355,28 @@ function findFile(templates, path) {
 }
 
 function processMiddleware(stack, context, req, res) {
-	stack.forEach(function(middleware, req, res) {
-		middleware(context);
+	
+	return new Promise(function(resolve, reject) {
+		var stackIndex = -1;
+		var next = function(err) {
+			if(err) {
+				//err should be an error
+				return reject(err);
+			}
+
+			stackIndex++;
+			if(stackIndex >= stack.length) {
+				return resolve(context);
+			}
+			stack[stackIndex](next, context, req, res);
+		};
+
+		next();
 	});
-	return context;
+
+	//stack.forEach(function(middleware) {
+		//middleware(next, context, req, res);
+	//});
+	//return context;
 }
 

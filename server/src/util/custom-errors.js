@@ -1,4 +1,4 @@
-function _createError(name, constructor) {
+function _createError(name, status, constructor) {
 	var error = function(message) {
 		this.message = message;
 		this.stack = (new Error()).stack;
@@ -12,8 +12,11 @@ function _createError(name, constructor) {
 }
 
 module.exports = {
-	NotFoundError: _createError('NotFoundError'),
-	TemplateLoadError: _createError('TemplateLoadError', function(message, path, err) {
+	BadRequestError: _createError('BadRequestError', 400, function(message, originalError) {
+		this.originalError = originalError;
+	}),
+	NotFoundError: _createError('NotFoundError', 404),
+	TemplateLoadError: _createError('TemplateLoadError', 500, function(message, path, err) {
 		this.path = path;
 		this.err = err;
 		this.message = path + ': ' + message + ': ' +  err.message;

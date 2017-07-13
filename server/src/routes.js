@@ -1,9 +1,7 @@
 var path = require('path');
-
 var express = require('express');
 
 var templating = require('./templating/routes');
-
 var freshrComments = require('./freshr-comments');
 
 /* options (object):
@@ -16,7 +14,13 @@ module.exports = function(options) {
 
 	var router = express.Router();
 
-	router.use(templating({clientPath: options.clientPath}, [freshrComments]));
+	var comments = freshrComments({
+		whitelist: ['/blog/*', '/games/*', '/not-games/*'],
+		authorPasswords: {'[neurotischism': 'this is mine'}
+	});
+
+	router.use('/comments', comments.expressRouter);
+	router.use(templating({clientPath: options.clientPath}, [comments.freshrHandler]));
 	router.use(express.static(path.join(__dirname, '../../client/dist')));
 	router.use(express.static(path.join(__dirname, '../../client/src/pages')));
 

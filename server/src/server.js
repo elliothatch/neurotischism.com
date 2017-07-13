@@ -35,6 +35,7 @@ function start(options) {
 	server = http.Server(app);
 
 	app.use(compress());
+	app.use(bodyParser.urlencoded({extended: false}));
 	app.use(bodyParser.json());
 
 	app.use(logger({name: 'neurotischism', reqName: loggerName, level: options.logLevel}));

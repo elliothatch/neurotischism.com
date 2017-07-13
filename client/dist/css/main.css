@@ -701,3 +701,6 @@ a:visited { color: #205caa; }
 
 .gamepost-contents {
   margin-bottom: 25px; }
+
+.comments ul li h3 {
+  margin-top: 0; }

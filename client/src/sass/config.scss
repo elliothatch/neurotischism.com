@@ -1,0 +1,69 @@
+/* config.scss */
+
+@import 'reset';
+@import 'theming';
+
+$theme: mat-light-theme(
+	mat-palette($mat-deep-purple, 400),
+	mat-palette($mat-light-blue),
+	mat-palette($mat-red));
+
+$theme-primary: map-get($theme, primary);
+$theme-accent: map-get($theme, accent);
+$theme-foreground: map-get($theme, foreground);
+$theme-background: map-get($theme, background);
+
+$page-content-width: 800px;
+
+/* Base */
+/* ----------------------------------------------------------*/
+
+*, *:before, *:after {
+  /* Chrome 9-, Safari 5-, iOS 4.2-, Android 3-, Blackberry 7- */
+  -webkit-box-sizing: border-box; 
+
+  /* Firefox (desktop or Android) 28- */
+  -moz-box-sizing: border-box;
+
+  /* Firefox 29+, IE 8+, Chrome 10+, Safari 5.1+, Opera 9.5+, iOS 5+, Opera Mini Anything, Blackberry 10+, Android 4+ */
+  box-sizing: border-box;
+}
+
+
+html, body {
+	height: 100%;
+	overflow-x: hidden;
+}
+
+body {
+	background: mat-color($theme-background, background);
+	color: mat-color($theme-foreground, text);
+	margin: 0;
+}
+
+header {
+	margin: 0;
+	padding: 25px;
+	color: mat-color($theme-primary, default-contrast);
+	background: mat-color($theme-primary, default);
+
+	.title {
+		margin: 0;
+		text-align: center;
+		font-size: 3em;
+	}
+}
+
+.page-content {
+	max-width: $page-content-width;
+	margin: 0 auto;
+}
+
+/*
+  a, p, h1, h2, h3, h4, h5, h6, form, label, li, time, section {
+    color: $primaryTextColor;
+    background-color: $primaryBackgroundColor;
+    font-family:"Courier New", Courier, monospace;
+    overflow-x: hidden;
+  }
+  */

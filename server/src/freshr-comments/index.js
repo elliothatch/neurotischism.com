@@ -65,9 +65,14 @@ module.exports = function(options) {
 
 	return {
 		expressRouter: makeExpressRouter(options, dbWrap),
-		freshrHandler: makeFreshrHandler(options, dbWrap)
+		freshrHandler: makeFreshrHandler(options, dbWrap),
+		freshrConfig: makeFreshrConfig(options)
 	};
 
+}
+
+function makeFreshrConfig(options) {
+	return {};
 }
 
 function makeExpressRouter(options, dbWrap) {

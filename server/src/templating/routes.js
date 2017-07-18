@@ -98,6 +98,11 @@ module.exports = function(options, middleware) {
 			tags: tagsArray
 		};
 
+		context.configs = [
+			{ title: 'core', fields: [{name: 'field1'}, {name: 'field2'}]},
+			{ title: 'freshr-comments', fields: [{name: 'hello'}, {name: 'hi'}]}
+		];
+
 		if(requestedFile.directory['posts.json']) {
 			context.posts = requestedFile.directory['posts.json'].data.contents.posts;
 		}

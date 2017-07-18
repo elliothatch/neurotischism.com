@@ -1,3 +1,4 @@
+@charset "UTF-8";
 /* config.scss */
 /* reset.css */
 /*! normalize.css v3.0.1 | MIT License | git.io/normalize */
@@ -392,6 +393,7 @@ body {
 
 header {
   margin: 0;
+  border: 2px solid rgba(0, 0, 0, 0.87);
   padding: 25px;
   color: white;
   background: #7e57c2; }
@@ -404,11 +406,48 @@ header {
   max-width: 800px;
   margin: 0 auto; }
 
-/*
-  a, p, h1, h2, h3, h4, h5, h6, form, label, li, time, section {
-    color: $primaryTextColor;
-    background-color: $primaryBackgroundColor;
-    font-family:"Courier New", Courier, monospace;
-    overflow-x: hidden;
-  }
-  */
+.card {
+  margin: 10px;
+  /*border: 2px solid map-get($theme-foreground, text);*/
+  /*border-right: 2px solid map-get($theme-foreground, text);*/ }
+  .card .card-title {
+    /*border-top: 2px solid map-get($theme-foreground, text);*/
+    /*border-bottom: 2px solid map-get($theme-foreground, text);*/
+    border: 2px solid rgba(0, 0, 0, 0.87);
+    border-bottom: none;
+    border-top-left-radius: 40px;
+    border-top-right-radius: 40px;
+    /*transform: skewY(5deg);*/
+    /*transform-origin: top left;*/
+    width: 100%;
+    margin: 0;
+    color: white;
+    background: #7e57c2;
+    padding: 5px 15px; }
+  .card .card-body {
+    margin: 0 auto;
+    color: rgba(0, 0, 0, 0.87);
+    background: #d1c4e9;
+    padding: 3px;
+    border: 2px solid rgba(0, 0, 0, 0.87);
+    border-top: none;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px; }
+  .card ul {
+    margin: 0; }
+
+.collapser {
+  /*background: map-get($theme-background, disabled-button);*/
+  background: none;
+  border: none;
+  float: right; }
+  .collapser:hover {
+    background: rgba(0, 0, 0, 0.06); }
+  .collapser:after {
+    content: "–"; }
+  .collapsed .collapser:after {
+    content: "+"; }
+
+.collapsed > .collapser-target {
+  height: 0;
+  overflow-y: hidden; }

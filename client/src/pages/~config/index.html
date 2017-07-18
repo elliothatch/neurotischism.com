@@ -11,8 +11,22 @@
 	<body>
 		<header>
 			<h1 class="title">Freshr Configuration</h1>
-		</head>
+		</header>
 		<div class="page-content">
+			{{#each configs}}
+			<div class="config card collapser-wrapper">
+				<h2 class="card-title">{{this.title}} <button class="collapser"></button></h2>
+				<div class="card-body collapser-target">
+					<ul class="fields">
+						{{#each this.fields}}
+						<li>{{this.name}}</li>
+						{{/each}}
+					</ul>
+				</div>
+			</div>
+			{{/each}}
 		</div>
+	<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+	<script src="/javascript/config.js"></script>
 	</body>
 </html>

@@ -41,8 +41,11 @@ body {
 	margin: 0;
 }
 
+$primary-border-style: 2px solid map-get($theme-foreground, text);
+
 header {
 	margin: 0;
+	border: $primary-border-style;
 	padding: 25px;
 	color: mat-color($theme-primary, default-contrast);
 	background: mat-color($theme-primary, default);
@@ -59,11 +62,64 @@ header {
 	margin: 0 auto;
 }
 
-/*
-  a, p, h1, h2, h3, h4, h5, h6, form, label, li, time, section {
-    color: $primaryTextColor;
-    background-color: $primaryBackgroundColor;
-    font-family:"Courier New", Courier, monospace;
-    overflow-x: hidden;
-  }
-  */
+.card {
+	margin: 10px;
+	/*border: 2px solid map-get($theme-foreground, text);*/
+	/*border-right: 2px solid map-get($theme-foreground, text);*/
+	.card-title {
+		/*border-top: 2px solid map-get($theme-foreground, text);*/
+		/*border-bottom: 2px solid map-get($theme-foreground, text);*/
+		border: $primary-border-style;
+		border-bottom: none;
+		border-top-left-radius: 40px;
+		border-top-right-radius: 40px;
+		/*transform: skewY(5deg);*/
+		/*transform-origin: top left;*/
+		width: 100%;
+		margin: 0;
+		color: mat-color($theme-primary, default-contrast);
+		background: mat-color($theme-primary, default);
+		padding: 5px 15px;;
+
+	}
+	.card-body {
+		margin: 0 auto;
+		color: mat-color($theme-primary, lighter-contrast);
+		background: mat-color($theme-primary, lighter);
+		padding: 3px;
+		border: $primary-border-style;
+		border-top: none;
+		border-bottom-left-radius: 5px;
+		border-bottom-right-radius: 5px;
+	}
+
+	ul {
+		margin: 0;
+	}
+	.fields {
+	}
+}
+
+.collapser {
+	/*background: map-get($theme-background, disabled-button);*/
+	background: none;
+	border: none;
+	float: right;
+
+	&:hover {
+		background: map-get($theme-background, focused-button);
+	}
+
+	&:after {
+		content: "–";
+	}
+	.collapsed &:after {
+		content: "+";
+	}
+}
+
+.collapsed>.collapser-target {
+	height: 0;
+	overflow-y: hidden;
+}
+

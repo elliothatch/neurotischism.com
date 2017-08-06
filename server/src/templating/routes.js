@@ -7,6 +7,7 @@ var Moment = require('moment-timezone');
 var Promise = require('bluebird');
 
 var CustomErrors = require('../util/custom-errors');
+var FreshrConfig = require('./freshr-config');
 
 var defaultDateFormat = 'MMMM D, YYYY [at] h:mm a z';
 var timezone = 'America/Los_Angeles';
@@ -19,7 +20,11 @@ var tagsDescending = true;
 module.exports = function(options, middleware) {
 	options = Object.assign({}, options);
 
+	var config = FreshrConfig();
+
 	var middlewareStack = Array.isArray(middleware) && middleware.slice() || [];
+	//default middlewares
+	middlewareStack.push(config.freshrHandler);
 
 	Handlebars.registerHelper('extend-context', function(context, options) {
 		return options.fn(Object.assign(Object.assign({}, this), JSON.parse(context)));
@@ -69,9 +74,7 @@ module.exports = function(options, middleware) {
 
 	var router = express.Router();
 
-	//router.get('/~config', function(req, res, next) {
-	//	res.status(200).send('hi');
-	//});
+	router.use('/~config', config.expressRouter);
 
 	router.get('/*', function(req, res, next) {
 		var path = req.path;

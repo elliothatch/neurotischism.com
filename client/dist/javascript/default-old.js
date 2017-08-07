@@ -46,10 +46,62 @@ var canvas2 = document.getElementById("foregroundCanvas");
 
 	var recaptchaDisplayed = false;
 
-	var calmmodeEnabled = true;
+	var calmmodeEnabled = localStorage.getItem('calmmode');
 
+var enableCalmmodeButton = document.getElementById('enableCalmmodeButton');
+var enableNormalmodeButton = document.getElementById('enableNormalmodeButton');
+
+//calm mode storage, don't use flashing colors if the user asked them not to appear
+if(calmmodeEnabled === null) {
+	//enable calmmode, display the prompt
+	calmmodeEnabled = true;
+	//display modal and register button click handlers
+	//displayCalmmodeModal();
+}
+else {
+	calmmodeEnabled = (calmmodeEnabled === 'true');
+}
+
+
+//document.getElementById('calmmodeButton').onclick = displayCalmmodeModal;
+
+function displayCalmmodeModal() {
+	if(calmmodeEnabled) {
+		document.getElementById('calmmodePhrase').textContent = 
+			'you are currently viewing a calmer version of the website';
+		enableCalmmodeButton.textContent = 'continue with calm mode';
+		enableNormalmodeButton.textContent = 'enable flashing colors';
+	}
+	else {
+		document.getElementById('calmmodePhrase').textContent = 
+			'you are currently viewing the website with flashing colors';
+		enableCalmmodeButton.textContent = 'enable calm mode';
+		enableNormalmodeButton.textContent = 'continue with flashing colors';
+	}
+	enableCalmmodeButton.onclick = function() { hideCalmmodeModal(); setCalmmode(true); };
+	enableNormalmodeButton.onclick = function() { hideCalmmodeModal(); setCalmmode(false); };
+	document.getElementById('calmmodeModal').style.display = 'block';
+}
+function hideCalmmodeModal() {
+	document.getElementById('calmmodeModal').style.display = 'none';
+}
+
+function setCalmmode(b) {
+	calmmodeEnabled = b;
+	//set as string in local storage for compatability reasons
+	if(b) {
+		localStorage.setItem('calmmode', 'true');
+	}
+	else {
+		localStorage.setItem('calmmode', 'false');
+	}
+}
+
+
+	backgroundContext.fillStyle="#000000";
+	backgroundContext.fillRect(0,0,mainWidth,mainHeight);
 	window.onresize = onWindowResized;
-	window.setInterval(function(){backgroundY1 += 2; backgroundY1 = backgroundY1 % mainHeight;},1000/60);
+	window.setInterval(function(){backgroundY1 += 2; backgroundY1 = backgroundY1 % mainHeight; animateBackground();},1000/60);
 	window.setInterval(function(){changeTitleColor();},1000/30);
 	window.setInterval(function(){updateLinkLetterSpacing();},1000/30);
 	window.setInterval(function(){updateRandomCharacters();}, 1000/30);
@@ -98,7 +150,7 @@ var canvas2 = document.getElementById("foregroundCanvas");
 		canvas1.height = mainHeight;
 		canvas2.width = mainWidth;
 		canvas2.height = mainHeight;
-		//backgroundContext.fillRect(0,0,mainWidth,mainHeight);
+		backgroundContext.fillRect(0,0,mainWidth,mainHeight);
 		//resize trash links
 		updateTrashLinkLineCharacters();
 		//resize scrollLinks (destructive :) )
@@ -491,6 +543,34 @@ var canvas2 = document.getElementById("foregroundCanvas");
 		}
 	}
 
+	function animateBackground()
+	{
+			
+			backgroundR += Math.floor((Math.random() - 0.5) * 50);
+			backgroundG += Math.floor((Math.random() - 0.5) * 50);
+			backgroundB += Math.floor((Math.random() - 0.5) * 50);
+
+			var maxBg = 255;
+			if(calmmodeEnabled) {
+				maxBg = 100;
+			}
+			backgroundR = Math.max(0, backgroundR);
+			backgroundG = Math.max(0, backgroundG);
+			backgroundB = Math.max(0, backgroundB);
+			backgroundR = Math.min(maxBg, backgroundR);
+			backgroundG = Math.min(maxBg, backgroundG);
+			backgroundB = Math.min(maxBg, backgroundB);
+
+			for(var i = 0; i < 5; i++)
+			{
+					backgroundContext.beginPath();
+					backgroundContext.moveTo(0, (backgroundY1 * i) % mainHeight);
+					backgroundContext.lineTo(mainWidth, (backgroundY1 * i) % mainHeight);
+					backgroundContext.strokeStyle=rgbToHex(backgroundR,backgroundG,backgroundB);
+					backgroundContext.stroke();
+			}
+	}
+
 	function componentToHex(c) {
     var hex = c.toString(16);
     return hex.length == 1 ? "0" + hex : hex;
@@ -498,19 +578,6 @@ var canvas2 = document.getElementById("foregroundCanvas");
 
 	function changeTitleColor()
 	{
-
-		backgroundR += Math.floor((Math.random() - 0.5) * 50);
-		backgroundG += Math.floor((Math.random() - 0.5) * 50);
-		backgroundB += Math.floor((Math.random() - 0.5) * 50);
-
-		var maxBg = 100;
-		backgroundR = Math.max(0, backgroundR);
-		backgroundG = Math.max(0, backgroundG);
-		backgroundB = Math.max(0, backgroundB);
-		backgroundR = Math.min(maxBg, backgroundR);
-		backgroundG = Math.min(maxBg, backgroundG);
-		backgroundB = Math.min(maxBg, backgroundB);
-
 		var calcColorComp;
 		var color1, color2, color3, color4;
 		if(!calmmodeEnabled)

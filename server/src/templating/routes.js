@@ -63,6 +63,32 @@ module.exports = function(options, middleware) {
 		return str.substring(0, charCount) + '...';
 	});
 
+	//{name: 'copy', func: function() {}};
+
+	//TODO: design a recursive data structure that allows you to specify synchronous and asynchronous tasks (without separately defining a syncTasks property)
+	var buildResults = buildProject(options.clientPath, [
+		{name: 'javascript', sync: true, tasks: [
+				//{name: 'minify', func: function(logger) {logger.info('minifying'); return Promise.reject();}},
+				{name: 'minify', func: function(logger) {logger.info('minifying'); return Promise.resolve();}},
+				{name: 'concat', func: function(logger) {logger.warn('concat warn'); return Promise.resolve();}}
+		]},
+		{name: 'sass', func: function(logger) {logger.info('sassin'); return Promise.resolve();}},
+		{name: 'copy a bunch', tasks: [
+			{name: 'copy 1', func: function(logger) {logger.info('copy 1 going'); return Promise.resolve();}},
+			{name: 'copy recursive', tasks: [
+				{name: 'copy r1', func: function(logger) {logger.info('copy r1 going'); return Promise.resolve();}},
+				{name: 'copy double recursive', tasks: [
+					{name: 'copy rr1', func: function(logger) {logger.info('copy rr1 going'); return Promise.resolve();}},
+					{name: 'copy rr2', func: function(logger) {logger.info('copy rr2 going'); return Promise.resolve();}},
+				]},
+			]},
+			{name: 'copy 2', func: function(logger) {return Promise.delay(1000).then(function(){logger.info('copy 2 going'); return Promise.resolve();})}}
+		]}
+	]);
+	//var initDistData = initDist(options.clientPath, [
+		//{ src: 'javascript', dist: 'javascript', func: copySrcToDist(options.clientPath, 'javascript') },
+		//{ src: 'sass', dist: 'css' },
+
 	var siteData = loadTemplates(options.clientPath);
 	var tagsArray = Object.keys(siteData.tags).map(function(tagName) {
 		return {name: tagName, posts: siteData.tags[tagName]};
@@ -129,6 +155,138 @@ module.exports = function(options, middleware) {
 
 	return router;
 }
+
+/**
+ * @param dir{string} - subdirectory path
+ */
+function copySrcToDist(clientPath, dir) {
+	var srcPath = Path.join(clientPath, 'src', dir);
+	var distPath = Path.join(clientPath, 'dist', dir);
+	//TODO: copy
+}
+
+//Tasks start at status 0 and are overwritten if a higher status is set
+var TaskStatuses = {
+	none: 0,
+	success: 1,
+	warn: 2,
+	error: 3
+}
+
+var TaskLogger = function(task) {
+	this.task = task;
+	this.status = TaskStatuses['none'];
+	this.logs = [];
+	this.running = false;
+
+	function makeSubloggers(t) {
+		if(!t.tasks) {
+			return [];
+		}
+		
+		return t.tasks.map(function(st) {
+			return new TaskLogger(st);
+		});
+	}
+	
+	this.subloggers = makeSubloggers(task);
+}
+
+var LoggerLevelFunc = function(level, updateStatus) {
+	return function(message, data) {
+		if(updateStatus && TaskStatuses[level] > this.status) {
+			this.status = TaskStatuses[level];
+		}
+
+		console.log({level: level, message: message, data: data});
+		this.logs.push({level: level, message: message, data: data});
+	};
+}
+
+TaskLogger.prototype.info = new LoggerLevelFunc('info', false);
+TaskLogger.prototype.warn = new LoggerLevelFunc('warn', true);
+TaskLogger.prototype.error = new LoggerLevelFunc('error', true);
+
+TaskLogger.prototype.start = function() {
+	console.log('Start: ' + this.task.name);
+	this.running = true;
+};
+TaskLogger.prototype.done = function() {
+	console.log('Done: ' + this.task.name);
+	this.running = false;
+};
+
+/*
+ * Builds the project
+ * @param clientPath{string}: path to client directory
+ * @param tasks{object[]}: array of build tasks. All tasks should be paralellizable, but tasks can have sub-tasks that are performed in sequence
+ *      - name{string}: name of the build step
+ *      - func{Promise<> function(taskLogger)}
+ *      OR
+ *      - tasks{tasks[]}: subtasks
+ *      - sync{boolean}: subtasks should be executed in synchronously
+ */
+function buildProject(clientPath, tasks) {
+	var srcPath = Path.join(clientPath, 'src');
+	var distPath = Path.join(clientPath, 'dist');
+
+	var rootTask = {name: 'All tasks', tasks: tasks};
+
+	var rootLogger = new TaskLogger(rootTask);
+
+	//TODO: make this wait for all tasks to finish, even if some were rejected
+	function buildTask(task, logger) {
+		logger.start();
+		var buildPromise = null;
+		if(task.tasks && task.tasks.length > 0) {
+			if(task.sync) {
+				buildPromise = Promise.mapSeries(task.tasks, function(t,i) {
+					return buildTask(t, logger.subloggers[i]);
+				});
+			} else {
+				buildPromise = Promise.all(task.tasks.map(function(t,i) {
+					return buildTask(t, logger.subloggers[i]);
+				}));
+			}
+		} else if(task.func) {
+			buildPromise = task.func(logger);
+		} else {
+			console.warn('Task "' + task.name + '" has no build function or subtasks');
+			buildPromise = Promise.resolve();
+		}
+
+		return buildPromise.finally(function() {
+			logger.done();
+		});
+	}
+	
+	buildTask(rootTask, rootLogger)
+	.then(function(result) {
+		console.log('build successful: ' + result);
+	})
+	.catch(function(error) {
+		console.error('Build failed: ' + error);
+	});
+}
+//function initDist(clientPath, mappings) {
+	//dirs = 
+		
+		//['src', 'dist'].reduce(function(o, dir) {
+		//o[dir] = Path.join(clientPath, dir),
+		//return o;
+	//}, {})
+
+	//var jsDirs = {
+		//src: Path.join(clientPath, 'src', 'javascript'),
+		//dist: Path.join(clientPath, 'dist', 'javascript')
+	//}
+
+	//var sassDirs = {
+		//src: Path.join(clientPath, 'src', 'sass'),
+		//dist: Path.join(clientPath, 'dist', 'css')
+	//}
+//}
+
 /*
  * Registers all partials, using their relative path from "partials" directory as the name,
  * then compiles all templates in "pages" directory

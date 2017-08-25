@@ -56,14 +56,14 @@ if(calmmodeEnabled === null) {
 	//enable calmmode, display the prompt
 	calmmodeEnabled = true;
 	//display modal and register button click handlers
-	displayCalmmodeModal();
+	//displayCalmmodeModal();
 }
 else {
 	calmmodeEnabled = (calmmodeEnabled === 'true');
 }
 
 
-document.getElementById('calmmodeButton').onclick = displayCalmmodeModal;
+//document.getElementById('calmmodeButton').onclick = displayCalmmodeModal;
 
 function displayCalmmodeModal() {
 	if(calmmodeEnabled) {

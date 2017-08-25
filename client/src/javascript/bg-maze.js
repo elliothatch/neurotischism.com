@@ -11,15 +11,22 @@
 			{ hue: 0.1 + (1-0.1)*Math.random(), hueOffset: Math.random(), saturation: 0.8, value: 0.8 }
 		]
 
+	}
+
+	MazeAnimation.prototype.init = function() {
+		//this.gallery.canvas.style.background = '#555';
+		this.gallery.ctx.fillStyle = '#555';
+		this.gallery.ctx.fillRect(0, 0, this.gallery.width, this.gallery.height);
+
 		this.particleColor = this.particleColors[1];
 		this.gridSize = 3;
-		this.mazeWidth = gallery.width/gridSize;
-		this.mazeHeight = gallery.height/gridSize;
+		this.mazeWidth = this.gallery.width/this.gridSize;
+		this.mazeHeight = this.gallery.height/this.gridSize;
 		this.maze = generateMaze(this.mazeWidth, this.mazeHeight);
 		this.particles = [];
-		this.countWeight = this.countWeights[mode];
-		this.particleHoverStepCount  = this.particleHoverStepCounts[mode];
-		this.particlesCount = Math.floor(this.countWeight * (gallery.width+gallery.height));
+		this.countWeight = this.countWeights[this.mode];
+		this.particleHoverStepCount  = this.particleHoverStepCounts[this.mode];
+		this.particlesCount = Math.floor(this.countWeight * (this.gallery.width+this.gallery.height));
 		this.particleHueSpeed = 0.001;
 		for(var i = 0; i < this.particlesCount; i++) {
 			this.particles.push({
@@ -29,13 +36,11 @@
 				hue: Math.random()
 			});
 		}
-	}
 
-	MazeAnimation.prototype.init = function() {
 		//draw maze
 		for(var i = 0; i < this.mazeWidth; i++) {
-			for(var j = 0; j < mazeHeight; j++) {
-				this.gallery.ctx.strokeStyle = rgb(0,0,0);
+			for(var j = 0; j < this.mazeHeight; j++) {
+				this.gallery.ctx.strokeStyle = this.gallery.helpers.rgbStr(0,0,0);
 				this.gallery.ctx.strokeWidth = 1;
 				this.gallery.ctx.beginPath();
 				if(!this.maze[i][j].paths[0]) {
@@ -59,23 +64,24 @@
 		}
 	}
 
-	MazeAnimation.prototype.draw(t, deltaT)
+	MazeAnimation.prototype.draw = function(t, deltaT)
 	{
+		var _this = this;
 		this.particles.forEach(function(p) {
 
 			var stepDrawCount = 1;
 			//on hover
 			//mode 0: step several times after draw
 			//mode 1: step several times and draw each step
-			if(this.gallery.linkHovered && this.mode === 1) {
-				stepDrawCount = this.particleHoverStepCount;
+			if(_this.gallery.linkHovered && _this.mode === 1) {
+				stepDrawCount = _this.particleHoverStepCount;
 			}
 			for(var i = 0; i < stepDrawCount; i++) {
-				this.gallery.ctx.fillStyle = this.gallery.helpers.HSVtoRGBStr(p.hue * this.particleColor.hue + this.particleColor.hueOffset, this.particleColor.saturation, this.particleColor.value);
-				this.gallery.ctx.strokeStyle = this.gallery.helpers.HSVtoRGBStr(p.hue * this.particleColor.hue + this.particleColor.hueOffset, this.particleColor.saturation, this.particleColor.value);
-				this.gallery.ctx.beginPath();
-				this.gallery.ctx.rect(p.x * this.gridSize, p.y * this.gridSize, this.gridSize, this.gridSize);
-				this.gallery.ctx.fill();
+				_this.gallery.ctx.fillStyle = _this.gallery.helpers.HSVtoRGBStr(p.hue * _this.particleColor.hue + _this.particleColor.hueOffset, _this.particleColor.saturation, _this.particleColor.value);
+				_this.gallery.ctx.strokeStyle = _this.gallery.helpers.HSVtoRGBStr(p.hue * _this.particleColor.hue + _this.particleColor.hueOffset, _this.particleColor.saturation, _this.particleColor.value);
+				_this.gallery.ctx.beginPath();
+				_this.gallery.ctx.rect(p.x * _this.gridSize, p.y * _this.gridSize, _this.gridSize, _this.gridSize);
+				_this.gallery.ctx.fill();
 				/*
 				if(!linkHovered) {
 					ctx.rect(p.x * gridSize, p.y * gridSize, gridSize, gridSize);
@@ -95,8 +101,8 @@
 				*/
 
 					var stepCount = 1;
-					if(this.gallerylinkHovered && this.mode === 0) {
-						stepCount = this.particleHoverStepCount;
+					if(_this.gallery.linkHovered && _this.mode === 0) {
+						stepCount = _this.particleHoverStepCount;
 					}
 
 				for(var j = 0; j < stepCount; j++) {
@@ -104,7 +110,7 @@
 					//randomly pick available direction, not including backwards
 					var dirs = [0,1,2,3];
 					dirs.splice((p.direction+2)%4,1);
-					dirs = shuffle(dirs.filter(function(idx) { return this.maze[p.x][p.y].paths[idx]; }));
+					dirs = shuffle(dirs.filter(function(idx) { return _this.maze[p.x][p.y].paths[idx]; }));
 					if(dirs.length === 0) {
 						//no more directions, go back
 						p.direction = (p.direction+2)%4;
@@ -115,7 +121,7 @@
 					var n = goDirection(p.x, p.y, p.direction);
 					p.x = n.x;
 					p.y = n.y;
-					p.hue = (p.hue + particleHueSpeed) % 1;
+					p.hue = (p.hue + _this.particleHueSpeed) % 1;
 				}
 			}
 		});
@@ -209,5 +215,6 @@
 		return array;
 	}
 
-	window.AnimationGallery.addAnimation(MazeAnimation);
+	window.AnimationGallery.addAnimation('maze', MazeAnimation);
+	//window.AnimationGallery.startAnimation(0);
 })(window);

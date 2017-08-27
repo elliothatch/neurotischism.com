@@ -1,10 +1,12 @@
 var Path = require('path');
-var fs = require('fs');
+var fs = require('fs-extra');
 var Url = require('url');
 var express = require('express');
 var Handlebars = require('handlebars');
 var Moment = require('moment-timezone');
 var Promise = require('bluebird');
+
+var sass = require('node-sass');
 
 var CustomErrors = require('../util/custom-errors');
 var FreshrConfig = require('./freshr-config');
@@ -64,8 +66,12 @@ module.exports = function(options, middleware) {
 	});
 
 	//{name: 'copy', func: function() {}};
+	var buildPromise = buildProject(options.clientPath, [
+		{name: 'javascript', func: makeCopySrcToDistTask('javascript')},
+		{name: 'sass', func: makeCompileSassTask('sass', 'css', ['main', 'shakespeare'])}
+	]);
 
-	//TODO: design a recursive data structure that allows you to specify synchronous and asynchronous tasks (without separately defining a syncTasks property)
+	/*
 	var buildResults = buildProject(options.clientPath, [
 		{name: 'javascript', sync: true, tasks: [
 				//{name: 'minify', func: function(logger) {logger.info('minifying'); return Promise.reject();}},
@@ -85,6 +91,7 @@ module.exports = function(options, middleware) {
 			{name: 'copy 2', func: function(logger) {return Promise.delay(1000).then(function(){logger.info('copy 2 going'); return Promise.resolve();})}}
 		]}
 	]);
+	*/
 	//var initDistData = initDist(options.clientPath, [
 		//{ src: 'javascript', dist: 'javascript', func: copySrcToDist(options.clientPath, 'javascript') },
 		//{ src: 'sass', dist: 'css' },
@@ -159,10 +166,46 @@ module.exports = function(options, middleware) {
 /**
  * @param dir{string} - subdirectory path
  */
-function copySrcToDist(clientPath, dir) {
-	var srcPath = Path.join(clientPath, 'src', dir);
-	var distPath = Path.join(clientPath, 'dist', dir);
-	//TODO: copy
+function makeCopySrcToDistTask(dir) {
+	return function(clientPath, logger) {
+		var srcPath = Path.join(clientPath, 'src', dir);
+		var distPath = Path.join(clientPath, 'dist', dir);
+		
+		logger.info("Removing '" + distPath + "'");
+		return fs.remove(distPath).then(function() {
+			logger.info("Copying '" + srcPath + "' to '" + distPath + "'");
+			return fs.copy(srcPath, distPath);
+		});
+	}
+}
+/**
+ * @param srcName{string}
+ * @param distName{string}
+ */
+function makeCompileSassTask(srcName, distName, files) {
+	return function(clientPath, logger) {
+		var srcPath = Path.join(clientPath, 'src', srcName);
+		var distPath = Path.join(clientPath, 'dist', distName);
+
+		logger.info("Removing '" + distPath + "'");
+		return fs.remove(distPath).then(function() {
+			return Promise.all(files.map(function(f) {
+				var outFile = Path.join(distPath, f + '.css');
+				return Promise.promisify(sass.render)({
+					file: Path.join(srcPath, f + '.scss'),
+					outFile: outFile,
+					sourceMap: true
+				}).then(function(result) {
+					return Promise.all([
+						fs.outputFile(outFile, result.css),
+						fs.outputFile(outFile + '.map', result.map)
+					]);
+				});
+			}));
+			logger.info("Compiling '" + srcPath + "' to '" + distPath + "'");
+			return fs.copy(srcPath, distPath);
+		});
+	}
 }
 
 //Tasks start at status 0 and are overwritten if a higher status is set
@@ -198,7 +241,7 @@ var LoggerLevelFunc = function(level, updateStatus) {
 			this.status = TaskStatuses[level];
 		}
 
-		console.log({level: level, message: message, data: data});
+		console.log(level + ": " + this.task.name + ": " + message);
 		this.logs.push({level: level, message: message, data: data});
 	};
 }
@@ -235,6 +278,7 @@ function buildProject(clientPath, tasks) {
 	var rootLogger = new TaskLogger(rootTask);
 
 	//TODO: make this wait for all tasks to finish, even if some were rejected
+	//TODO: standard error log for rejected promises
 	function buildTask(task, logger) {
 		logger.start();
 		var buildPromise = null;
@@ -249,7 +293,8 @@ function buildProject(clientPath, tasks) {
 				}));
 			}
 		} else if(task.func) {
-			buildPromise = task.func(logger);
+			//resolve is to convert non-bluebird promises, so we can use bluebird helpers
+			buildPromise = Promise.resolve(task.func(clientPath, logger));
 		} else {
 			console.warn('Task "' + task.name + '" has no build function or subtasks');
 			buildPromise = Promise.resolve();

@@ -20,7 +20,7 @@ module.exports = function(options) {
 	});
 
 	router.use('/comments', comments.expressRouter);
-	router.use(templating({clientPath: options.clientPath}, [comments.freshrHandler]));
+	router.use(templating(options, [comments.freshrHandler]));
 	router.use(express.static(path.join(__dirname, '../../client/dist')));
 	router.use(express.static(path.join(__dirname, '../../client/src/pages')));
 

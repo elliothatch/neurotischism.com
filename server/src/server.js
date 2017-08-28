@@ -8,6 +8,8 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var compress = require('compression');
 
+var io = require('socket.io');
+
 var routes = require('./routes');
 var logger = require('./util/logger');
 
@@ -33,13 +35,14 @@ function start(options) {
 
 	app = express();
 	server = http.Server(app);
+	socketServer = io(http);
 
 	app.use(compress());
 	app.use(bodyParser.urlencoded({extended: false}));
 	app.use(bodyParser.json());
 
 	app.use(logger({name: 'neurotischism', reqName: loggerName, level: options.logLevel}));
-	app.use(routes({loggerName: loggerName, clientPath: options.clientPath}));
+	app.use(routes({loggerName: loggerName, clientPath: options.clientPath, socketServer: socketServer}));
 
 	server.listen(options.port);
 	console.log('Listening on port ' + options.port);

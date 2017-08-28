@@ -31,7 +31,8 @@
     "moment": "^2.18.1",
     "moment-timezone": "^0.5.13",
     "mongodb": "^2.2.30",
-    "safe-json-stringify": "^1.0.4"
+    "safe-json-stringify": "^1.0.4",
+    "socket.io": "^2.0.3"
   },
   "devDependencies": {
     "node-sass": "^4.5.3"

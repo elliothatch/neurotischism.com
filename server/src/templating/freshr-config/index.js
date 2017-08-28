@@ -1,16 +1,17 @@
 var Promise = require('bluebird');
 var express = require('express');
-
-var CustomErrors = require('../../util/custom-errors');
+var BuildManager = require('./build');
 
 /* Constructs a freshr-config instance which has two properties:
  * exoressRouter - an express middleware which accepts a POST to `/` containing JSON of configuration fields that should be updated, then redirects
- * freshrHandler - a Freshr middleware that loads configuration options when visiting `/~config`
+ * freshrHandler - a Freshr middleware that loads configuration omeptions when visiting `/~config`
  * parameters:
  * options{object}
  */
 module.exports = function(options) {
 	options = Object.assign({}, options);
+
+	options.socketServer.of('/~config').use(makeSocketHandler(options));
 
 	return {
 		expressRouter: makeExpressRouter(options),
@@ -65,3 +66,15 @@ function makeFreshrHandler(options, dbWrap) {
 	};
 }
 
+function makeSocketHandler(options) {
+	return function(socket) {
+		socket.on('build', function(data) {
+			BuildManager.buildProject(options.clientPath, [
+				{name: 'javascript', func: makeCopySrcToDistTask('javascript')},
+				{name: 'sass', func: makeCompileSassTask('sass', 'css', ['main', 'shakespeare', 'config'])}
+			]).then(function(result) {
+				socket.emit('
+			});
+		});
+	};
+}

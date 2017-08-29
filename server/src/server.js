@@ -35,7 +35,7 @@ function start(options) {
 
 	app = express();
 	server = http.Server(app);
-	socketServer = io(http);
+	socketServer = io(server);
 
 	app.use(compress());
 	app.use(bodyParser.urlencoded({extended: false}));

@@ -1,5 +1,6 @@
-var Promise = require('bluebird');
 var Path = require('path');
+var Observable = require('rxjs/Rx').Observable;
+var Promise = require('bluebird');
 var fs = require('fs-extra');
 
 var sass = require('node-sass');
@@ -12,8 +13,12 @@ var TaskStatuses = {
 	error: 3
 }
 
-var TaskLogger = function(task) {
+//paths to tasks in the task structure are described by an array of ints
+//an empty array means the root task, the first value is the index into rootTask.tasks, the second value is the index into that task's tasks array, and so on
+var TaskLogger = function(task, observer, taskPath) {
 	this.task = task;
+	this.observer = observer;
+	this.taskPath = taskPath;
 	this.status = TaskStatuses['none'];
 	this.logs = [];
 	this.running = false;
@@ -23,8 +28,8 @@ var TaskLogger = function(task) {
 			return [];
 		}
 
-		return t.tasks.map(function(st) {
-			return new TaskLogger(st);
+		return t.tasks.map(function(st, i) {
+			return new TaskLogger(st, observer, taskPath.concat([i]));
 		});
 	}
 
@@ -37,8 +42,9 @@ var LoggerLevelFunc = function(level, updateStatus) {
 			this.status = TaskStatuses[level];
 		}
 
-		console.log(level + ": " + this.task.name + ": " + message);
-		this.logs.push({level: level, message: message, data: data});
+		var log = {level: level, message: message, data: data};
+		this.logs.push(log);
+		this.observer.next({eType: 'task/log', path: this.taskPath, status: this.status, log: log});
 	};
 }
 
@@ -47,12 +53,21 @@ TaskLogger.prototype.warn = new LoggerLevelFunc('warn', true);
 TaskLogger.prototype.error = new LoggerLevelFunc('error', true);
 
 TaskLogger.prototype.start = function() {
-	console.log('Start: ' + this.task.name);
+	this.observer.next({eType: 'task/start', path: this.taskPath});
 	this.running = true;
 };
 TaskLogger.prototype.done = function() {
-	console.log('Done: ' + this.task.name);
+	this.observer.next({eType: 'task/done', path: this.taskPath});
 	this.running = false;
+};
+
+TaskLogger.prototype.serializeTaskStructure = function() {
+	return {
+		name: this.task.name,
+		status: this.status,
+		running: this.running,
+		tasks: this.subloggers.map(function(sublogger) { return sublogger.serializeTaskStructure(); })
+	};
 };
 
 /**
@@ -109,50 +124,64 @@ function makeCompileSassTask(srcName, distName, files) {
  *      OR
  *      - tasks{tasks[]}: subtasks
  *      - sync{boolean}: subtasks should be executed in synchronously
+ *
+ * @returns {EventEmitter}: emits following events:
+ *      - 'start'{SerializedTask}
+ *      - 'success'{}
+ *      - 'fail'{}
+ *      - 'task/start'{{path}}
+ *      - 'task/log'{{path, status, log}}
+ *      - 'task/done'{{path}}
  */
 function buildProject(clientPath, tasks) {
 	var srcPath = Path.join(clientPath, 'src');
 	var distPath = Path.join(clientPath, 'dist');
 
-	var rootTask = {name: 'All tasks', tasks: tasks};
+	var rootTask = {name: 'Build', tasks: tasks};
 
-	var rootLogger = new TaskLogger(rootTask);
+	return Observable.create(function(buildEventsObserver) {
+		var rootLogger = new TaskLogger(rootTask, buildEventsObserver, []);
+		buildEventsObserver.next({eType: 'start', tasks: rootLogger.serializeTaskStructure()});
 
-	//TODO: make this wait for all tasks to finish, even if some were rejected
-	//TODO: standard error log for rejected promises
-	function buildTask(task, logger) {
-		logger.start();
-		var buildPromise = null;
-		if(task.tasks && task.tasks.length > 0) {
-			if(task.sync) {
-				buildPromise = Promise.mapSeries(task.tasks, function(t,i) {
-					return buildTask(t, logger.subloggers[i]);
-				});
+		//TODO: make this wait for all tasks to finish, even if some were rejected
+		//TODO: standard error log for rejected promises
+		function buildTask(task, logger) {
+			logger.start();
+			var buildPromise = null;
+			if(task.tasks && task.tasks.length > 0) {
+				if(task.sync) {
+					buildPromise = Promise.mapSeries(task.tasks, function(t,i) {
+						return buildTask(t, logger.subloggers[i]);
+					});
+				} else {
+					buildPromise = Promise.all(task.tasks.map(function(t,i) {
+						return buildTask(t, logger.subloggers[i]);
+					}));
+				}
+			} else if(task.func) {
+				//resolve is to convert non-bluebird promises, so we can use bluebird helpers
+				buildPromise = Promise.resolve(task.func(clientPath, logger));
 			} else {
-				buildPromise = Promise.all(task.tasks.map(function(t,i) {
-					return buildTask(t, logger.subloggers[i]);
-				}));
+				console.warn('Task "' + task.name + '" has no build function or subtasks');
+				buildPromise = Promise.resolve();
 			}
-		} else if(task.func) {
-			//resolve is to convert non-bluebird promises, so we can use bluebird helpers
-			buildPromise = Promise.resolve(task.func(clientPath, logger));
-		} else {
-			console.warn('Task "' + task.name + '" has no build function or subtasks');
-			buildPromise = Promise.resolve();
+
+			return buildPromise.finally(function() {
+				logger.done();
+			});
 		}
 
-		return buildPromise.finally(function() {
-			logger.done();
-		});
-	}
-
-	buildTask(rootTask, rootLogger)
-		.then(function(result) {
-			console.log('build successful: ' + result);
-		})
-		.catch(function(error) {
-			console.error('Build failed: ' + error);
-		});
+		buildTask(rootTask, rootLogger)
+			.then(function(result) {
+				buildEventsObserver.next({eType: 'success', result: result});
+			})
+			.catch(function(error) {
+				buildEventsObserver.next({eType: 'fail', error: error});
+			})
+			.finally(function() {
+				buildEventsObserver.complete();
+			});
+	});
 }
 
 	/*
@@ -176,3 +205,11 @@ function buildProject(clientPath, tasks) {
 		]}
 	]);
 	*/
+
+module.exports = {
+	buildProject: buildProject,
+	tasks: {
+		makeCopySrcToDistTask: makeCopySrcToDistTask,
+		makeCompileSassTask: makeCompileSassTask
+	}
+};

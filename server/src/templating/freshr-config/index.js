@@ -67,14 +67,22 @@ function makeFreshrHandler(options, dbWrap) {
 }
 
 function makeSocketHandler(options) {
-	return function(socket) {
+	var buildEmitter = BuildManager.buildProject(options.clientPath, [
+		{name: 'javascript', func: BuildManager.tasks.makeCopySrcToDistTask('javascript')},
+		{name: 'sass', func: BuildManager.tasks.makeCompileSassTask('sass', 'css', ['main', 'shakespeare', 'config'])}
+	]);
+	return function(socket, next) {
 		socket.on('build', function(data) {
+			console.log('build', data);
 			BuildManager.buildProject(options.clientPath, [
-				{name: 'javascript', func: makeCopySrcToDistTask('javascript')},
-				{name: 'sass', func: makeCompileSassTask('sass', 'css', ['main', 'shakespeare', 'config'])}
-			]).then(function(result) {
-				socket.emit('
+				{name: 'javascript', func: BuildManager.tasks.makeCopySrcToDistTask('javascript')},
+				{name: 'sass', func: BuildManager.tasks.makeCompileSassTask('sass', 'css', ['main', 'shakespeare', 'config'])}
+			]).subscribe(function(event) {
+				var eType = event.eType;
+				delete event.eType;
+				socket.emit('build/' + eType, event);
 			});
 		});
+		next();
 	};
 }

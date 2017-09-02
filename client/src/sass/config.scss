@@ -3,9 +3,31 @@
 @import 'reset';
 @import 'theming';
 
+$mat-fresh-green: (
+  300: #81ffa8,
+  500: #43ea78,
+  700: #00b649,
+  contrast: (
+	50: $black-87-opacity,
+	100: $black-87-opacity,
+	200: $black-87-opacity,
+    300: $black-87-opacity,
+	400: $black-87-opacity,
+	500: $black-87-opacity,
+	600: $black-87-opacity,
+	700: $black-87-opacity,
+	800: $white-87-opacity,
+	900: $white-87-opacity,
+	A100: $black-87-opacity,
+	A200: $black-87-opacity,
+	A400: $black-87-opacity,
+	A700: $black-87-opacity,
+  )
+);
+
 $theme: mat-light-theme(
-	mat-palette($mat-deep-purple, 400),
-	mat-palette($mat-light-blue),
+	mat-palette($mat-fresh-green, 500, 300, 700),
+	mat-palette($mat-yellow),
 	mat-palette($mat-red));
 
 $theme-primary: map-get($theme, primary);
@@ -41,11 +63,13 @@ body {
 	margin: 0;
 }
 
-$primary-border-style: 2px solid map-get($theme-foreground, text);
+$primary-border-style: 1px solid map-get($theme-foreground, text);
 
 header {
 	margin: 0;
-	border: $primary-border-style;
+	/*border: $primary-border-style;*/
+	border-top: 30px solid mat-color($theme-primary, darker);
+	border-bottom: 5px solid map-get($theme-foreground, divider);
 	padding: 25px;
 	color: mat-color($theme-primary, default-contrast);
 	background: mat-color($theme-primary, default);
@@ -69,10 +93,10 @@ header {
 	.card-title {
 		/*border-top: 2px solid map-get($theme-foreground, text);*/
 		/*border-bottom: 2px solid map-get($theme-foreground, text);*/
-		border: $primary-border-style;
-		border-bottom: none;
-		border-top-left-radius: 40px;
-		border-top-right-radius: 40px;
+		/*border: $primary-border-style;*/
+		/*border-bottom: none;*/
+		/*border-top-left-radius: 5px;*/
+		/*border-top-right-radius: 5px;*/
 		/*transform: skewY(5deg);*/
 		/*transform-origin: top left;*/
 		width: 100%;
@@ -87,10 +111,10 @@ header {
 		color: mat-color($theme-primary, lighter-contrast);
 		background: mat-color($theme-primary, lighter);
 		padding: 3px;
-		border: $primary-border-style;
-		border-top: none;
-		border-bottom-left-radius: 5px;
-		border-bottom-right-radius: 5px;
+		/*border: $primary-border-style;*/
+		/*border-top: none;*/
+		/*border-bottom-left-radius: 5px;*/
+		/*border-bottom-right-radius: 5px;*/
 	}
 
 	ul {

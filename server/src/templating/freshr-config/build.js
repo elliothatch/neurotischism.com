@@ -4,6 +4,7 @@ var Promise = require('bluebird');
 var fs = require('fs-extra');
 
 var sass = require('node-sass');
+var babel = require('babel-core');
 
 //Tasks start at status 0 and are overwritten if a higher status is set
 var TaskStatuses = {
@@ -70,21 +71,33 @@ TaskLogger.prototype.serializeTaskStructure = function() {
 	};
 };
 
+
+function makeCleanTask(dir) {
+	return {
+		name: 'clean',
+		func: function(clientPath, logger) {
+			var fullPath = Path.join(clientPath, dir);
+			logger.info("Removing '" + fullPath + "'");
+			return fs.remove(fullPath);
+		}
+	}
+}
+
 /**
  * @param dir{string} - subdirectory path
  */
-function makeCopySrcToDistTask(dir) {
+function makeCopySrcToDistTask(dir, ignoreFiles) {
 	return function(clientPath, logger) {
 		var srcPath = Path.join(clientPath, 'src', dir);
 		var distPath = Path.join(clientPath, 'dist', dir);
 
-		logger.info("Removing '" + distPath + "'");
-		return fs.remove(distPath).then(function() {
-			logger.info("Copying '" + srcPath + "' to '" + distPath + "'");
-			return fs.copy(srcPath, distPath);
+		logger.info("Copying '" + srcPath + "' to '" + distPath + "'");
+		return fs.copy(srcPath, distPath, {
+			filter: function(src, dest) { return !ignoreFiles.includes(Path.basename(src))}
 		});
 	}
 }
+
 /**
  * @param srcName{string}
  * @param distName{string}
@@ -94,25 +107,53 @@ function makeCompileSassTask(srcName, distName, files) {
 		var srcPath = Path.join(clientPath, 'src', srcName);
 		var distPath = Path.join(clientPath, 'dist', distName);
 
-		logger.info("Removing '" + distPath + "'");
-		return fs.remove(distPath).then(function() {
-			return Promise.all(files.map(function(f) {
-				var outFile = Path.join(distPath, f + '.css');
-				return Promise.promisify(sass.render)({
-					file: Path.join(srcPath, f + '.scss'),
-					outFile: outFile,
-					sourceMap: true
-				}).then(function(result) {
-					return Promise.all([
-						fs.outputFile(outFile, result.css),
-						fs.outputFile(outFile + '.map', result.map)
-					]);
-				});
-			}));
-			logger.info("Compiling '" + srcPath + "' to '" + distPath + "'");
-			return fs.copy(srcPath, distPath);
-		});
+		return Promise.all(files.map(function(f) {
+			var inFile = Path.join(srcPath, f + '.scss');
+			var outFile = Path.join(distPath, f + '.css');
+			logger.info("Compiling '" + inFile + "' to '" + outFile + "'");
+			return Promise.promisify(sass.render)({
+				file: inFile,
+				outFile: outFile,
+				sourceMap: true
+			}).then(function(result) {
+				return Promise.all([
+					fs.outputFile(outFile, result.css),
+					fs.outputFile(outFile + '.map', result.map)
+				]);
+			});
+		}));
 	}
+}
+
+//actually returns a task instead of a func--fix names of other funcs (well make them actually tasks instead of just funcs)
+function makeCompileReactTask(name, dir, files) {
+	return {
+		name: name,
+		tasks: [
+			{name: 'babel', func: function(clientPath, logger) {
+				var srcPath = Path.join(clientPath, 'src', dir);
+				var distPath = Path.join(clientPath, 'dist', dir);
+
+				return Promise.all(files.map(function(f) {
+					var inFile = Path.join(srcPath, f + '.jsx');
+					var outFile = Path.join(distPath, f + '.js');
+					logger.info("Compiling '" + inFile + "' to '" + outFile + "'");
+					return Promise.promisify(babel.transformFile)(inFile, {
+						babelrc: false,
+						filename: f,
+						presets: ['react', 'es2015'],
+						sourceMaps: true,
+						sourceRoot: clientPath
+					}).then(function(result) {
+						return Promise.all([
+							fs.outputFile(outFile, result.code),
+							fs.outputFile(outFile + '.map', result.map)
+						]);
+					});
+				}));
+			}}
+		]
+	};
 }
 
 /*
@@ -209,7 +250,9 @@ function buildProject(clientPath, tasks) {
 module.exports = {
 	buildProject: buildProject,
 	tasks: {
+		makeCleanTask: makeCleanTask,
 		makeCopySrcToDistTask: makeCopySrcToDistTask,
-		makeCompileSassTask: makeCompileSassTask
+		makeCompileSassTask: makeCompileSassTask,
+		makeCompileReactTask: makeCompileReactTask
 	}
 };

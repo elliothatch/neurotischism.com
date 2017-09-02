@@ -68,15 +68,29 @@ function makeFreshrHandler(options, dbWrap) {
 
 function makeSocketHandler(options) {
 	var buildEmitter = BuildManager.buildProject(options.clientPath, [
-		{name: 'javascript', func: BuildManager.tasks.makeCopySrcToDistTask('javascript')},
-		{name: 'sass', func: BuildManager.tasks.makeCompileSassTask('sass', 'css', ['main', 'shakespeare', 'config'])}
-	]);
+		{ name: 'clean', sync: true, tasks: [
+			BuildManager.tasks.makeCleanTask('dist'),
+			{ name: 'build', tasks: [
+				{name: 'javascript', func: BuildManager.tasks.makeCopySrcToDistTask('javascript', ['config-react.jsx'])},
+				{name: 'sass', func: BuildManager.tasks.makeCompileSassTask('sass', 'css', ['main', 'shakespeare', 'config'])},
+				BuildManager.tasks.makeCompileReactTask('react', 'javascript', ['config-react'])
+			]}
+		]}
+	]).subscribe(function(event) {
+		console.log(event);
+	});
 	return function(socket, next) {
 		socket.on('build', function(data) {
 			console.log('build', data);
 			BuildManager.buildProject(options.clientPath, [
-				{name: 'javascript', func: BuildManager.tasks.makeCopySrcToDistTask('javascript')},
-				{name: 'sass', func: BuildManager.tasks.makeCompileSassTask('sass', 'css', ['main', 'shakespeare', 'config'])}
+				{ name: 'clean', sync: true, tasks: [
+					BuildManager.tasks.makeCleanTask('dist'),
+					{ name: 'build', tasks: [
+						{name: 'javascript', func: BuildManager.tasks.makeCopySrcToDistTask('javascript', ['config-react.jsx'])},
+						{name: 'sass', func: BuildManager.tasks.makeCompileSassTask('sass', 'css', ['main', 'shakespeare', 'config'])},
+						BuildManager.tasks.makeCompileReactTask('react', 'javascript', ['config-react'])
+					]}
+				]}
 			]).subscribe(function(event) {
 				var eType = event.eType;
 				delete event.eType;

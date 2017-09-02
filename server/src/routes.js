@@ -19,10 +19,32 @@ module.exports = function(options) {
 		authorPasswords: {'[neurotischism': 'this is mine'}
 	});
 
+	/*
+	var innerRouter = express.Router();
+	setTimeout(function() {
+		console.log('add premiddleware');
+		innerRouter.use(function(req, res, next) {
+			res.status(200).send('overruled');
+		});
+	}, 5000);
+	innerRouter.use(function(req, res, next) {
+		console.log('inner router');
+		next();
+	});
+	router.use(innerRouter);
+
+	router.use(function(req, res, next) {
+		res.status(200).send('test');
+	});
+	*/
+
 	router.use('/comments', comments.expressRouter);
 	router.use(templating(options, [comments.freshrHandler]));
 	router.use(express.static(path.join(__dirname, '../../client/dist')));
 	router.use(express.static(path.join(__dirname, '../../client/src/pages')));
+	//TODO: make these part of react plugin express router
+	router.use(express.static(path.join(__dirname, '../../node_modules/react/dist')));
+	router.use(express.static(path.join(__dirname, '../../node_modules/react-dom/dist')));
 
 	router.use(function(err, req, res, next) {
 		if(!err.status) {

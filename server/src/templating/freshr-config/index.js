@@ -1,4 +1,3 @@
-var Promise = require('bluebird');
 var express = require('express');
 var BuildManager = require('./build');
 
@@ -19,12 +18,12 @@ module.exports = function(options) {
 		//freshrConfig: makeFreshrConfig(options)
 	};
 
-}
+};
 
 //CONFIG FOR THE CONFIG???? 0_0
-function makeFreshrConfig(options) {
-	return {};
-}
+//function makeFreshrConfig(options) {
+//return {};
+//}
 
 //Configuration
 //configuration is stored as a JSON object--config values are passed to the context as the "config" property
@@ -67,7 +66,7 @@ function makeFreshrHandler(options, dbWrap) {
 }
 
 function makeSocketHandler(options) {
-	var buildEmitter = BuildManager.buildProject(options.clientPath, [
+	BuildManager.buildProject(options.clientPath, [
 		{ name: 'clean', sync: true, tasks: [
 			BuildManager.tasks.makeCleanTask('dist'),
 			{ name: 'build', tasks: [
@@ -76,12 +75,13 @@ function makeSocketHandler(options) {
 				BuildManager.tasks.makeCompileReactTask('react', 'javascript', ['config-react'])
 			]}
 		]}
-	]).subscribe(function(event) {
-		console.log(event);
+	]).filter(function(e) {return e.eType === 'task/log';}).subscribe(function(event) {
+		if(event.level === 'error') {
+			console.log(event);
+		}
 	});
 	return function(socket, next) {
 		socket.on('build', function(data) {
-			console.log('build', data);
 			BuildManager.buildProject(options.clientPath, [
 				{ name: 'clean', sync: true, tasks: [
 					BuildManager.tasks.makeCleanTask('dist'),

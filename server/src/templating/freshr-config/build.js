@@ -12,7 +12,7 @@ var TaskStatuses = {
 	success: 1,
 	warn: 2,
 	error: 3
-}
+};
 
 //paths to tasks in the task structure are described by an array of ints
 //an empty array means the root task, the first value is the index into rootTask.tasks, the second value is the index into that task's tasks array, and so on
@@ -20,7 +20,7 @@ var TaskLogger = function(task, observer, taskPath) {
 	this.task = task;
 	this.observer = observer;
 	this.taskPath = taskPath;
-	this.status = TaskStatuses['none'];
+	this.status = TaskStatuses.none;
 	this.logs = [];
 	this.running = false;
 
@@ -35,7 +35,7 @@ var TaskLogger = function(task, observer, taskPath) {
 	}
 
 	this.subloggers = makeSubloggers(task);
-}
+};
 
 var LoggerLevelFunc = function(level, updateStatus) {
 	return function(message, data) {
@@ -47,7 +47,7 @@ var LoggerLevelFunc = function(level, updateStatus) {
 		this.logs.push(log);
 		this.observer.next({eType: 'task/log', path: this.taskPath, status: this.status, log: log});
 	};
-}
+};
 
 TaskLogger.prototype.info = new LoggerLevelFunc('info', false);
 TaskLogger.prototype.warn = new LoggerLevelFunc('warn', true);
@@ -58,8 +58,11 @@ TaskLogger.prototype.start = function() {
 	this.running = true;
 };
 TaskLogger.prototype.done = function() {
-	this.observer.next({eType: 'task/done', path: this.taskPath});
+	if(this.status < TaskStatuses['success']) {
+		this.status = TaskStatuses['success'];
+	}
 	this.running = false;
+	this.observer.next({eType: 'task/done', path: this.taskPath, status: this.status});
 };
 
 TaskLogger.prototype.serializeTaskStructure = function() {
@@ -80,7 +83,7 @@ function makeCleanTask(dir) {
 			logger.info("Removing '" + fullPath + "'");
 			return fs.remove(fullPath);
 		}
-	}
+	};
 }
 
 /**
@@ -93,9 +96,9 @@ function makeCopySrcToDistTask(dir, ignoreFiles) {
 
 		logger.info("Copying '" + srcPath + "' to '" + distPath + "'");
 		return fs.copy(srcPath, distPath, {
-			filter: function(src, dest) { return !ignoreFiles.includes(Path.basename(src))}
+			filter: function(src, dest) { return !ignoreFiles.includes(Path.basename(src));}
 		});
-	}
+	};
 }
 
 /**
@@ -122,7 +125,7 @@ function makeCompileSassTask(srcName, distName, files) {
 				]);
 			});
 		}));
-	}
+	};
 }
 
 //actually returns a task instead of a func--fix names of other funcs (well make them actually tasks instead of just funcs)
@@ -175,9 +178,6 @@ function makeCompileReactTask(name, dir, files) {
  *      - 'task/done'{{path}}
  */
 function buildProject(clientPath, tasks) {
-	var srcPath = Path.join(clientPath, 'src');
-	var distPath = Path.join(clientPath, 'dist');
-
 	var rootTask = {name: 'Build', tasks: tasks};
 
 	return Observable.create(function(buildEventsObserver) {
@@ -199,12 +199,21 @@ function buildProject(clientPath, tasks) {
 						return buildTask(t, logger.subloggers[i]);
 					}));
 				}
+				buildPromise = buildPromise.then(function(results) {
+					return {success: results.filter(function(r) { return !r.success;}).length > 0, data: results};
+				});
 			} else if(task.func) {
 				//resolve is to convert non-bluebird promises, so we can use bluebird helpers
-				buildPromise = Promise.resolve(task.func(clientPath, logger));
+				buildPromise = Promise.resolve(task.func(clientPath, logger))
+					.then(function(result) {
+						return { success: true, data: result};
+					}).catch(function(error) {
+						logger.error(error && error.message, error);
+						return { success: false, data: error};
+					});
 			} else {
-				console.warn('Task "' + task.name + '" has no build function or subtasks');
-				buildPromise = Promise.resolve();
+				logger.warn('Task "' + task.name + '" has no build function or subtasks');
+				buildPromise = Promise.resolve({success: true, data: null});
 			}
 
 			return buildPromise.finally(function() {
@@ -214,7 +223,11 @@ function buildProject(clientPath, tasks) {
 
 		buildTask(rootTask, rootLogger)
 			.then(function(result) {
-				buildEventsObserver.next({eType: 'success', result: result});
+				if(result.success) {
+					buildEventsObserver.next({eType: 'success', result: result});
+				} else {
+					buildEventsObserver.next({eType: 'fail', result: result});
+				}
 			})
 			.catch(function(error) {
 				buildEventsObserver.next({eType: 'fail', error: error});
@@ -225,27 +238,27 @@ function buildProject(clientPath, tasks) {
 	});
 }
 
-	/*
-	var buildResults = buildProject(options.clientPath, [
-		{name: 'javascript', sync: true, tasks: [
-			//{name: 'minify', func: function(logger) {logger.info('minifying'); return Promise.reject();}},
-				{name: 'minify', func: function(logger) {logger.info('minifying'); return Promise.resolve();}},
-				{name: 'concat', func: function(logger) {logger.warn('concat warn'); return Promise.resolve();}}
-		]},
-		{name: 'sass', func: function(logger) {logger.info('sassin'); return Promise.resolve();}},
-		{name: 'copy a bunch', tasks: [
-			{name: 'copy 1', func: function(logger) {logger.info('copy 1 going'); return Promise.resolve();}},
-			{name: 'copy recursive', tasks: [
-				{name: 'copy r1', func: function(logger) {logger.info('copy r1 going'); return Promise.resolve();}},
-				{name: 'copy double recursive', tasks: [
-					{name: 'copy rr1', func: function(logger) {logger.info('copy rr1 going'); return Promise.resolve();}},
-					{name: 'copy rr2', func: function(logger) {logger.info('copy rr2 going'); return Promise.resolve();}},
-				]},
+/*
+var buildResults = buildProject(options.clientPath, [
+	{name: 'javascript', sync: true, tasks: [
+		//{name: 'minify', func: function(logger) {logger.info('minifying'); return Promise.reject();}},
+			{name: 'minify', func: function(logger) {logger.info('minifying'); return Promise.resolve();}},
+			{name: 'concat', func: function(logger) {logger.warn('concat warn'); return Promise.resolve();}}
+	]},
+	{name: 'sass', func: function(logger) {logger.info('sassin'); return Promise.resolve();}},
+	{name: 'copy a bunch', tasks: [
+		{name: 'copy 1', func: function(logger) {logger.info('copy 1 going'); return Promise.resolve();}},
+		{name: 'copy recursive', tasks: [
+			{name: 'copy r1', func: function(logger) {logger.info('copy r1 going'); return Promise.resolve();}},
+			{name: 'copy double recursive', tasks: [
+				{name: 'copy rr1', func: function(logger) {logger.info('copy rr1 going'); return Promise.resolve();}},
+				{name: 'copy rr2', func: function(logger) {logger.info('copy rr2 going'); return Promise.resolve();}},
 			]},
-			{name: 'copy 2', func: function(logger) {return Promise.delay(1000).then(function(){logger.info('copy 2 going'); return Promise.resolve();})}}
-		]}
-	]);
-	*/
+		]},
+		{name: 'copy 2', func: function(logger) {return Promise.delay(1000).then(function(){logger.info('copy 2 going'); return Promise.resolve();})}}
+	]}
+]);
+*/
 
 module.exports = {
 	buildProject: buildProject,

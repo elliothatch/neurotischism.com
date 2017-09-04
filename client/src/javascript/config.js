@@ -7,6 +7,7 @@
 		});
 	});
 
+	/*
 	var configSocket = io('/~config');
 
 	configSocket.on('build/start', function(tasks) {
@@ -29,5 +30,6 @@
 	});
 
 	configSocket.emit('build');
+	*/
 
 })(window, document);

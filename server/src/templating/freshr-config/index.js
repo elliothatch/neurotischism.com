@@ -1,5 +1,7 @@
 var express = require('express');
 var BuildManager = require('./build');
+var Ip = require('ip');
+var PublicIp = require('public-ip');
 
 /* Constructs a freshr-config instance which has two properties:
  * exoressRouter - an express middleware which accepts a POST to `/` containing JSON of configuration fields that should be updated, then redirects
@@ -58,9 +60,16 @@ function makeFreshrHandler(options, dbWrap) {
 			fields: [
 				{name: 'timezone', dataType: 'string'}
 			]
+		}, {
+			name: 'freshr-comments',
+			fields: [{name: 'hello', dataType: 'string'}, {name: 'hi', dataType: 'string'}]
 		});
 
-		context.config = { categories: configCategories };
+		context.config = {
+			categories: configCategories,
+			serverLocalIp: Ip.address(),
+			serverPort: req.socket.server.address().port
+		};
 		return next();
 	};
 }
@@ -95,6 +104,11 @@ function makeSocketHandler(options) {
 				var eType = event.eType;
 				delete event.eType;
 				socket.emit('build/' + eType, event);
+			});
+		});
+		socket.on('publicip', function(data) {
+			PublicIp.v4().then(function(ip) {
+				socket.emit('publicip', ip);
 			});
 		});
 		next();

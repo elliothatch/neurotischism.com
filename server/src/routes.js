@@ -45,6 +45,8 @@ module.exports = function(options) {
 	//TODO: make these part of react plugin express router
 	router.use(express.static(path.join(__dirname, '../../node_modules/react/dist')));
 	router.use(express.static(path.join(__dirname, '../../node_modules/react-dom/dist')));
+	//TODO: make this part of config plugin
+	router.use(express.static(path.join(__dirname, '../../node_modules/qrcode/build')));
 
 	router.use(function(err, req, res, next) {
 		if(!err.status) {
@@ -70,4 +72,4 @@ module.exports = function(options) {
 
 
 	return router;
-}
+};

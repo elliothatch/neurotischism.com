@@ -2,7 +2,6 @@ var Promise = require('bluebird');
 Promise.longStackTraces();
 
 var http = require('http');
-var path = require('path');
 
 var express = require('express');
 var bodyParser = require('body-parser');
@@ -15,6 +14,7 @@ var logger = require('./util/logger');
 
 var app;
 var server;
+var socketServer;
 var isProduction;
 
 function start(options) {

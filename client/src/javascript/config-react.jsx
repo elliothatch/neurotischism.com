@@ -2,6 +2,7 @@
 /*global ReactDOM*/
 /*global io*/
 /*global FreshrContext*/
+/*global qrcodelib*/
 
 var configSocket = io('/~config');
 
@@ -67,6 +68,42 @@ class TaskDisplay extends React.Component {
 	}
 }
 
+class QRComponent extends React.Component {
+	constructor(props) {
+		super(props);
+		this.state = {dataUrl: null};
+	}
+
+	componentWillMount() {
+		this.generateQrCode(this.props.text);
+	}
+
+	componentWillReceiveProps(nextProps) {
+		if(nextProps.text !== this.props.text) {
+			this.generateQrCode(nextProps.text);
+		}
+	}
+
+	generateQrCode(text) {
+		if(text) {
+			qrcodelib.toDataURL(text, {}, (err, url) => {
+				if(err) {
+					console.error('QRComponent', err);
+				}
+				else {
+					this.setState({dataUrl: url});
+				}
+			});
+		}
+	}
+
+	render() {
+		return <div>
+			{this.state.dataUrl && <img src={this.state.dataUrl} />}
+		</div>;
+	}
+}
+
 class ConfigComponent extends React.Component {
 
 	handleClickBuild(event) {
@@ -79,20 +116,31 @@ class ConfigComponent extends React.Component {
 				<h1 className="title">Freshr Configuration</h1>
 			</header>
 			<div className="page-content">
-				<button onClick={this.handleClickBuild}>Build</button>
-				{this.props.buildTask && <TaskDisplay task={this.props.buildTask} />}
-				{this.props.configs.map(config => {
-					return <div key={config.title} className="config card collapser-wrapper">
-						<h2 className="card-title">{config.title} <button className="collapser"></button></h2>
-						<div className="card-body collapser-target">
-							<ul className="fields">
-								{config.fields.map(field => {
-									return <li key={field.name}>{field.name}</li>;
-								})}
-							</ul>
-						</div>
-					</div>;
-				})}
+				<div className="ip-display">
+					{[{name: 'Local URL', ip: this.props.config.serverLocalIp}, {name: 'Public URL', ip: this.props.config.serverPublicIp}].map(ipObj => {
+						var url = ipObj.ip && 'http://' + ipObj.ip + ':' + this.props.config.serverPort;
+						return <div key={ipObj.name}>
+							<span>{ipObj.name}: {ipObj.ip ? url : 'unknown'}</span>
+							<QRComponent text={url} />
+						</div>;
+					})}
+				</div>
+				<div className="build-display">
+					<button onClick={this.handleClickBuild}>Build</button>
+					{this.props.buildTask && <TaskDisplay task={this.props.buildTask} />}
+					{this.props.config.categories.map(category => {
+						return <div key={category.name} className="config card collapser-wrapper">
+							<h2 className="card-title">{category.name} <button className="collapser"></button></h2>
+							<div className="card-body collapser-target">
+								<ul className="fields">
+									{category.fields.map(field => {
+										return <li key={field.name}>{field.name}</li>;
+									})}
+								</ul>
+							</div>
+						</div>;
+					})}
+				</div>
 			</div>
 		</div>;
 	}
@@ -139,12 +187,18 @@ configSocket.on('build/task/done', function(data) {
 	render();
 });
 
+configSocket.on('publicip', function(ip) {
+	FreshrContext.config.serverPublicIp = ip;
+	render();
+});
+
 configSocket.emit('build');
+configSocket.emit('publicip');
 
 render();
 
 function render() {
-	const element = <ConfigComponent configs={FreshrContext.configs} buildTask={buildTasks.tasks} />;
+	const element = <ConfigComponent config={FreshrContext.config} buildTask={buildTasks.tasks} />;
 	ReactDOM.render(
 		element,
 		document.getElementById('root')

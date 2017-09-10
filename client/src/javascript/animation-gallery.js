@@ -26,7 +26,7 @@
 		document.body.onmousemove = function(event) {
 			_this.mouseX = event.clientX;
 			_this.mouseY = event.clientY;
-		}
+		};
 		document.body.addEventListener('touchmove', function(event) {
 			_this.mouseX = event.touches[0].clientX;
 			_this.mouseY = event.touches[0].clientY;
@@ -45,7 +45,7 @@
 				_this.linkHovered = null;
 			});
 		}
-	}
+	};
 
 	AnimationGallery.prototype.step = function (timestamp) {
 		if(!this.startTime) {
@@ -56,7 +56,7 @@
 		this.lastTime = timestamp;
 		var _this = this;
 		window.requestAnimationFrame(function() { _this.step.apply(_this, arguments); });
-	}
+	};
 
 	//a bg can specify:
 	//init function()
@@ -74,13 +74,14 @@
 	};
 	function rgbStr(r, g, b) {
 		return "rgb("+r+","+g+","+b+")";
-	};
+	}
 	function hsvStr(h, s, v){
-		return "hsv("+h+","+s+","+v+")";
-	};
+		var rgb = HSVtoRGB(h,s,v);
+		return "rgb("+rgb.r+","+rgb.g+","+rgb.b+")";
+	}
 	function lerp(a, b, t) {
 		return (b-a)*t + a;
-	};
+	}
 	function HSVtoRGB(h, s, v) {
 		var r, g, b, i, f, p, q, t;
 		if (h && s === undefined && v === undefined) {
@@ -90,21 +91,21 @@
 		f = h * 6 - i;
 		p = v * (1 - s);
 		q = v * (1 - f * s);
-		t = v * (1 - (1 - f) * s);https://www.dropbox.com/s/16q6nxob8e1cfbb/eye2.html?dl=0
+		t = v * (1 - (1 - f) * s);
 		switch (i % 6) {
-			case 0: r = v; g = t; b = p; break;
-			case 1: r = q; g = v; b = p; break;
-			case 2: r = p; g = v; b = t; break;
-			case 3: r = p; g = q; b = v; break;
-			case 4: r = t; g = p; b = v; break;
-			case 5: r = v; g = p; b = q; break;
+		case 0: r = v; g = t; b = p; break;
+		case 1: r = q; g = v; b = p; break;
+		case 2: r = p; g = v; b = t; break;
+		case 3: r = p; g = q; b = v; break;
+		case 4: r = t; g = p; b = v; break;
+		case 5: r = v; g = p; b = q; break;
 		}
 		return {
 			r: Math.floor(r * 255),
 			g: Math.floor(g * 255),
 			b: Math.floor(b * 255)
 		};
-	};
+	}
 	function HSVtoRGBStr(h,s,v) {
 		var color = HSVtoRGB(h,s,v);
 		return rgbStr(color.r, color.g, color.b);
@@ -114,14 +115,14 @@
 	AnimationGallery.prototype.addAnimation = function(name, animation) {
 		var anim = new animation(this);
 		this.animations.push(anim);
-	}
+	};
 
 	AnimationGallery.prototype.startAnimation = function(index) {
 		this.animationIndex = index;
 		this.animations[this.animationIndex].init();
 		var _this = this;
 		window.requestAnimationFrame(function() { _this.step.apply(_this, arguments); });
-	}
+	};
 
 	window.AnimationGallery = new AnimationGallery('backgroundCanvas');
 

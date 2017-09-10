@@ -49,6 +49,7 @@ var canvas2 = document.getElementById("foregroundCanvas");
 	var calmmodeEnabled = true;
 
 	window.onresize = onWindowResized;
+/*
 	window.setInterval(function(){backgroundY1 += 2; backgroundY1 = backgroundY1 % mainHeight;},1000/60);
 	window.setInterval(function(){changeTitleColor();},1000/30);
 	window.setInterval(function(){updateLinkLetterSpacing();},1000/30);
@@ -58,6 +59,7 @@ var canvas2 = document.getElementById("foregroundCanvas");
 	window.setInterval(function(){updateH1HoverColoring();}, 1000/30);
 	window.setInterval(function(){updateCorruptZone();}, 1000/30);
 	window.setInterval(function(){updateCommentAuthorOwner();}, 1000/10);
+	*/
 
 	//add the mouse events to all links
 	var linkElements = document.getElementsByTagName('a');

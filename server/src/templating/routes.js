@@ -1,12 +1,9 @@
 var Path = require('path');
 var fs = require('fs-extra');
-var Url = require('url');
 var express = require('express');
 var Handlebars = require('handlebars');
 var Moment = require('moment-timezone');
 var Promise = require('bluebird');
-
-var sass = require('node-sass');
 
 var CustomErrors = require('../util/custom-errors');
 var FreshrConfig = require('./freshr-config');
@@ -38,7 +35,7 @@ module.exports = function(options, middleware) {
 
 	Handlebars.registerHelper('contains', function(str, target) {
 		return (typeof str === 'string') && (typeof target === 'string')
-		 && str.includes(target);
+			&& str.includes(target);
 	});
 
 	Handlebars.registerHelper('downcase', function(str) {
@@ -63,6 +60,10 @@ module.exports = function(options, middleware) {
 		}
 
 		return str.substring(0, charCount) + '...';
+	});
+
+	Handlebars.registerHelper('toJSON', function(object) {
+		return new Handlebars.SafeString(JSON.stringify(object));
 	});
 
 	var siteData = loadTemplates(options.clientPath);
@@ -123,14 +124,14 @@ module.exports = function(options, middleware) {
 
 		//TODO: load dynamically
 		//context.comments = [
-			//{isowner: true, author: '[neurotischism', message: 'hello there!', timestamp: Moment().toISOString()},
-			//{isowner: false, author: 'sam', message: 'good game', timestamp: Moment().toISOString()}
+		//{isowner: true, author: '[neurotischism', message: 'hello there!', timestamp: Moment().toISOString()},
+		//{isowner: false, author: 'sam', message: 'good game', timestamp: Moment().toISOString()}
 		//];
 
 	});
 
 	return router;
-}
+};
 
 /*
  * Registers all partials, using their relative path from "partials" directory as the name,
@@ -144,9 +145,9 @@ module.exports = function(options, middleware) {
  * @returns {object}: represents the pages directory tree, file.contents are compiled handlebars templates
  */
 function loadTemplates(clientPath) {
-	var templates = {};
+	//var templates = {};
 	var partialsDir = Path.join(clientPath, 'src', 'partials');
-	var pagesDir = Path.join(clientPath, 'src', 'pages')
+	var pagesDir = Path.join(clientPath, 'src', 'pages');
 
 	// register all partials
 	walkDirectory(partialsDir, function(path) {
@@ -171,7 +172,7 @@ function loadTemplates(clientPath) {
 
 			//if the first text in the template extends the context, parse it
 			var context = null;
-			var contextMatch = templateText.match(/\s*{{#\s*extend\-context\s+'([\s\S]*)'}}/m);
+			var contextMatch = templateText.match(/\s*{{#\s*extend-context\s+'([\s\S]*)'}}/m);
 			if(contextMatch) {
 				context = JSON.parse(contextMatch[1]);
 			}
@@ -249,7 +250,7 @@ function walkDirectory(dirPath, f, urlPath, isInnerCall) {
 		}
 		
 		if(!postsContent.order) {
-			postsContent.order = {}
+			postsContent.order = {};
 		}
 
 		if(!postsContent.order.field) {
@@ -353,10 +354,10 @@ function findFile(templates, path) {
 				requestedFile = fileEntry.data;
 			}
 			else if(fileEntry.type === 'dir') {
-				var indexEntry = fileEntry.contents['index.html'];
-				if(indexEntry && indexEntry.type === 'file') {
+				var indexFileEntry = fileEntry.contents['index.html'];
+				if(indexFileEntry && indexFileEntry.type === 'file') {
 					currentDir = fileEntry.contents;
-					requestedFile = indexEntry.data;
+					requestedFile = indexFileEntry.data;
 				}
 			}
 		}
@@ -386,7 +387,7 @@ function processMiddleware(stack, context, req, res) {
 	});
 
 	//stack.forEach(function(middleware) {
-		//middleware(next, context, req, res);
+	//middleware(next, context, req, res);
 	//});
 	//return context;
 }

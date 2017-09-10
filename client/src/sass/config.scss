@@ -4,31 +4,31 @@
 @import 'theming';
 
 $mat-fresh-green: (
-  300: #81ffa8,
-  500: #43ea78,
-  700: #00b649,
-  contrast: (
-	50: $black-87-opacity,
-	100: $black-87-opacity,
-	200: $black-87-opacity,
-    300: $black-87-opacity,
-	400: $black-87-opacity,
-	500: $black-87-opacity,
-	600: $black-87-opacity,
-	700: $black-87-opacity,
-	800: $white-87-opacity,
-	900: $white-87-opacity,
-	A100: $black-87-opacity,
-	A200: $black-87-opacity,
-	A400: $black-87-opacity,
-	A700: $black-87-opacity,
-  )
+	300: #81ffa8,
+	500: #43ea78,
+	700: #00b649,
+	contrast: (
+		50: $black-87-opacity,
+		100: $black-87-opacity,
+		200: $black-87-opacity,
+		300: $black-87-opacity,
+		400: $black-87-opacity,
+		500: $black-87-opacity,
+		600: $black-87-opacity,
+		700: $black-87-opacity,
+		800: $white-87-opacity,
+		900: $white-87-opacity,
+		A100: $black-87-opacity,
+		A200: $black-87-opacity,
+		A400: $black-87-opacity,
+		A700: $black-87-opacity,
+	)
 );
 
 $theme: mat-light-theme(
-	mat-palette($mat-fresh-green, 500, 300, 700),
-	mat-palette($mat-yellow),
-	mat-palette($mat-red));
+mat-palette($mat-fresh-green, 500, 300, 700),
+mat-palette($mat-yellow),
+mat-palette($mat-red));
 
 $theme-primary: map-get($theme, primary);
 $theme-accent: map-get($theme, accent);
@@ -46,14 +46,14 @@ $page-content-width: 800px;
 /* ----------------------------------------------------------*/
 
 *, *:before, *:after {
-  /* Chrome 9-, Safari 5-, iOS 4.2-, Android 3-, Blackberry 7- */
-  -webkit-box-sizing: border-box; 
+	/* Chrome 9-, Safari 5-, iOS 4.2-, Android 3-, Blackberry 7- */
+	-webkit-box-sizing: border-box;
 
-  /* Firefox (desktop or Android) 28- */
-  -moz-box-sizing: border-box;
+	/* Firefox (desktop or Android) 28- */
+	-moz-box-sizing: border-box;
 
-  /* Firefox 29+, IE 8+, Chrome 10+, Safari 5.1+, Opera 9.5+, iOS 5+, Opera Mini Anything, Blackberry 10+, Android 4+ */
-  box-sizing: border-box;
+	/* Firefox 29+, IE 8+, Chrome 10+, Safari 5.1+, Opera 9.5+, iOS 5+, Opera Mini Anything, Blackberry 10+, Android 4+ */
+	box-sizing: border-box;
 }
 
 
@@ -87,8 +87,8 @@ header {
 }
 
 .page-content {
-	max-width: $page-content-width;
-	margin: 0 auto;
+	//max-width: $page-content-width;
+	//margin: 0 auto;
 }
 
 .card {
@@ -152,26 +152,51 @@ header {
 	overflow-y: hidden;
 }
 
+$task-col-width: 300px;
+$task-card-height: 60px;
+$task-result-border-width: 15px;
+
 .task-display {
 	display: flex;
 	flex-direction: row;
 
+	.task-col {
+		width: $task-col-width;
+		background: $black-6-opacity;
+	}
+
 	.task {
+		margin: 0;
 		.card {
-			height: 100px;
+			position: relative;
+			margin: 0;
+			width: 250px;
+			height: $task-card-height;
+
+			&:before {
+				content: "";
+				position: absolute;
+				width: $task-col-width + $task-result-border-width;
+				height: $task-card-height;
+				left: -$task-result-border-width;
+				border-left: $task-result-border-width solid map-get($theme-foreground, divider);
+			}
+			&.success:before {
+				border-left: $task-result-border-width solid $color-success
+			}
+			&.warn:before {
+				border-left: $task-result-border-width solid $color-warn
+			}
+			&.error:before {
+				border-left: $task-result-border-width solid $color-error
+			}
+
+			border-bottom: 5px solid $black-12-opacity;
 			background: map-get($theme-background, card);
-			border-left: 5px solid map-get($theme-foreground, divider);
-			&.success {
-				border-left: 5px solid $color-success
-			}
-			&.warn {
-				border-left: 5px solid $color-warn
-			}
-			&.error {
-				border-left: 5px solid $color-error
-			}
 		}
 		&>.tasks {
+			margin: 0;
+			padding-left: $task-result-border-width;
 			list-style-type: none;
 		}
 	}

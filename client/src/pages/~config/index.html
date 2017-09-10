@@ -9,25 +9,12 @@
 		<link rel="stylesheet" href="/css/config.css">
 	</head>
 	<body>
-		<header>
-			<h1 class="title">Freshr Configuration</h1>
-		</header>
 		<div id="root">
 		</div>
-		<div class="page-content">
-			{{#each configs}}
-			<div class="config card collapser-wrapper">
-				<h2 class="card-title">{{this.title}} <button class="collapser"></button></h2>
-				<div class="card-body collapser-target">
-					<ul class="fields">
-						{{#each this.fields}}
-						<li>{{this.name}}</li>
-						{{/each}}
-					</ul>
-				</div>
-			</div>
-			{{/each}}
-		</div>
+	<script>
+		window.FreshrContext = {{toJSON this}};
+	</script>
+
 	<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 	<script src="react.js"></script>
 	<script src="react-dom.js"></script>

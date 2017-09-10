@@ -2,12 +2,12 @@
 
 	var EyeAnimation = function(gallery) {
 		this.gallery = gallery;
-	}
+	};
 
 	EyeAnimation.prototype.init = function() {
 		this.gallery.ctx.fillStyle = '#000';
 		this.gallery.ctx.fillRect(0,0,this.gallery.width,this.gallery.height);
-	}
+	};
 
 	EyeAnimation.prototype.draw = function(t, deltaT)
 	{
@@ -30,7 +30,7 @@
 		pupilRadius = this.gallery.helpers.lerp(pupilRadius, pupilRadius * 1.6, this.gallery.linkT);
 		innerIrisRadius = this.gallery.helpers.lerp(innerIrisRadius, innerIrisRadius * 1.6, this.gallery.linkT);
 		
-		var angle = t * 3.1 * Math.PI / 180;
+		//var angle = t * 3.1 * Math.PI / 180;
 		//var r = Math.floor((t/360) * 255);
 		//var g = Math.floor((0.5*Math.sin(angle) + 0.5) * 255);
 		//var b = Math.floor((1.0) * 255);
@@ -58,7 +58,7 @@
 		this.gallery.ctx.lineWidth = 2;
 		var irisCount = 360;
 		//iris
-		for(var i = 0; i < irisCount; i++) {
+		for(i = 0; i < irisCount; i++) {
 			var color = this.gallery.helpers.HSVtoRGB(Math.random() * 0.1 + 0.8, 0.8, 0.8);
 			var radius = innerIrisRadius + Math.random()*40;
 			this.gallery.ctx.strokeStyle = this.gallery.helpers.rgbStr(color.r, color.g, color.b);
@@ -147,8 +147,7 @@
 		this.gallery.ctx.fill();
 
 
-	}
+	};
 
 	window.AnimationGallery.addAnimation('eye', EyeAnimation);
-	window.AnimationGallery.startAnimation(2);
 })(window);

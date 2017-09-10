@@ -1,14 +1,17 @@
 /*global React*/
 /*global ReactDOM*/
 /*global io*/
+/*global FreshrContext*/
+
+var configSocket = io('/~config');
 
 class TaskLogDisplay extends React.Component {
 	render() {
 		return <div className="log-display">
 			{this.props.task && this.props.task.logs &&
-				<ul className="logs">
-					{this.props.task.logs.map((l,i) => <li key={i}>{l.message}</li>)}
-				</ul>}
+			<ul className="logs">
+				{this.props.task.logs.map((l,i) => <li key={i}>{l.message}</li>)}
+			</ul>}
 		</div>;
 	}
 }
@@ -33,9 +36,9 @@ class Task extends React.Component {
 				<span className="name">{this.props.task.name}</span>
 			</div>
 			{this.props.task.tasks.length > 0 &&
-				<ul className="tasks">
-					{this.props.task.tasks.map((t,i) => <li key={i}><Task task={t} onSelectionChange={this.props.onSelectionChange} /></li>)}
-				</ul>
+					<ul className="tasks">
+						{this.props.task.tasks.map((t,i) => <li key={i}><Task task={t} onSelectionChange={this.props.onSelectionChange} /></li>)}
+					</ul>
 			}
 		</div>;
 	}
@@ -56,14 +59,51 @@ class TaskDisplay extends React.Component {
 
 	render() {
 		return <div className="task-display">
-			<Task task={this.props.task} onSelectionChange={this.handleSelectionChange}></Task>
+			<div className="task-col">
+				<Task task={this.props.task} onSelectionChange={this.handleSelectionChange}></Task>
+			</div>
 			<TaskLogDisplay task={this.state.selectedTask}></TaskLogDisplay>
 		</div>;
 	}
 }
 
+class ConfigComponent extends React.Component {
 
-var configSocket = io('/~config');
+	handleClickBuild(event) {
+		configSocket.emit('build');
+	}
+
+	render() {
+		return <div>
+			<header>
+				<h1 className="title">Freshr Configuration</h1>
+			</header>
+			<div className="page-content">
+				<button onClick={this.handleClickBuild}>Build</button>
+				{this.props.buildTask && <TaskDisplay task={this.props.buildTask} />}
+				{this.props.configs.map(config => {
+					return <div key={config.title} className="config card collapser-wrapper">
+						<h2 className="card-title">{config.title} <button className="collapser"></button></h2>
+						<div className="card-body collapser-target">
+							<ul className="fields">
+								{config.fields.map(field => {
+									return <li key={field.name}>{field.name}</li>;
+								})}
+							</ul>
+						</div>
+					</div>;
+				})}
+			</div>
+		</div>;
+	}
+}
+
+function getTask(task, taskPath) {
+	if(taskPath.length === 0) {
+		return task;
+	}
+	return getTask(task.tasks[taskPath[0]], taskPath.slice(1));
+}
 
 var buildTasks = {};
 
@@ -101,17 +141,14 @@ configSocket.on('build/task/done', function(data) {
 
 configSocket.emit('build');
 
+render();
+
 function render() {
-	const element = <TaskDisplay task={buildTasks.tasks} />;
+	const element = <ConfigComponent configs={FreshrContext.configs} buildTask={buildTasks.tasks} />;
 	ReactDOM.render(
 		element,
 		document.getElementById('root')
 	);
 }
 
-function getTask(task, taskPath) {
-	if(taskPath.length === 0) {
-		return task;
-	}
-	return getTask(task.tasks[taskPath[0]], taskPath.slice(1));
-}
+

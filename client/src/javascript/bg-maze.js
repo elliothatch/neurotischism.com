@@ -9,17 +9,23 @@
 		this.particleColors = [
 			{ hue: 1, hueOffset: 0, saturation: 0.8, value: 0.8 },
 			{ hue: 0.1 + (1-0.1)*Math.random(), hueOffset: Math.random(), saturation: 0.8, value: 0.8 }
-		]
+		];
 
-	}
+	};
 
 	MazeAnimation.prototype.init = function() {
+		//var gridSize = parseInt(window.localStorage.getItem("bg-maze:gridSize"));
+		//if(!gridSize) {
+			//gridSize = 20;
+		//}
+		var gridSize = 3;
+		var startTime = performance.now();
 		//this.gallery.canvas.style.background = '#555';
 		this.gallery.ctx.fillStyle = '#555';
 		this.gallery.ctx.fillRect(0, 0, this.gallery.width, this.gallery.height);
 
 		this.particleColor = this.particleColors[1];
-		this.gridSize = 3;
+		this.gridSize = gridSize;
 		this.mazeWidth = this.gallery.width/this.gridSize;
 		this.mazeHeight = this.gallery.height/this.gridSize;
 		this.maze = generateMaze(this.mazeWidth, this.mazeHeight);
@@ -38,7 +44,7 @@
 		}
 
 		//draw maze
-		for(var i = 0; i < this.mazeWidth; i++) {
+		for(i = 0; i < this.mazeWidth; i++) {
 			for(var j = 0; j < this.mazeHeight; j++) {
 				this.gallery.ctx.strokeStyle = this.gallery.helpers.rgbStr(0,0,0);
 				this.gallery.ctx.strokeWidth = 1;
@@ -62,7 +68,23 @@
 				this.gallery.ctx.stroke();
 			}
 		}
-	}
+
+		/*
+		var endTime = performance.now();
+		var loadTime = endTime - startTime;
+		console.log(gridSize, loadTime);
+		var loadMinThreshold = 300;
+		var loadMaxThreshold = 500;
+		if(loadTime < loadMinThreshold) {
+			gridSize -= 1;
+		} else if(loadTime > loadMaxThreshold) {
+			gridSize += 1;
+		}
+
+		window.localStorage.setItem('bg-maze:gridSize', gridSize);
+		*/
+	};
+
 
 	MazeAnimation.prototype.draw = function(t, deltaT)
 	{
@@ -100,10 +122,10 @@
 				}
 				*/
 
-					var stepCount = 1;
-					if(_this.gallery.linkHovered && _this.mode === 0) {
-						stepCount = _this.particleHoverStepCount;
-					}
+				var stepCount = 1;
+				if(_this.gallery.linkHovered && _this.mode === 0) {
+					stepCount = _this.particleHoverStepCount;
+				}
 
 				for(var j = 0; j < stepCount; j++) {
 					//move
@@ -126,7 +148,7 @@
 			}
 		});
 
-	}
+	};
 
 	//maze is 2d array of [u,r,d,l, visited] bools, true if no wall
 	function generateMaze(width, height) {
@@ -157,12 +179,12 @@
 		carve(0,0);
 		*/
 
-	var stack = [];
-	//0: up, 1: right, 2: down, 3: left
-	//add 4 starting directions
-	shuffle([0,1,2,3]).forEach(function(dir) {
-		stack.push({x: 0, y: 0, dir: dir});
-	});
+		var stack = [];
+		//0: up, 1: right, 2: down, 3: left
+		//add 4 starting directions
+		shuffle([0,1,2,3]).forEach(function(dir) {
+			stack.push({x: 0, y: 0, dir: dir});
+		});
 
 		while(stack.length > 0) {
 			var current = stack.pop();

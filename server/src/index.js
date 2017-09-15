@@ -5,6 +5,8 @@ var server = require('./server');
 
 var configOptions = {
 	port: config.get('port'),
+	httpPort: config.get('httpPort'),
+	certPath: config.get('certPath'),
 	clientPath: path.resolve(config.get('clientPath')),
 	logLevel: config.get('logLevel')
 };

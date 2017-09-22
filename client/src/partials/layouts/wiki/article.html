@@ -1,0 +1,9 @@
+{{#extend-context '{}'}}
+	{{#> layouts/bare.html }}
+		{{#*inline "bare-contents"}}
+				{{#> article-contents}}
+					<!-- No layouts/wiki/article.html contents -->
+				{{/article-contents}}
+		{{/inline}}
+	{{/layouts/bare.html}}
+{{/extend-context}}

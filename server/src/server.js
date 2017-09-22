@@ -81,9 +81,16 @@ function start(options) {
 			httpsPortStr = ':' + options.port.toString();
 		}
 		httpServer = http.Server(function(req, res) {
-			var host = req.headers['host'].split(':')[0];
-			res.writeHead(307, { "Location": "https://" + host + httpsPortStr + req.url });
-			res.end();
+			try {
+				var host = req.headers['host'].split(':')[0];
+				res.writeHead(307, { "Location": "https://" + host + httpsPortStr + req.url });
+				res.end();
+			}
+			catch(err) {
+				console.error(err);
+				res.writeHead(500);
+				res.end();
+			}
 		});
 		httpServer.listen(options.httpPort);
 		httpsServer.listen(options.port);

@@ -146,7 +146,7 @@ function loadTemplates(clientPath) {
 
 	// register all partials
 	walkDirectory(partialsDir, function(path) {
-		var name = path.substring(partialsDir.length+1).replace('\\', '/');
+		var name = path.substring(partialsDir.length+1).replace(/\\/g, '/');
 		Handlebars.registerPartial(name, fs.readFileSync(path, 'utf8'));
 	});
 

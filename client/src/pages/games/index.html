@@ -1,11 +1,11 @@
 {{#extend-context '{"page": { "title": "games" } }'}}
 	{{#> layouts/default.html }}
-	{{#*inline "default-contents"}}
-		<ul class="postsList">
-			{{#each posts}}
-			<li><a class="scrollLink" href="{{this.url}}">{{this.page.title}}</a></li>
-			{{/each}}
-		</ul>
-	{{/inline}}
+		{{#*inline "default-contents"}}
+			<ul class="postsList">
+				{{#each posts}}
+				<li><a class="scrollLink" href="{{this.url}}">{{this.page.title}}</a></li>
+				{{/each}}
+			</ul>
+		{{/inline}}
 	{{/layouts/default.html}}
 {{/extend-context}}

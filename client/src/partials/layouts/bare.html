@@ -1,4 +1,9 @@
 {{#extend-context '{"site": { "title": "[neurotischism", "email": "elliot@neurotischism.com", "twitter": "neurotischism", "github": "elliothatch" } }'}}
 	{{#> layouts/core.html }}
+		{{#*inline "core-contents"}}
+				{{#> bare-contents}}
+					<!-- No layouts/bare.html contents -->
+				{{/bare-contents}}
+		{{/inline}}
 	{{/layouts/core.html}}
 {{/extend-context}}

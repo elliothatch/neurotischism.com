@@ -39,6 +39,9 @@
 		var c2x = x + length*widthRatio*Math.cos(angle+Math.PI*1/3);
 		var c2y = y + length*widthRatio*Math.sin(angle+Math.PI*1/3);
 
+		//var c1y = y + length*widthRatio*Math.sin(angle);
+		//var c2y = y + length*widthRatio*Math.sin(angle);
+
 		this.gallery.ctx.fillStyle = fillColor;
 		this.gallery.ctx.strokeStyle = strokeColor;
 

@@ -14,6 +14,7 @@
 		//private
 		this.animations = [];
 		this.animationIndex = 0;
+		this.animationRunning = false;
 
 		this.startTime = null;
 		this.lastTime = null;
@@ -121,7 +122,10 @@
 		this.animationIndex = index;
 		this.animations[this.animationIndex].init();
 		var _this = this;
-		window.requestAnimationFrame(function() { _this.step.apply(_this, arguments); });
+		if(!this.animationRunning) {
+			this.animationRunning = true;
+			window.requestAnimationFrame(function() { _this.step.apply(_this, arguments); });
+		}
 	};
 
 	window.AnimationGallery = new AnimationGallery('backgroundCanvas');

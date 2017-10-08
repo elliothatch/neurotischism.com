@@ -2,6 +2,7 @@
 
 @import 'reset';
 @import 'theming';
+@import 'material-icons';
 
 $mat-fresh-green: (
 	300: #81ffa8,
@@ -85,6 +86,53 @@ header {
 		font-size: 3em;
 	}
 }
+
+$button-edge-border-radius: 12px;
+$button-edge-border-color-light: rgba(black, 0.12);
+$button-edge-border-color-dark: rgba(black, 0.35);
+
+button {
+	background: map-get($theme-background, raised-button);
+	padding: 6px 12px;
+	//border-style: outset;
+	//border-color: map-get($theme-foreground, divider);
+	border-style: solid;
+	border-top-color: $button-edge-border-color-light;
+	border-bottom-color: $button-edge-border-color-dark;
+	border-left-color: $button-edge-border-color-light;
+	border-right-color: $button-edge-border-color-light;
+	border-width: 2px 1px;
+	border-radius: 0px;
+	&:first-of-type {
+		border-left-width: 2px;
+		border-top-left-radius: $button-edge-border-radius;
+		border-bottom-left-radius: $button-edge-border-radius;
+	}
+	&:last-of-type {
+		border-right-color: $button-edge-border-color-dark;
+		border-right-width: 2px;
+		border-top-right-radius: $button-edge-border-radius;
+		border-bottom-right-radius: $button-edge-border-radius;
+	}
+	&:hover {
+		background: map-get($theme-background, focused-button);
+	}
+	&:active {
+		border-left-color: $button-edge-border-color-dark;
+		border-top-color: $button-edge-border-color-dark;
+		border-bottom-color: $button-edge-border-color-light;
+		border-right-color: $button-edge-border-color-light;
+		background: map-get($theme-background, selected-button);
+	}
+	&:disabled {
+		color: map-get($theme-foreground, disabled-button);
+		background: map-get($theme-background, disabled-button);
+		&:active {
+			background: map-get($theme-background, selected-disabled-button);
+		}
+	}
+}
+
 
 .page-content {
 	//max-width: $page-content-width;
@@ -215,28 +263,51 @@ $task-result-border-width: 15px;
 .file-explorer-display {
 	.file-explorer {
 		.path {
-			button {
-			}
+
+			margin: 0;
 
 			.directories {
+				display: inline-block;
 				//display: flex;
 				//flex-direction: row;
 				list-style-type: none;
-				li {
-					display: inline-block;
-					height: 50px;
+				padding-left: 0;
+				margin: 0;
+				.up-directory-button {
+					padding-left: 3px;
+					padding-right: 3px;
+					i {
+						line-height: 0;
+						transform: translateY(6px);
+					}
 				}
+				button:last-of-type {
+					border-top-right-radius: 0px;
+					border-bottom-right-radius: 0px;
+				}
+				//li {
+					//display: inline-block;
+					//margin: 0;
+				//}
 			}
 		}
 
 		.entries {
+			margin: 0;
+			padding-left: 0;
+			background: $black-6-opacity;
 			list-style-type: none;
 			li {
+				i {
+					color: mat-color($theme-accent, darker);
+				}
 				.card {
 					position: relative;
 					margin: 0;
 					width: 250px;
-					height: 80px;
+					height: 30px;
+					background: map-get($theme-background, card);
+					border-bottom: 2px solid $black-12-opacity;
 
 					&.selected {
 						color: mat-color($theme-primary, lighter-contrast);

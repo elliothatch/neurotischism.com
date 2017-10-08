@@ -88,6 +88,7 @@ function start(options) {
 			}
 			catch(err) {
 				console.error(err);
+				console.log(req.headers);
 				res.writeHead(500);
 				res.end();
 			}

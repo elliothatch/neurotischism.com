@@ -137,10 +137,10 @@ class FileExplorerPath extends React.Component {
 	}
 	render() {
 		return <div className="path">
-			<button className="up-directory-button" disabled={this.props.path.length <= 1} onClick={this.handleClickUpDirectory}>Up</button>
-			<ul className="directories">
+			<div className="directories">
+				<button className="up-directory-button" disabled={this.props.path.length <= 1} onClick={this.handleClickUpDirectory}><i className="material-icons">arrow_back</i></button>
 				{this.props.path.map((e) => <FileExplorerPathEntry key={e.path} entry={e} onClickDirectory={this.handleClickDirectory} />)}
-			</ul>
+			</div>
 		</div>;
 	}
 }
@@ -155,7 +155,7 @@ class FileExplorerPathEntry extends React.Component {
 		this.props.onClickDirectory(this.props.entry);
 	}
 	render() {
-		return <li><button onClick={this.handleClick}>{this.props.entry.name}</button></li>;
+		return <button onClick={this.handleClick}>{this.props.entry.name}</button>;
 	}
 }
 
@@ -170,7 +170,13 @@ class FileExplorerEntry extends  React.Component {
 	}
 
 	render() {
-		return <li><div className={`card${this.props.selected ? ' selected' : ''}`} onClick={this.handleClick}>{this.props.entry.name}</div></li>;
+		return <li>
+			<div className={`card${this.props.selected ? ' selected' : ''}`} onClick={this.handleClick}>
+				{this.props.entry.type === 'file' && <i className="material-icons">insert_drive_file</i>}
+				{this.props.entry.type === 'directory' && <i className="material-icons">folder</i>}
+				{this.props.entry.name}
+			</div>
+		</li>;
 	}
 }
 

@@ -31,6 +31,7 @@
     "fs-extra": "^4.0.1",
     "handlebars": "^4.0.10",
     "ip": "^1.1.5",
+    "material-design-icons": "^3.0.1",
     "minimist": "^1.2.0",
     "moment": "^2.18.1",
     "moment-timezone": "^0.5.13",

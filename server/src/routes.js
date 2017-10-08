@@ -47,6 +47,7 @@ module.exports = function(options) {
 	router.use(express.static(path.join(__dirname, '../../node_modules/react-dom/dist')));
 	//TODO: make this part of config plugin
 	router.use(express.static(path.join(__dirname, '../../node_modules/qrcode/build')));
+	router.use('/material-design-icons', express.static(path.join(__dirname, '../../node_modules/material-design-icons/iconfont')));
 
 	router.use(function(err, req, res, next) {
 		if(!err.status) {

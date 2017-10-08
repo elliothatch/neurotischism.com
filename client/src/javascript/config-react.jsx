@@ -6,6 +6,174 @@
 
 var configSocket = io('/~config');
 
+const srcDirectory = {
+	name: 'src',
+	path: '/src',
+	type: 'directory',
+	entries: [
+		{
+			name: 'sass',
+			path: 'src/sass',
+			type: 'directory',
+			entries: [
+				{
+					name: 'a.sass',
+					path: 'src/javascript/a.sass',
+					type: 'file',
+					entries: null
+				}, {
+					name: 'b.sass',
+					path: 'src/javascript/b.sass',
+					type: 'file',
+					entries: null
+				}
+			]
+		}, {
+			name: 'javascript',
+			path: 'src/javascript',
+			type: 'directory',
+			entries: [
+				{
+					name: 'one.js',
+					path: 'src/javascript/one.js',
+					type: 'file',
+					entries: null
+				}, {
+					name: 'two.js',
+					path: 'src/javascript/two.js',
+					type: 'file',
+					entries: null
+				}, {
+					name: 'more',
+					path: 'src/javascript/more',
+					type: 'directory',
+					entries: [
+						{
+							name: 'three.js',
+							path: 'src/javascript/more/three.js',
+							type: 'file',
+							entries: null
+						}, {
+							name: 'four.js',
+							path: 'src/javascript/more/four.js',
+							type: 'file',
+							entries: null
+						}
+					]
+				}
+			]
+		}
+	]
+};
+
+/*
+ * entry:
+ *   name{string}
+ *   path{string}
+ *   type{'file' | 'directory'}
+ *   entries{entry[]}
+ */
+class FileExplorer extends React.Component {
+	constructor(props) {
+		super(props);
+
+		this.handleChangeDirectory = this.handleChangeDirectory.bind(this);
+		this.handleSelectionChange = this.handleSelectionChange.bind(this);
+
+		this.state = {
+			selectedEntry: null,
+			currentPath: [props.entry]
+		};
+	}
+
+	handleChangeDirectory(entry) {
+		var entryIndex = this.state.currentPath.findIndex((e) => e === entry);
+		this.setState({
+			currentPath: this.state.currentPath.slice(0, entryIndex+1)
+		});
+	}
+	handleSelectionChange(entry) {
+		if(this.state.selectedEntry === entry) {
+			if(this.state.selectedEntry.type === 'directory') {
+				this.setState({
+					currentPath: this.state.currentPath.concat(this.state.selectedEntry)
+				});
+			}
+		}
+		else {
+			this.setState({
+				selectedEntry: entry
+			});
+		}
+	}
+
+	render() {
+		return <div className="file-explorer">
+			<div>File Explorer</div>
+			<FileExplorerPath path={this.state.currentPath} onChangeDirectory={this.handleChangeDirectory}></FileExplorerPath>
+			<ul className="entries">
+				{this.state.currentPath.length > 0 && this.state.currentPath[this.state.currentPath.length-1].entries.map(
+					(e) => <FileExplorerEntry key={e.path} entry={e} onSelectionChange={this.handleSelectionChange} selected={this.state.selectedEntry === e}></FileExplorerEntry>)
+				}
+			</ul>
+		</div>;
+	}
+}
+
+class FileExplorerPath extends React.Component {
+	constructor(props) {
+		super(props);
+		this.handleClickUpDirectory = this.handleClickUpDirectory.bind(this);
+		this.handleClickDirectory = this.handleClickDirectory.bind(this);
+	}
+
+	handleClickUpDirectory(e, data) {
+		if(this.props.path.length > 1) {
+			this.props.onChangeDirectory(this.props.path[this.props.path.length-2]);
+		}
+	}
+	handleClickDirectory(entry) {
+		this.props.onChangeDirectory(entry);
+	}
+	render() {
+		return <div className="path">
+			<button className="up-directory-button" disabled={this.props.path.length <= 1} onClick={this.handleClickUpDirectory}>Up</button>
+			<ul className="directories">
+				{this.props.path.map((e) => <FileExplorerPathEntry key={e.path} entry={e} onClickDirectory={this.handleClickDirectory} />)}
+			</ul>
+		</div>;
+	}
+}
+
+class FileExplorerPathEntry extends React.Component {
+	constructor(props) {
+		super(props);
+		this.handleClick= this.handleClick.bind(this);
+	}
+
+	handleClick(e, data) {
+		this.props.onClickDirectory(this.props.entry);
+	}
+	render() {
+		return <li><button onClick={this.handleClick}>{this.props.entry.name}</button></li>;
+	}
+}
+
+class FileExplorerEntry extends  React.Component {
+	constructor(props) {
+		super(props);
+		this.handleClick = this.handleClick.bind(this);
+	}
+
+	handleClick(e, data) {
+		this.props.onSelectionChange(this.props.entry);
+	}
+
+	render() {
+		return <li><div className={`card${this.props.selected ? ' selected' : ''}`} onClick={this.handleClick}>{this.props.entry.name}</div></li>;
+	}
+}
+
 class TaskLogDisplay extends React.Component {
 	render() {
 		return <div className="log-display">
@@ -116,6 +284,9 @@ class ConfigComponent extends React.Component {
 				<h1 className="title">Freshr Configuration</h1>
 			</header>
 			<div className="page-content">
+				<div className="file-explorer-display">
+					<FileExplorer entry={this.props.srcDirectory}></FileExplorer>
+				</div>
 				<div className="ip-display">
 					{[{name: 'Local URL', ip: this.props.config.serverLocalIp}, {name: 'Public URL', ip: this.props.config.serverPublicIp}].map(ipObj => {
 						var url = ipObj.ip && 'http://' + ipObj.ip + ':' + this.props.config.serverPort;
@@ -198,7 +369,7 @@ configSocket.emit('publicip');
 render();
 
 function render() {
-	const element = <ConfigComponent config={FreshrContext.config} buildTask={buildTasks.tasks} />;
+	const element = <ConfigComponent config={FreshrContext.config} buildTask={buildTasks.tasks} srcDirectory={srcDirectory} />;
 	ReactDOM.render(
 		element,
 		document.getElementById('root')

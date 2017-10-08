@@ -212,6 +212,44 @@ $task-result-border-width: 15px;
 	}
 }
 
+.file-explorer-display {
+	.file-explorer {
+		.path {
+			button {
+			}
+
+			.directories {
+				//display: flex;
+				//flex-direction: row;
+				list-style-type: none;
+				li {
+					display: inline-block;
+					height: 50px;
+				}
+			}
+		}
+
+		.entries {
+			list-style-type: none;
+			li {
+				.card {
+					position: relative;
+					margin: 0;
+					width: 250px;
+					height: 80px;
+
+					&.selected {
+						color: mat-color($theme-primary, lighter-contrast);
+						background: mat-color($theme-primary, lighter);
+					}
+				}
+				button {
+				}
+			}
+		}
+	}
+}
+
 .loader,
 .loader:after {
 	border-radius: 50%;

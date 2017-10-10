@@ -5,67 +5,6 @@
 /*global qrcodelib*/
 
 var configSocket = io('/~config');
-
-const srcDirectory = {
-	name: 'src',
-	path: '/src',
-	type: 'directory',
-	entries: [
-		{
-			name: 'sass',
-			path: 'src/sass',
-			type: 'directory',
-			entries: [
-				{
-					name: 'a.sass',
-					path: 'src/javascript/a.sass',
-					type: 'file',
-					entries: null
-				}, {
-					name: 'b.sass',
-					path: 'src/javascript/b.sass',
-					type: 'file',
-					entries: null
-				}
-			]
-		}, {
-			name: 'javascript',
-			path: 'src/javascript',
-			type: 'directory',
-			entries: [
-				{
-					name: 'one.js',
-					path: 'src/javascript/one.js',
-					type: 'file',
-					entries: null
-				}, {
-					name: 'two.js',
-					path: 'src/javascript/two.js',
-					type: 'file',
-					entries: null
-				}, {
-					name: 'more',
-					path: 'src/javascript/more',
-					type: 'directory',
-					entries: [
-						{
-							name: 'three.js',
-							path: 'src/javascript/more/three.js',
-							type: 'file',
-							entries: null
-						}, {
-							name: 'four.js',
-							path: 'src/javascript/more/four.js',
-							type: 'file',
-							entries: null
-						}
-					]
-				}
-			]
-		}
-	]
-};
-
 /*
  * entry:
  *   name{string}
@@ -82,29 +21,47 @@ class FileExplorer extends React.Component {
 
 		this.state = {
 			selectedEntry: null,
-			currentPath: [props.entry]
+			currentPath: this.pathFromEntry(this.props.entry, this.props.entry)
 		};
 	}
 
-	handleChangeDirectory(entry) {
-		var entryIndex = this.state.currentPath.findIndex((e) => e === entry);
-		this.setState({
-			currentPath: this.state.currentPath.slice(0, entryIndex+1)
-		});
-	}
-	handleSelectionChange(entry) {
-		if(this.state.selectedEntry === entry) {
-			if(this.state.selectedEntry.type === 'directory') {
-				this.setState({
-					currentPath: this.state.currentPath.concat(this.state.selectedEntry)
-				});
-			}
-		}
-		else {
+	componentWillReceiveProps(nextProps) {
+		if(nextProps.entry !== this.props.entry) {
 			this.setState({
-				selectedEntry: entry
+				selectedEntry: null,
+				currentPath: this.pathFromEntry(nextProps.entry, nextProps.entry)
 			});
 		}
+	}
+
+	handleChangeDirectory(entry) {
+		this.setState({
+			currentPath: this.pathFromEntry(this.props.entry, entry)
+		});
+	}
+
+	/**
+	 * Calculate a path array from an entry in the directory tree
+	*/
+	pathFromEntry(rootEntry, entry) {
+		if(!rootEntry || !entry) {
+			return [];
+		}
+		// convert each part of the path into an entry, ignoring the first entry (the root entry)
+		return entry.path.split('/').slice(1).reduce((path, entryName) => {
+			var entry = path[path.length-1].entries.find((e) => e.name === entryName);
+			if(!entry) {
+				throw new Error(`Directory '${[path[path.length-1].path, entryName].join('/')}' not found`);
+			}
+			path.push(entry);
+			return path;
+		}, [rootEntry]);
+	}
+
+	handleSelectionChange(entry) {
+		this.setState({
+			selectedEntry: entry
+		});
 	}
 
 	render() {
@@ -112,8 +69,8 @@ class FileExplorer extends React.Component {
 			<div>File Explorer</div>
 			<FileExplorerPath path={this.state.currentPath} onChangeDirectory={this.handleChangeDirectory}></FileExplorerPath>
 			<ul className="entries">
-				{this.state.currentPath.length > 0 && this.state.currentPath[this.state.currentPath.length-1].entries.map(
-					(e) => <FileExplorerEntry key={e.path} entry={e} onSelectionChange={this.handleSelectionChange} selected={this.state.selectedEntry === e}></FileExplorerEntry>)
+				{this.props.entry && this.state.currentPath.length > 0 && this.state.currentPath[this.state.currentPath.length-1].entries.map(
+					(e) => <FileExplorerEntry key={e.path} entry={e} onSelectionChange={this.handleSelectionChange} onChangeDirectory={this.handleChangeDirectory} selected={this.state.selectedEntry === e}></FileExplorerEntry>)
 				}
 			</ul>
 		</div>;
@@ -163,10 +120,18 @@ class FileExplorerEntry extends  React.Component {
 	constructor(props) {
 		super(props);
 		this.handleClick = this.handleClick.bind(this);
+		this.lastClickTime = Date.now();
+		this.doubleClickDelay = 800;
 	}
 
 	handleClick(e, data) {
-		this.props.onSelectionChange(this.props.entry);
+		if(this.props.selected && this.props.entry.type === 'directory' && Date.now() - this.lastClickTime < this.doubleClickDelay) {
+			this.props.onChangeDirectory(this.props.entry);
+		}
+		else {
+			this.props.onSelectionChange(this.props.entry);
+		}
+		this.lastClickTime = Date.now();
 	}
 
 	render() {
@@ -330,6 +295,13 @@ function getTask(task, taskPath) {
 	return getTask(task.tasks[taskPath[0]], taskPath.slice(1));
 }
 
+var srcDirectory = null;
+configSocket.on('files/src', function(srcEntry) {
+	console.log('files/src', srcEntry);
+	srcDirectory = srcEntry;
+	render();
+});
+
 var buildTasks = {};
 
 configSocket.on('build/start', function(tasks) {
@@ -371,6 +343,7 @@ configSocket.on('publicip', function(ip) {
 
 configSocket.emit('build');
 configSocket.emit('publicip');
+configSocket.emit('files/src');
 
 render();
 

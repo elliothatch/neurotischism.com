@@ -77,35 +77,41 @@ function makeFreshrHandler(options, dbWrap) {
 }
 
 function makeSocketHandler(options) {
-	BuildManager.buildProject(options.clientPath, [
+	/*
+	var tasks = [
 		{ name: 'clean', sync: true, tasks: [
 			BuildManager.tasks.makeCleanTask('dist'),
 			{ name: 'build', tasks: [
 				{name: 'javascript', func: BuildManager.tasks.makeCopySrcToDistTask('javascript', ['config-react.jsx'])},
 				{name: 'sass', func: BuildManager.tasks.makeCompileSassTask('sass', 'css', ['main', 'shakespeare', 'config'])},
-				BuildManager.tasks.makeCompileReactTask('react', 'javascript', ['config-react'])
+				BuildManager.tasks.makeCompileReactTask('react', 'javascript', ['config/config-react', 'config/FileExplorer'])
 			]}
 		]}
-	]).filter(function(e) {return e.eType === 'task/log';}).subscribe(function(event) {
-		if(event.level === 'error') {
+	];*/
+	
+	var tasks = [
+		{ name: 'clean', sync: true, tasks: [
+			BuildManager.tasks.makeCleanTask('dist'),
+			{ name: 'build', tasks: [
+				{name: 'javascript', func: BuildManager.tasks.makeCopySrcToDistTask('javascript', ['config/config-react.jsx', 'config/FileExplorer.jsx', 'config/QRComponent.jsx', 'config/TaskDisplay.jsx'])},
+				{name: 'sass', func: BuildManager.tasks.makeCompileSassTask('sass', 'css', ['main', 'shakespeare', 'config'])},
+				BuildManager.tasks.makeCompileReactRollupTask('react', 'javascript', 'config/config-react', 'FreshrConfig')
+			]}
+		]}
+	];
+	
+	BuildManager.buildProject(options.clientPath, tasks).filter(function(e) {return e.eType === 'task/log';}).subscribe(function(event) {
+		if(event.level === 'error' || event.log.level === 'error') {
 			console.log(event);
 		}
 	});
+
 	return function(socket, next) {
 		socket.on('files/src', function(data) {
 			socket.emit('files/src', getFileEntry(options.clientPath, 'src'));
 		});
 		socket.on('build', function(data) {
-			BuildManager.buildProject(options.clientPath, [
-				{ name: 'clean', sync: true, tasks: [
-					BuildManager.tasks.makeCleanTask('dist'),
-					{ name: 'build', tasks: [
-						{name: 'javascript', func: BuildManager.tasks.makeCopySrcToDistTask('javascript', ['config-react.jsx'])},
-						{name: 'sass', func: BuildManager.tasks.makeCompileSassTask('sass', 'css', ['main', 'shakespeare', 'config'])},
-						BuildManager.tasks.makeCompileReactTask('react', 'javascript', ['config-react'])
-					]}
-				]}
-			]).subscribe(function(event) {
+			BuildManager.buildProject(options.clientPath, tasks).subscribe(function(event) {
 				var eType = event.eType;
 				delete event.eType;
 				socket.emit('build/' + eType, event);
@@ -158,3 +164,60 @@ function getFileEntry(basePath, relativePath) {
 	}
 }
 
+/**
+ * TaskDefintion -- defines a type of task (copy, compile sass)
+ *  input/output params should define the minimum files necessary for one execution of the task (e.g. copy only needs one in file and one out file)
+ *  The Task engine handles calling the TaskDefintion func mutliple times if multiple files are specified, so that logic doesn't need to be implemented in the TaskDefintion
+ *   name{string}
+ *   func{function}
+ *   inputs{FileSpec[]}
+ *   outputs{FileSpec[]}
+ */
+
+// eslint-disable-next-line no-unused-vars
+var CopyTaskDefintion = {
+	name: 'copy',
+	//func:
+	inputs: [{
+		name: 'in',
+		type: 'file',
+		hint: null
+	}],
+	outputs: [{
+		name: 'out',
+		type: 'file',
+		hint: null
+	}]
+};
+
+// eslint-disable-next-line no-unused-vars
+var SassTaskDefintion = {
+	name: 'sass',
+	//func:
+	inputs: ['files'],
+	outputs: ['file', 'file'] //.css, .css.map
+};
+
+// eslint-disable-next-line no-unused-vars
+var TemplateTaskDefinition = {
+	name: 'sass',
+	//func:
+	inputs: ['file', 'file'],
+	outputs: ['files'] //.css, .css.map
+};
+
+
+/**
+ * FileSpec -- specifies allowed types of file/dir as an input/output of a task
+ *    name{string}
+ *    type{'file' | 'files' | 'dir' | 'dirs'}
+ *    hint{string|null}: expected name format. Matches input names for filtering, autogenerates suggested output name
+ *       e.g. *.js -- input matches all files with .js extension. output 
+ */
+
+/**
+ * Task -- instance of a task
+ *    definition{string}
+ *    sync{boolean}
+ *    tasks{Task[]}
+ */

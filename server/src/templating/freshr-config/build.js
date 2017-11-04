@@ -6,6 +6,13 @@ var fs = require('fs-extra');
 var sass = require('node-sass');
 var babel = require('babel-core');
 
+var rollup = require('rollup');
+var rollupBabel = require('rollup-plugin-babel');
+var rollupCjs = require('rollup-plugin-commonjs');
+var rollupResolve = require('rollup-plugin-node-resolve');
+var rollupNodeBuiltins = require('rollup-plugin-node-builtins');
+var rollupNodeGlobals = require('rollup-plugin-node-globals');
+
 //Tasks start at status 0 and are overwritten if a higher status is set
 var TaskStatuses = {
 	none: 0,
@@ -96,7 +103,7 @@ function makeCopySrcToDistTask(dir, ignoreFiles) {
 
 		logger.info("Copying '" + srcPath + "' to '" + distPath + "'");
 		return fs.copy(srcPath, distPath, {
-			filter: function(src, dest) { return !ignoreFiles.includes(Path.basename(src));}
+			filter: function(src, dest) { return !ignoreFiles.includes(src.slice(srcPath.length+1).replace(/\\/g, '/'));}
 		});
 	};
 }
@@ -154,6 +161,71 @@ function makeCompileReactTask(name, dir, files) {
 						]);
 					});
 				}));
+			}}
+		]
+	};
+}
+
+function makeCompileReactRollupTask(name, dir, file, bundleName) {
+	return {
+		name: name,
+		tasks: [
+			{name: 'rollup react', func: function(clientPath, logger) {
+				var srcPath = Path.join(clientPath, 'src', dir);
+				var distPath = Path.join(clientPath, 'dist', dir);
+				var inFile = Path.join(srcPath, file + '.jsx');
+				var outFile = Path.join(distPath, file + '.js');
+
+				var inputOptions = {
+					input: inFile,
+					plugins: [
+						rollupBabel({
+							exclude: 'node_modules/**',
+							babelrc: false,
+							presets: [
+								'react',
+								['es2015', {'modules': false}]
+							],
+							plugins: ['external-helpers']
+						}),
+						rollupResolve({
+							browser: true,
+							main: true,
+							extensions: ['.js', '.jsx']
+						}),
+						rollupCjs({
+							exclude: [
+								'node_modules/process-es6/**',
+								'node_modules/buffer-es6/**',
+							],
+							include: [
+
+								'node_modules/dijkstrajs/**',
+								'node_modules/qrcode/**',
+
+								'node_modules/create-react-class/**',
+								'node_modules/fbjs/**',
+								'node_modules/object-assign/**',
+								'node_modules/react/**',
+								'node_modules/react-dom/**',
+								'node_modules/prop-types/**',
+							]
+						}),
+						rollupNodeGlobals(),
+						rollupNodeBuiltins(),
+					]
+				};
+				var outputOptions = {
+					file: outFile,
+					format: 'iife',
+					name: bundleName,
+					sourcemap: true
+				};
+				
+				logger.info("Compiling '" + inFile + "' to '" + outFile + "'");
+				return rollup.rollup(inputOptions).then(function(bundle) {
+					return bundle.write(outputOptions);
+				});
 			}}
 		]
 	};
@@ -266,6 +338,7 @@ module.exports = {
 		makeCleanTask: makeCleanTask,
 		makeCopySrcToDistTask: makeCopySrcToDistTask,
 		makeCompileSassTask: makeCompileSassTask,
-		makeCompileReactTask: makeCompileReactTask
+		makeCompileReactTask: makeCompileReactTask,
+		makeCompileReactRollupTask: makeCompileReactRollupTask
 	}
 };

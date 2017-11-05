@@ -249,7 +249,7 @@ function makeCompileReactRollupTask(name, dir, file, bundleName) {
  *      - 'task/log'{{path, status, log}}
  *      - 'task/done'{{path}}
  */
-function buildProject(clientPath, tasks) {
+function buildProject(clientPath, taskDefinitions, tasks) {
 	var rootTask = {name: 'Build', tasks: tasks};
 
 	return Observable.create(function(buildEventsObserver) {
@@ -272,17 +272,29 @@ function buildProject(clientPath, tasks) {
 					}));
 				}
 				buildPromise = buildPromise.then(function(results) {
-					return {success: results.filter(function(r) { return !r.success;}).length > 0, data: results};
+					return {success: results.filter(function(r) { return !r.success;}).length === 0, data: results};
 				});
-			} else if(task.func) {
+			} else if(task.definition) {
+				var taskDefinition = taskDefinitions[task.definition];
+				if(!taskDefinition) {
+					throw new Error('Task Definition \'' + task.definition + '\' not found');
+				}
+
 				//resolve is to convert non-bluebird promises, so we can use bluebird helpers
-				buildPromise = Promise.resolve(task.func(clientPath, logger))
-					.then(function(result) {
-						return { success: true, data: result};
-					}).catch(function(error) {
-						logger.error(error && error.message, error);
-						return { success: false, data: error};
-					});
+				buildPromise = Promise.all(task.files.map(function(f) {
+					var inputs = f.inputs && f.inputs.map(function(inF) { return Path.join(clientPath, inF);});
+					var outputs = f.outputs && f.outputs.map(function(outF) { return Path.join(clientPath, outF);});
+					var options = Object.assign(Object.assign({}, task.options), f.options); //copy the overall options, then overwrite file specific options
+					return Promise.resolve(taskDefinition.func(inputs, outputs, options, logger))
+						.then(function(result) {
+							return { success: true, data: result};
+						}).catch(function(error) {
+							logger.error(error && error.message, error);
+							return { success: false, data: error};
+						});
+				})).then(function(results) {
+					return {success: results.filter(function(r) { return !r.success;}).length === 0, data: results};
+				});
 			} else {
 				logger.warn('Task "' + task.name + '" has no build function or subtasks');
 				buildPromise = Promise.resolve({success: true, data: null});
@@ -307,6 +319,170 @@ function buildProject(clientPath, tasks) {
 			.finally(function() {
 				buildEventsObserver.complete();
 			});
+	});
+}
+
+/**
+ * TaskDefinition -- defines a type of task (copy, compile sass)
+ *  input/output params should define the minimum files necessary for one execution of the task (e.g. copy only needs one in file and one out file)
+ *  The Task engine handles calling the TaskDefinition func mutliple times if multiple files are specified, so that logic doesn't need to be implemented in the TaskDefinition
+ *   name{string}
+ *   func{function}
+ *   inputs{FileSpec[]}
+ *   outputs{FileSpec[]}
+ */
+
+/**
+ * FileSpec -- specifies allowed types of file/dir as an input/output of a task
+ *    name{string}
+ *    type{'file' 'dir'}
+ *    count{int | [int, (int)]): number of files/dirs. if an int, specifies exact count, if array it is an inclusive range [min, max], if max is omitted there is no upper limit
+ *    hint{string| string[] | null}: expected name format. Matches input names for filtering, autogenerates suggested output name. if array, all hints are applied (only allowed on input)
+ *       e.g. '*.js' -- input matches all files with .js extension.
+ *
+ *       output hints can use the input name as a parameter. anything in '{}' is interpolated, parts of the name can be specified after a pipe (|)
+ *       {0}, {1}, ..., {n} : input at array index n
+ *       {0 | basename}: input at index 0 without extension
+ *       {}: user provided, allows hints for just an extension, prefix, etc (e.g. {}.html)
+ */
+
+var CleanTaskDefinition = {
+	name: 'clean',
+	func: cleanTaskFunc,
+	inputs: [{
+		name: 'in',
+		type: 'dir',
+		count: [1],
+		hint: null
+	}],
+	outputs: []
+};
+
+function cleanTaskFunc(inputs, outputs, options, logger) {
+	logger.info("Removing '" + inputs[0] + "'");
+	return fs.remove(inputs[0]);
+}
+
+var CopyTaskDefintion = {
+	name: 'copy',
+	func: copyTaskFunc,
+	inputs: [{
+		name: 'in',
+		type: 'file',
+		count: 1,
+		hint: null
+	}],
+	outputs: [{
+		name: 'out',
+		type: 'file',
+		count: 1,
+		hint: '{0}'
+	}]
+};
+
+function copyTaskFunc(inputs, outputs, options, logger) {
+	logger.info("Copying '" + inputs[0] + "' to '" + outputs[0] + "'");
+	return fs.copy(inputs[0], outputs[0]);
+}
+
+var CompileSassTaskDefinition = {
+	name: 'sass',
+	func: compileSassFunc,
+	inputs: [{
+		type: 'file',
+		count: [1],
+		hint: ['*.sass', '*.scss']
+	}],
+	outputs: [{
+		type: 'file',
+		count: 1,
+		hint: '{0 | basename}.css'
+	}, {
+		type: 'file',
+		count: 1,
+		hint: '{0 | basename}.css.map'
+	}]
+};
+
+function compileSassFunc(inputs, outputs, options, logger) {
+	logger.info("Compiling '" + inputs[0] + "' to '" + outputs[0] + "' and '" + outputs[1] + "'");
+	return Promise.promisify(sass.render)({
+		file: inputs[0],
+		outFile: outputs[0],
+		sourceMap: true
+	}).then(function(result) {
+		return Promise.all([
+			fs.outputFile(outputs[0], result.css),
+			fs.outputFile(outputs[1], result.map)
+		]);
+	});
+}
+
+var CompileReactRollupTaskDefinition = {
+	name: 'react-rollup',
+	func: compileReactRollupFunc,
+	inputs: [{
+		type: 'file',
+		count: [1],
+		hint: ['*.js', '*.jsx']
+	}],
+	outputs: [{
+		type: 'file',
+		count: 1,
+		hint: '{0 | basename}.js'
+	}]
+};
+
+function compileReactRollupFunc(inputs, outputs, options, logger) {
+	var inputOptions = {
+		input: inputs[0],
+		plugins: [
+			rollupBabel({
+				exclude: 'node_modules/**',
+				babelrc: false,
+				presets: [
+					'react',
+					['es2015', {'modules': false}]
+				],
+				plugins: ['external-helpers']
+			}),
+			rollupResolve({
+				browser: true,
+				main: true,
+				extensions: ['.js', '.jsx']
+			}),
+			rollupCjs({
+				exclude: [
+					'node_modules/process-es6/**',
+					'node_modules/buffer-es6/**',
+				],
+				include: [
+
+					'node_modules/dijkstrajs/**',
+					'node_modules/qrcode/**',
+
+					'node_modules/create-react-class/**',
+					'node_modules/fbjs/**',
+					'node_modules/object-assign/**',
+					'node_modules/react/**',
+					'node_modules/react-dom/**',
+					'node_modules/prop-types/**',
+				]
+			}),
+			rollupNodeGlobals(),
+			rollupNodeBuiltins(),
+		]
+	};
+	var outputOptions = {
+		file: outputs[0],
+		format: 'iife',
+		name: options.bundleName,
+		sourcemap: true
+	};
+
+	logger.info("Compiling '" + inputs[0] + "' to '" + outputs[0] + "'");
+	return rollup.rollup(inputOptions).then(function(bundle) {
+		return bundle.write(outputOptions);
 	});
 }
 
@@ -340,5 +516,11 @@ module.exports = {
 		makeCompileSassTask: makeCompileSassTask,
 		makeCompileReactTask: makeCompileReactTask,
 		makeCompileReactRollupTask: makeCompileReactRollupTask
+	},
+	taskDefinitions: {
+		CopyTaskDefintion: CopyTaskDefintion,
+		CompileSassTaskDefinition: CompileSassTaskDefinition,
+		CleanTaskDefinition: CleanTaskDefinition,
+		CompileReactRollupTaskDefinition: CompileReactRollupTaskDefinition,
 	}
 };

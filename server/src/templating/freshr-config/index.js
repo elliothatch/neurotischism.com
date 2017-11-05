@@ -89,6 +89,7 @@ function makeSocketHandler(options) {
 		]}
 	];*/
 	
+	/*
 	var tasks = [
 		{ name: 'clean', sync: true, tasks: [
 			BuildManager.tasks.makeCleanTask('dist'),
@@ -98,10 +99,53 @@ function makeSocketHandler(options) {
 				BuildManager.tasks.makeCompileReactRollupTask('react', 'javascript', 'config/config-react', 'FreshrConfig')
 			]}
 		]}
+	];*/
+
+	/**
+	 * Task -- instance of a task
+	 *    definition{string (token?) | null}:
+	 *    sync{boolean}
+	 *    tasks{Task[] | null}
+	 *    options: {object}: task-defintiion specific options
+	 *    files{ioObjs[]}: input/output file/dir names for the task. multiple groups can be specified. format: {inputs, outputs}, where inputs/outputs are arrays matching format of taskdefinition
+	 */
+
+	var taskDefinitions = Object.keys(BuildManager.taskDefinitions).reduce(function(o, tdName) {
+		var td = BuildManager.taskDefinitions[tdName];
+		o[td.name] = td;
+		return o;
+	}, {});
+
+	var tasks = [
+		{ definition: null, sync: true, tasks: [
+			{ definition: 'clean',
+				files: [{inputs: ['dist']}]
+			},
+			{ definition: null, tasks: [
+				{ definition: 'copy',
+					files: [
+						{inputs: ['src/javascript/config.js'], outputs: ['dist/javascript/config.js']},
+						{inputs: ['src/javascript/default.js'], outputs: ['dist/javascript/default.js']},
+					]
+				},
+				{ definition: 'sass',
+					files: [
+						{inputs: ['src/sass/main.scss'], outputs: ['dist/css/main.css', 'dist/css/main.css.map']},
+						{inputs: ['src/sass/shakespeare.scss'], outputs: ['dist/css/shakespeare.css', 'dist/css/shakespeare.css.map']},
+						{inputs: ['src/sass/config.scss'], outputs: ['dist/css/config.css', 'dist/css/config.css.map']},
+					]
+				},
+				{ definition: 'react-rollup',
+					files: [
+						{inputs: ['src/javascript/config/config-react.jsx'], outputs: ['dist/javascript/config/config-react.js'], options: {bundleName: 'FreshrConfig'}},
+					]
+				},
+			]}
+		]}
 	];
 	
-	BuildManager.buildProject(options.clientPath, tasks).filter(function(e) {return e.eType === 'task/log';}).subscribe(function(event) {
-		if(event.level === 'error' || event.log.level === 'error') {
+	BuildManager.buildProject(options.clientPath, taskDefinitions, tasks).filter(function(e) {return e.eType === 'task/log';}).subscribe(function(event) {
+		if(event.level === 'error' || (event.log && event.log.level === 'error')) {
 			console.log(event);
 		}
 	});
@@ -111,7 +155,7 @@ function makeSocketHandler(options) {
 			socket.emit('files/src', getFileEntry(options.clientPath, 'src'));
 		});
 		socket.on('build', function(data) {
-			BuildManager.buildProject(options.clientPath, tasks).subscribe(function(event) {
+			BuildManager.buildProject(options.clientPath, taskDefinitions, tasks).subscribe(function(event) {
 				var eType = event.eType;
 				delete event.eType;
 				socket.emit('build/' + eType, event);
@@ -125,6 +169,7 @@ function makeSocketHandler(options) {
 		next();
 	};
 }
+
 
 
 /*
@@ -164,60 +209,3 @@ function getFileEntry(basePath, relativePath) {
 	}
 }
 
-/**
- * TaskDefintion -- defines a type of task (copy, compile sass)
- *  input/output params should define the minimum files necessary for one execution of the task (e.g. copy only needs one in file and one out file)
- *  The Task engine handles calling the TaskDefintion func mutliple times if multiple files are specified, so that logic doesn't need to be implemented in the TaskDefintion
- *   name{string}
- *   func{function}
- *   inputs{FileSpec[]}
- *   outputs{FileSpec[]}
- */
-
-// eslint-disable-next-line no-unused-vars
-var CopyTaskDefintion = {
-	name: 'copy',
-	//func:
-	inputs: [{
-		name: 'in',
-		type: 'file',
-		hint: null
-	}],
-	outputs: [{
-		name: 'out',
-		type: 'file',
-		hint: null
-	}]
-};
-
-// eslint-disable-next-line no-unused-vars
-var SassTaskDefintion = {
-	name: 'sass',
-	//func:
-	inputs: ['files'],
-	outputs: ['file', 'file'] //.css, .css.map
-};
-
-// eslint-disable-next-line no-unused-vars
-var TemplateTaskDefinition = {
-	name: 'sass',
-	//func:
-	inputs: ['file', 'file'],
-	outputs: ['files'] //.css, .css.map
-};
-
-
-/**
- * FileSpec -- specifies allowed types of file/dir as an input/output of a task
- *    name{string}
- *    type{'file' | 'files' | 'dir' | 'dirs'}
- *    hint{string|null}: expected name format. Matches input names for filtering, autogenerates suggested output name
- *       e.g. *.js -- input matches all files with .js extension. output 
- */
-
-/**
- * Task -- instance of a task
- *    definition{string}
- *    sync{boolean}
- *    tasks{Task[]}
- */

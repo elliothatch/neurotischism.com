@@ -116,6 +116,20 @@ function makeSocketHandler(options) {
 		return o;
 	}, {});
 
+	var filesToCopy = [
+		'javascript/animation-gallery.js',
+		'javascript/bg-eye.js',
+		'javascript/bg-flower.js',
+		'javascript/bg-maze.js',
+		'javascript/bg-rings.js',
+		'javascript/bg-scan.js',
+		'javascript/bg-solarsystem.js',
+		'javascript/bg-tree.js',
+		'javascript/bg-gravity.js',
+		'javascript/config.js',
+		'javascript/default.js',
+	];
+
 	var tasks = [
 		{ definition: null, sync: true, tasks: [
 			{ definition: 'clean',
@@ -123,10 +137,10 @@ function makeSocketHandler(options) {
 			},
 			{ definition: null, tasks: [
 				{ definition: 'copy',
-					files: [
-						{inputs: ['src/javascript/config.js'], outputs: ['dist/javascript/config.js']},
-						{inputs: ['src/javascript/default.js'], outputs: ['dist/javascript/default.js']},
-					]
+					files:
+						filesToCopy.map(function(f) {
+							return {inputs: ['src/' + f], outputs: ['dist/' + f]};
+						})
 				},
 				{ definition: 'sass',
 					files: [

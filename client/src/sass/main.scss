@@ -383,15 +383,21 @@ a:visited { color: #205caa; }
 	margin-left: 1em;
 }
 
-#calmmodeButton {
+#calmmodeButton, #fullscreen-button {
 	position: absolute;
-	background-color: $primaryBackgroundColor;
-	color: $primaryTextColor;
+	//background-color: $primaryBackgroundColor;
+	background-color: #222222;
+	color: #cccccc;
 	top: 10px;
 	right: 0px;
 	padding: 0.5em;
 	z-index: 1001;
 	cursor: pointer;
+
+	border-style: solid;
+	border-color: $primaryBackgroundColor;
+	border-width: 2px;
+	border-radius: 0px;
 }
 
 .read-header {

@@ -16,6 +16,7 @@
 		// put bodies in a circle
 		for(var i = 0; i < this.bodyCount; i++) {
 			var angle = (i/this.bodyCount)*2*Math.PI;
+			//var size = 100 * Math.random();
 			this.bodies.push({
 				position: {
 					x: 5*Math.cos(angle),
@@ -29,9 +30,10 @@
 					x: 0,
 					y: 0
 				},
-				mass: 10,
+				mass: 10/*size*/,
 				radius: 0,
-				color: this.gallery.helpers.HSVtoRGBStr(i/this.bodyCount, 0.8, 0.9)
+				color: this.gallery.helpers.HSVtoRGBStr(i/this.bodyCount, 0.8, 0.9),
+				//thickness: size/10
 			});
 		}
 
@@ -54,6 +56,8 @@
 			body.lastPosition = Object.assign({}, body.position);
 		});
 
+		//var aspectRatio = this.gallery.width / this.gallery.height;
+
 		this.simulation = {
 			bodies: this.bodies,
 			wells: this.wells,
@@ -61,6 +65,10 @@
 			timeScale: 1/1000,
 			debug: false,
 			bodyGravity: true,
+			/*edges: {
+				x: [-15*aspectRatio,15*aspectRatio],
+				y: [-15,15]
+			},*/
 		};
 	};
 
@@ -103,6 +111,19 @@
 			body.velocity.x += body.acceleration.x*dt;
 			body.velocity.y += body.acceleration.y*dt;
 
+			if(simulation.edges) {
+				var x2 = body.position.x + body.velocity.x*dt;
+				var y2 = body.position.y + body.velocity.y*dt;
+
+				if(x2 <= simulation.edges.x[0] || x2 >= simulation.edges.x[1]) {
+					body.velocity.x = -body.velocity.x;
+				}
+
+				if(y2 <= simulation.edges.y[0] || y2 >= simulation.edges.y[1]) {
+					body.velocity.y = -body.velocity.y;
+				}
+			}
+
 			body.position.x += body.velocity.x*dt;
 			body.position.y += body.velocity.y*dt;
 		});
@@ -127,8 +148,9 @@
 			ctx.fill();
 
 			if(!entity.noTrail) {
+				var thickness = entity.thickness != null ? entity.thickness : 1;
 				ctx.beginPath();
-				ctx.lineWidth = 1;
+				ctx.lineWidth = thickness;
 				ctx.strokeStyle = entity.color;
 				ctx.moveTo(lastX, lastY);
 				ctx.lineTo(x, y);

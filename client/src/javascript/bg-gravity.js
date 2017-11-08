@@ -32,7 +32,21 @@
 				},
 				mass: 10/*size*/,
 				radius: 0,
-				color: this.gallery.helpers.HSVtoRGBStr(i/this.bodyCount, 0.8, 0.9),
+				color: {
+					h: i/this.bodyCount,
+					s: 0.8,
+					v: 0.9
+				},
+				//trail: 'pulse',
+				//trail: 'rainbow',
+				trailOptions: {
+					// pulse
+					//t: Math.random() * 2 * Math.PI,
+					//rate: 1/100,
+					//rainbow
+					t: 0,
+					rate: 1/10000
+				}
 				//thickness: size/10
 			});
 		}
@@ -49,7 +63,7 @@
 			mass: 500,
 			radius: 0,
 			color: '#fff',
-			noTrail: true
+			trail: 'none'
 		}];
 
 		this.bodies.concat(this.wells).forEach(function(body) {
@@ -141,23 +155,35 @@
 			var lastY = entity.lastPosition.y * simulation.scale + _this.gallery.height/2;
 			var vx = entity.velocity.x * simulation.scale * 0.1;
 			var vy = entity.velocity.y * simulation.scale * 0.1;
+			var colorStr = typeof entity.color === 'string' ? entity.color : _this.gallery.helpers.HSVtoRGBStr(entity.color);
 			ctx.beginPath();
-			ctx.fillStyle = entity.color;
+			ctx.fillStyle = colorStr;
 			ctx.arc(x, y, entity.radius, 0, 2*Math.PI);
 			ctx.closePath();
 			ctx.fill();
 
-			if(!entity.noTrail) {
+			if(entity.trail !== 'none') {
+				if(typeof entity.color !== 'string') {
+					//hsv has fancy effects
+					if(entity.trail === 'pulse') {
+						colorStr = _this.gallery.helpers.HSVtoRGBStr(entity.color.h, entity.color.s, entity.color.v*Math.abs(Math.sin(entity.trailOptions.t)));
+						entity.trailOptions.t += entity.trailOptions.rate*deltaT;
+					}
+					if(entity.trail === 'rainbow') {
+						colorStr = _this.gallery.helpers.HSVtoRGBStr((entity.color.h+entity.trailOptions.t) % 1, entity.color.s, entity.color.v);
+						entity.trailOptions.t += entity.trailOptions.rate*deltaT;
+					}
+				}
 				var thickness = entity.thickness != null ? entity.thickness : 1;
 				ctx.beginPath();
 				ctx.lineWidth = thickness;
-				ctx.strokeStyle = entity.color;
+				ctx.strokeStyle = colorStr;
 				ctx.moveTo(lastX, lastY);
 				ctx.lineTo(x, y);
 				ctx.closePath();
 				ctx.stroke();
 			}
-			
+
 			if(simulation.debug) {
 				ctx.beginPath();
 				ctx.lineWidth = 1;

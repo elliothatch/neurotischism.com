@@ -95,12 +95,24 @@ var fullscreenButton = document.getElementById('fullscreen-button');
 var foregroundWrapper = document.getElementById('foregroundWrapper');
 var fullscreen = window.localStorage.getItem('fullscreen') === 'true';
 foregroundWrapper.style.visibility = fullscreen ? 'hidden' : 'visible';
-console.log(foregroundWrapper.style.visibility);
 fullscreenButton.onclick = function() {
 	fullscreen = !fullscreen;
 	foregroundWrapper.style.visibility = fullscreen ? 'hidden' : 'visible';
 	window.localStorage.setItem('fullscreen', fullscreen + '');
 }
+// gallery controls
+var prevAnimationButton = document.getElementById('prev-animation-button');
+var nextAnimationButton = document.getElementById('next-animation-button');
+prevAnimationButton.onclick = function() {
+	if(window.AnimationGallery) {
+		window.AnimationGallery.startAnimation((window.AnimationGallery.animationIndex + window.AnimationGallery.animations.length - 1) % window.AnimationGallery.animations.length);
+	}
+};
+nextAnimationButton.onclick = function() {
+	if(window.AnimationGallery) {
+		window.AnimationGallery.startAnimation((window.AnimationGallery.animationIndex + 1) % window.AnimationGallery.animations.length);
+	}
+};
 
 function onWindowResized()
 {

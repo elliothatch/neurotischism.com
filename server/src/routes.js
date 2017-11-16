@@ -3,6 +3,7 @@ var express = require('express');
 
 var templating = require('./templating/routes');
 var freshrComments = require('./freshr-comments');
+var freshrAuthentication = require('./freshr-authentication');
 
 /* options (object):
  *   - clientPath {string}: path to client directory, which should contain site/layouts/partials
@@ -17,6 +18,11 @@ module.exports = function(options) {
 	var comments = freshrComments({
 		whitelist: ['/blog/*', '/games/*', '/not-games/*'],
 		authorPasswords: {'[neurotischism': 'this is mine'}
+	});
+
+	var authentication = freshrAuthentication({
+		jwtCertPath: options.jwtCertPath,
+		matchPatterns: ['/~config']
 	});
 
 	/*
@@ -38,8 +44,9 @@ module.exports = function(options) {
 	});
 	*/
 
+	router.use(authentication.expressRouter);
 	router.use('/comments', comments.expressRouter);
-	router.use(templating(options, [comments.freshrHandler]));
+	router.use(templating(options, [comments.freshrHandler, authentication.freshrHandler]));
 	router.use(express.static(path.join(__dirname, '../../client/dist')));
 	router.use(express.static(path.join(__dirname, '../../client/src/pages')));
 	//TODO: make these part of react plugin express router

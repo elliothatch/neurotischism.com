@@ -7,6 +7,7 @@ var configOptions = {
 	port: config.get('port'),
 	httpPort: config.get('httpPort'),
 	certPath: config.get('certPath'),
+	jwtCertPath: config.get('jwtCertPath'),
 	clientPath: path.resolve(config.get('clientPath')),
 	logLevel: config.get('logLevel')
 };

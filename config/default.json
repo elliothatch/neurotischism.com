@@ -2,6 +2,7 @@
 	"port": 8443,
 	"httpPort": 8080,
 	"certPath": "server/certs",
+	"jwtCertPath": "server/jwtcerts",
 	"clientPath": "client",
 	"logLevel": "warn"
 }

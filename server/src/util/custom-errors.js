@@ -8,6 +8,7 @@ function _createError(name, status, constructor) {
 	};
 	error.prototype = new Error();
 	error.prototype.name = name;
+	error.prototype.status = status;
 	return error;
 }
 
@@ -16,6 +17,7 @@ module.exports = {
 		this.originalError = originalError;
 	}),
 	NotFoundError: _createError('NotFoundError', 404),
+	UnauthorizedError: _createError('UnauthorizedError', 401),
 	TemplateLoadError: _createError('TemplateLoadError', 500, function(message, path, err) {
 		this.path = path;
 		this.err = err;

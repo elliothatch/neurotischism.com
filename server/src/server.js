@@ -8,6 +8,7 @@ var https = require('https');
 
 var express = require('express');
 var bodyParser = require('body-parser');
+var cookieParser = require('cookie-parser');
 var compress = require('compression');
 
 var io = require('socket.io');
@@ -71,9 +72,10 @@ function start(options) {
 	app.use(compress());
 	app.use(bodyParser.urlencoded({extended: false}));
 	app.use(bodyParser.json());
+	app.use(cookieParser());
 
 	app.use(logger({name: 'neurotischism', reqName: loggerName, level: options.logLevel}));
-	app.use(routes({loggerName: loggerName, clientPath: options.clientPath, socketServer: socketServer}));
+	app.use(routes({loggerName: loggerName, clientPath: options.clientPath, jwtCertPath: options.jwtCertPath, socketServer: socketServer}));
 
 	if(usingSSL) {
 		var httpsPortStr = '';

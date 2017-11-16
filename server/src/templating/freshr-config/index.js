@@ -1,5 +1,3 @@
-var Path = require('path');
-var fs = require('fs-extra');
 var express = require('express');
 var BuildManager = require('./build');
 var Ip = require('ip');
@@ -116,6 +114,16 @@ function makeSocketHandler(options) {
 		return o;
 	}, {});
 
+	var taskDefinitionsSerialized = Object.keys(taskDefinitions).reduce(function(o, tdName) {
+		var td = taskDefinitions[tdName];
+		o[td.name] = {
+			name: td.name,
+			inputs: td.inputs,
+			outputs: td.outputs
+		};
+		return o;
+	}, {});
+
 	var filesToCopy = [
 		'javascript/animation-gallery.js',
 		'javascript/bg-eye.js',
@@ -166,7 +174,10 @@ function makeSocketHandler(options) {
 
 	return function(socket, next) {
 		socket.on('files/src', function(data) {
-			socket.emit('files/src', getFileEntry(options.clientPath, 'src'));
+			socket.emit('files/src', BuildManager.getFileEntry(options.clientPath, 'src'));
+		});
+		socket.on('task-definitions', function(data) {
+			socket.emit('task-definitions', taskDefinitionsSerialized);
 		});
 		socket.on('build', function(data) {
 			BuildManager.buildProject(options.clientPath, taskDefinitions, tasks).subscribe(function(event) {
@@ -186,40 +197,6 @@ function makeSocketHandler(options) {
 
 
 
-/*
- * entry:
- *   name{string}
- *   path{string}
- *   type{'file' | 'directory'}
- *   entries{entry[]}
- */
 
-/*
- * Get the file entry for the specified path. If it is a directory recursively gets the directory contents. base path is not included in the 'path' property
- * @param basePath {string}: path to the base directory
- * @param relativePath {string}: relative path to the target file/directory
- * @returns {entry}
- */
-function getFileEntry(basePath, relativePath) {
-	var fullPath = Path.join(basePath, relativePath);
-	var stats = fs.lstatSync(fullPath);
-	if(stats.isFile()) {
-		return {
-			name: Path.basename(relativePath),
-			path: relativePath.replace(/\\/g, '/'),
-			type: 'file',
-			entries: null
-		};
-	}
-	else if(stats.isDirectory()) {
-		return {
-			name: Path.basename(relativePath),
-			path: relativePath.replace(/\\/g, '/'),
-			type: 'directory',
-			entries: fs.readdirSync(fullPath).map(function(filename) {
-				return getFileEntry(basePath, Path.join(relativePath, filename));
-			})
-		};
-	}
-}
+
 

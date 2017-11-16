@@ -2,6 +2,7 @@ var Path = require('path');
 var Observable = require('rxjs/Rx').Observable;
 var Promise = require('bluebird');
 var fs = require('fs-extra');
+var minimatch = require('minimatch');
 
 var sass = require('node-sass');
 var babel = require('babel-core');
@@ -231,6 +232,20 @@ function makeCompileReactRollupTask(name, dir, file, bundleName) {
 	};
 }
 
+
+function getFileMatches(fileEntry, pattern) {
+	if(fileEntry.type === 'file') {
+		if(minimatch(fileEntry.path, pattern)) {
+			return [fileEntry];
+		}
+	}
+	else if(fileEntry.type === 'directory') {
+		return fileEntry.entries.map(function(entry) {
+			return getFileMatches(entry, pattern);
+		});
+	}
+}
+
 /*
  * Builds the project
  * @param clientPath{string}: path to client directory
@@ -251,6 +266,15 @@ function makeCompileReactRollupTask(name, dir, file, bundleName) {
  */
 function buildProject(clientPath, taskDefinitions, tasks) {
 	var rootTask = {name: 'Build', tasks: tasks};
+	var fileEntries = {
+		name: 'build',
+		path: 'build',
+		type: 'directory',
+		entries: [
+			getFileEntry(clientPath, 'src'),
+			getFileEntry(clientPath, 'dist')
+		]
+	};
 
 	return Observable.create(function(buildEventsObserver) {
 		var rootLogger = new TaskLogger(rootTask, buildEventsObserver, []);
@@ -508,8 +532,47 @@ var buildResults = buildProject(options.clientPath, [
 ]);
 */
 
+/*
+ * entry:
+ *   name{string}
+ *   path{string}
+ *   type{'file' | 'directory'}
+ *   entries{entry[]}
+ */
+
+/*
+ * Get the file entry for the specified path. If it is a directory recursively gets the directory contents. base path is not included in the 'path' property
+ * @param basePath {string}: path to the base directory
+ * @param relativePath {string}: relative path to the target file/directory
+ * @returns {entry}
+ */
+function getFileEntry(basePath, relativePath) {
+	var fullPath = Path.join(basePath, relativePath);
+	var stats = fs.lstatSync(fullPath);
+	if(stats.isFile()) {
+		return {
+			name: Path.basename(relativePath),
+			path: relativePath.replace(/\\/g, '/'),
+			type: 'file',
+			entries: null
+		};
+	}
+	else if(stats.isDirectory()) {
+		return {
+			name: Path.basename(relativePath),
+			path: relativePath.replace(/\\/g, '/'),
+			type: 'directory',
+			entries: fs.readdirSync(fullPath).map(function(filename) {
+				return getFileEntry(basePath, Path.join(relativePath, filename));
+			})
+		};
+	}
+}
+
+
 module.exports = {
 	buildProject: buildProject,
+	getFileEntry: getFileEntry,
 	tasks: {
 		makeCleanTask: makeCleanTask,
 		makeCopySrcToDistTask: makeCopySrcToDistTask,

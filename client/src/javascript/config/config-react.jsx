@@ -1,6 +1,7 @@
 import TaskDisplay from "./TaskDisplay";
 import FileExplorer from "./FileExplorer";
 import QRComponent from "./QRcomponent";
+import TaskDefinitionDisplay from "./TaskDefinitionDisplay";
 
 import React from 'react';
 import ReactDOM from 'react-dom';
@@ -40,6 +41,7 @@ class ConfigComponent extends React.Component {
 					})}
 				</div>
 				<div className="build-display">
+					{this.props.taskDefinitions && <TaskDefinitionDisplay taskDefinitions={this.props.taskDefinitions} />}
 					<button onClick={this.handleClickBuild}>Build</button>
 					{this.props.buildTask && <TaskDisplay task={this.props.buildTask} />}
 					{this.props.config.categories.map(category => {
@@ -113,14 +115,22 @@ configSocket.on('publicip', function(ip) {
 	render();
 });
 
+var taskDefinitions = {};
+configSocket.on('task-definitions', function(tds) {
+	console.log(tds);
+	taskDefinitions = tds;
+	render();
+});
+
 //configSocket.emit('build');
 configSocket.emit('publicip');
 configSocket.emit('files/src');
+configSocket.emit('task-definitions');
 
 render();
 
 function render() {
-	const element = <ConfigComponent config={FreshrContext.config} buildTask={buildTasks.tasks} srcDirectory={srcDirectory} />;
+	const element = <ConfigComponent config={FreshrContext.config} taskDefinitions={taskDefinitions} buildTask={buildTasks.tasks} srcDirectory={srcDirectory} />;
 	ReactDOM.render(
 		element,
 		document.getElementById('root')

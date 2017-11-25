@@ -22,7 +22,7 @@ module.exports = function(options) {
 
 	var authentication = freshrAuthentication({
 		jwtCertPath: options.jwtCertPath,
-		matchPatterns: ['/~config']
+		matchPatterns: [{path: '/~config', roles: ['admin']}]
 	});
 
 	/*

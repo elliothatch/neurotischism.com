@@ -173,13 +173,23 @@ function makeExpressRouter(options, dbWrap) {
 			req.freshrAuthentication = {user: token};
 		}
 		catch(err) {
-			console.log(err);
-			if(matchUrlPatterns(req.url, options.matchPatterns)) {
-				return res.status(401).send('This page requires authentication');
-			}
+			// do nothing
 		}
+		next();
+	});
 
-		return next();
+	options.matchPatterns.forEach(function(matchPattern) {
+		router.use(matchPattern.path, function(req, res, next) {
+			if(!req.freshrAuthentication) {
+				var queryString = querystring.stringify({url: req.originalUrl});
+				return res.redirect('/~authentication/login?' + queryString);
+			}
+			if(!matchPattern.roles.includes(req.freshrAuthentication.user.role)) {
+				return res.status(403).send('Insufficient permissions. To view this page, you must have one of the following roles: ' + matchPattern.roles);
+			}
+
+			next();
+		});
 	});
 
 	return router;

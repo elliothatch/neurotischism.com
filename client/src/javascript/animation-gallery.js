@@ -39,7 +39,7 @@
 
 		for(var i = 0; i < links.length; i++) {
 			links[i].addEventListener('mouseenter', function(event) {
-				_this.linkHovered = this;
+				_this.linkHovered = event;
 				_this.linkT = 0;
 			});
 			links[i].addEventListener('mouseleave', function(event) {
@@ -120,6 +120,7 @@
 
 	AnimationGallery.prototype.startAnimation = function(index) {
 		this.animationIndex = index;
+		this.ctx.globalCompositeOperation = 'source-over';
 		this.animations[this.animationIndex].init();
 		var _this = this;
 		if(!this.animationRunning) {

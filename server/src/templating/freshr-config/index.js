@@ -130,10 +130,12 @@ function makeSocketHandler(options) {
 		'javascript/bg-flower.js',
 		'javascript/bg-maze.js',
 		'javascript/bg-rings.js',
+		'javascript/bg-light.js',
 		'javascript/bg-scan.js',
 		'javascript/bg-solarsystem.js',
 		'javascript/bg-tree.js',
 		'javascript/bg-gravity.js',
+		'javascript/bg-targeting.js',
 		'javascript/config.js',
 		'javascript/default.js',
 	];

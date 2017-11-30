@@ -53,7 +53,9 @@
 			this.startTime = timestamp;
 			this.lastTime = this.startTime;
 		}
-		this.animations[this.animationIndex].draw((timestamp - this.startTime), timestamp - this.lastTime);
+		var deltaT = timestamp - this.lastTime;
+		this.linkT += deltaT;
+		this.animations[this.animationIndex].draw((timestamp - this.startTime), deltaT);
 		this.lastTime = timestamp;
 		var _this = this;
 		window.requestAnimationFrame(function() { _this.step.apply(_this, arguments); });

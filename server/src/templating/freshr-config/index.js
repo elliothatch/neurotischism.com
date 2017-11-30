@@ -136,6 +136,7 @@ function makeSocketHandler(options) {
 		'javascript/bg-tree.js',
 		'javascript/bg-gravity.js',
 		'javascript/bg-targeting.js',
+		'javascript/bg-warp.js',
 		'javascript/config.js',
 		'javascript/default.js',
 	];

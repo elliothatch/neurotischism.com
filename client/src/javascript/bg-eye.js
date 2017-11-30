@@ -7,6 +7,8 @@
 	EyeAnimation.prototype.init = function() {
 		this.gallery.ctx.fillStyle = '#000';
 		this.gallery.ctx.fillRect(0,0,this.gallery.width,this.gallery.height);
+
+		this.transitionT = 0;
 	};
 
 	EyeAnimation.prototype.draw = function(t, deltaT)
@@ -14,10 +16,10 @@
 		var linkTransitionTime = 0.2;
 		this.gallery.canvas.width = this.gallery.width;
 		if(this.gallery.linkHovered) {
-			this.gallery.linkT = Math.min(this.gallery.linkT + deltaT/1000 / linkTransitionTime, 1);
+			this.transitionT = Math.min(this.transitionT + deltaT/1000 / linkTransitionTime, 1);
 		}
 		else {
-			this.gallery.linkT = Math.max(this.gallery.linkT - deltaT/1000 / linkTransitionTime, 0);
+			this.transitionT = Math.max(this.transitionT - deltaT/1000 / linkTransitionTime, 0);
 		}
 		//var pupilRadius = 70;
 		//var innerIrisRadius = 100;
@@ -27,8 +29,8 @@
 		var innerIrisRadius = this.gallery.height*0.9*0.100;
 		var outerRadius = this.gallery.height*0.9*0.250;
 
-		pupilRadius = this.gallery.helpers.lerp(pupilRadius, pupilRadius * 1.6, this.gallery.linkT);
-		innerIrisRadius = this.gallery.helpers.lerp(innerIrisRadius, innerIrisRadius * 1.6, this.gallery.linkT);
+		pupilRadius = this.gallery.helpers.lerp(pupilRadius, pupilRadius * 1.6, this.transitionT);
+		innerIrisRadius = this.gallery.helpers.lerp(innerIrisRadius, innerIrisRadius * 1.6, this.transitionT);
 		
 		//var angle = t * 3.1 * Math.PI / 180;
 		//var r = Math.floor((t/360) * 255);
@@ -39,15 +41,15 @@
 		var lookDistance = Math.pow(Math.pow(this.gallery.mouseX-this.gallery.width/2,2) + Math.pow(this.gallery.mouseY-this.gallery.height/2,2), 2/5);
 		//iris and pupil
 		var pupilCenter = {
-			x: this.gallery.width/2 + lookDistance*Math.cos(lookDirection) + Math.random()*this.gallery.linkT*15,
-			y: this.gallery.height/2 + lookDistance*Math.sin(lookDirection) + Math.random()*this.gallery.linkT*15
+			x: this.gallery.width/2 + lookDistance*Math.cos(lookDirection) + Math.random()*this.transitionT*15,
+			y: this.gallery.height/2 + lookDistance*Math.sin(lookDirection) + Math.random()*this.transitionT*15
 		};
 
 		this.gallery.ctx.strokeStyle = '#000';
 		this.gallery.ctx.lineWidth = 5;
 		//ctx.fillStyle = '#fff';
 		//ctx.arc(pupilCenter.x, pupilCenter.y, outerRadius, 0, 2*Math.PI);
-		var pupilCount = 10 + this.gallery.linkT*5;
+		var pupilCount = 10 + this.transitionT*5;
 		for(var i = 0; i < pupilCount; i++) {
 			this.gallery.ctx.beginPath();
 			this.gallery.ctx.arc(pupilCenter.x, pupilCenter.y, this.gallery.helpers.lerp(0,pupilRadius,i/pupilCount)+Math.random()*3, 0, 2*Math.PI);
@@ -118,7 +120,7 @@
 			this.gallery.ctx.quadraticCurveTo(this.gallery.width/2, this.gallery.height-(-Math.cos(eyeT*2*Math.PI)*(blinkHeight/2) + (blinkHeight/2-squintHeight)), 0, this.gallery.height/2);
 		} else {
 			var controlPoint = this.gallery.height-(-Math.cos(eyeT*2*Math.PI)*squintHeight);
-			this.gallery.ctx.quadraticCurveTo(this.gallery.width/2, this.gallery.helpers.lerp(controlPoint, controlPoint*1.2, this.gallery.linkT), 0, this.gallery.height/2);
+			this.gallery.ctx.quadraticCurveTo(this.gallery.width/2, this.gallery.helpers.lerp(controlPoint, controlPoint*1.2, this.transitionT), 0, this.gallery.height/2);
 		}
 
 		//[-b+b-s, b+b-s]
@@ -139,7 +141,7 @@
 			this.gallery.ctx.quadraticCurveTo(this.gallery.width/2, -Math.cos(eyeT*2*Math.PI)*blinkHeight*1.1+(blinkHeight*1.1-squintHeight), 0, this.gallery.height/2);
 		} else {
 			var controlPoint = -Math.cos(eyeT*2*Math.PI)*squintHeight;
-			this.gallery.ctx.quadraticCurveTo(this.gallery.width/2, this.gallery.helpers.lerp(controlPoint-this.gallery.height, (controlPoint-this.gallery.height)*1.2, this.gallery.linkT)+this.gallery.height, 0, this.gallery.height/2);
+			this.gallery.ctx.quadraticCurveTo(this.gallery.width/2, this.gallery.helpers.lerp(controlPoint-this.gallery.height, (controlPoint-this.gallery.height)*1.2, this.transitionT)+this.gallery.height, 0, this.gallery.height/2);
 		}
 		//this.gallery.ctx.quadraticCurveTo(this.gallery.width/2, Math.sin(t/100)*40, 0, this.gallery.height/2);
 		this.gallery.ctx.closePath();

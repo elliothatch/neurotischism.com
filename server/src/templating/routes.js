@@ -101,7 +101,8 @@ module.exports = function(options, middleware) {
 		var context = {
 			url: '/' + path,
 			backUrl: '/' + path.split('/').slice(0, -1).join('/'),
-			tags: tagsArray
+			tags: tagsArray,
+			query: req.query
 		};
 
 		if(requestedFile.directory['posts.json']) {

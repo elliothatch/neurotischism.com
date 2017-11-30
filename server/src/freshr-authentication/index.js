@@ -123,7 +123,13 @@ function makeExpressRouter(options, dbWrap) {
 			});
 
 			res.cookie('jwt', token, {httpOnly: true, secure: true});
-			return res.status(200).send({token: token});
+			var redirectUrl = req.query.redirect && querystring.unescape(req.query.redirect);
+			if(!redirectUrl || !redirectUrl.startsWith('/')) {
+				// only allow redirects on the current domain
+				return res.redirect('/');
+			}
+			return res.redirect(redirectUrl);
+			//return res.status(200).send({token: token});
 		}).catch(function(err) {
 			return next(err);
 		});
@@ -181,7 +187,7 @@ function makeExpressRouter(options, dbWrap) {
 	options.matchPatterns.forEach(function(matchPattern) {
 		router.use(matchPattern.path, function(req, res, next) {
 			if(!req.freshrAuthentication) {
-				var queryString = querystring.stringify({url: req.originalUrl});
+				var queryString = querystring.stringify({redirect: req.originalUrl});
 				return res.redirect('/~authentication/login?' + queryString);
 			}
 			if(!matchPattern.roles.includes(req.freshrAuthentication.user.role)) {

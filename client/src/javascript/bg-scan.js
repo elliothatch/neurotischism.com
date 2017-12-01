@@ -8,12 +8,12 @@
 			b: 0
 		};
 		this.y1 = 320;
-	}
+	};
 
 	ScanlineAnimation.prototype.init = function() {
 		this.gallery.ctx.fillStyle = '#000';
 		this.gallery.ctx.fillRect(0,0,this.gallery.width,this.gallery.height);
-	}
+	};
 
 	ScanlineAnimation.prototype.draw = function(t, deltaT)
 	{
@@ -35,11 +35,11 @@
 		{
 			this.gallery.ctx.beginPath();
 			this.gallery.ctx.moveTo(0, (this.y1 * i) % this.gallery.height);
-			this.gallery.ctx.lineTo(mainWidth, (this.y1 * i) % this.gallery.height);
+			this.gallery.ctx.lineTo(this.gallery.width, (this.y1 * i) % this.gallery.height);
 			this.gallery.ctx.strokeStyle = this.gallery.helpers.rgbStr(this.color.r, this.color.g, this.color.b);
 			this.gallery.ctx.stroke();
 		}
-	}
+	};
 
 	window.AnimationGallery.addAnimation('scan', ScanlineAnimation);
 	//window.AnimationGallery.startAnimation();

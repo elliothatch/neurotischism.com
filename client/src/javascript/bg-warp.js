@@ -25,7 +25,7 @@
 				this.linkX = pos.left + (pos.right - pos.left)/2;
 				this.linkY = pos.top + (pos.bottom - pos.top)/2;
 			}
-			this.drawText(this.linkX, this.linkY, this.gallery.linkT/1000 * 30);
+			this.drawText(this.linkX, this.linkY, this.gallery.linkT/1000 * 10);
 		}
 
 		this.linkHoveredLast = this.gallery.linkHovered;
@@ -43,7 +43,7 @@
 		var fontSize = t*20;
 		this.gallery.ctx.font = fontSize + 'px serif';
 
-		this.gallery.ctx.fillStyle = this.gallery.helpers.hsvStr(((x+y)/(this.gallery.width+this.gallery.height)+(t*0.01))%1, 0.6, 0.9);
+		this.gallery.ctx.fillStyle = this.gallery.helpers.hsvStr(((x+y)/(this.gallery.width+this.gallery.height)+(t*0.1))%1, 0.6, 0.9);
 		var linkText = this.gallery.linkHovered.target.textContent;
 		var textSize = this.gallery.ctx.measureText(linkText);
 		this.gallery.ctx.fillText(linkText, this.linkX - textSize.width/2, this.linkY + fontSize/4);

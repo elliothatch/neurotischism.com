@@ -1,604 +1,485 @@
-var canvas1 = document.getElementById("backgroundCanvas");
-var backgroundContext = canvas1.getContext("2d");
-var mainWidth = document.body.clientWidth;
-var mainHeight = document.body.clientHeight;
-canvas1.width = mainWidth;
-canvas1.height = mainHeight;
+(function(window, document) {
+	var AnimationGallery = window.AnimationGallery;
 
-var canvas2 = document.getElementById("foregroundCanvas");
-var foregroundContext = canvas2.getContext("2d");
-var mainWidth = document.body.clientWidth;
-var mainHeight = document.body.clientHeight;
-canvas2.width = mainWidth;
-canvas2.height = mainHeight;
+	var bgCanvas = document.getElementById('backgroundCanvas');
+	bgCanvas.width = document.body.clientWidth;
+	bgCanvas.height = document.body.clientHeight;
+	var bgContext = bgCanvas.getContext('2d');
 
-var backgroundY1 = 320;
-var backgroundR = 0;
-var backgroundG = 0;
-var backgroundB = 0;
+	var fgCanvas = document.getElementById('foregroundCanvas');
+	fgCanvas.width = document.body.clientWidth;
+	fgCanvas.height = document.body.clientHeight;
+	var fgContext = bgCanvas.getContext('2d');
 
-var titleDiv = document.getElementById("siteTitle");
-var titleR = 0;
-var titleG = 0;
-var titleB = 0;
-
-var linkLetterSpacing = 1;
-var isLinkHovered = false;
-var hoveredLink;
-
-var isH1Hovered = false;
-var hoveredH1;
-var hoveredH1Rect;
-
-var h1Hue = 0;
-
-var corruptZoneObj = null;
-var isCorruptZoneHovered = false;
-var corruptZoneText;
-var corruptZoneOriginalText;
-
-var scrollMaxDelay = 30 * 2;
-
-var commentAuthorOwnerElements = document.getElementsByClassName('commentAuthorOwner');
-var commentAuthorOwnerCycleSpeed = 1;
-var commentAuthorOwnerColorStep = 0.05;
-var commentAuthorOwnerHue = 0.0;
-
-var recaptchaDisplayed = false;
-
-var calmmodeEnabled = true;
-
-window.onresize = onWindowResized;
-/*
-	window.setInterval(function(){backgroundY1 += 2; backgroundY1 = backgroundY1 % mainHeight;},1000/60);
-	window.setInterval(function(){changeTitleColor();},1000/30);
-	window.setInterval(function(){updateLinkLetterSpacing();},1000/30);
-	window.setInterval(function(){updateRandomCharacters();}, 1000/30);
-	window.setInterval(function(){updateScrollLinks();}, 1000/40);
-	window.setInterval(function(){updateH1Colors();}, 1000/8);
-	window.setInterval(function(){updateH1HoverColoring();}, 1000/30);
-	window.setInterval(function(){updateCorruptZone();}, 1000/30);
-	window.setInterval(function(){updateCommentAuthorOwner();}, 1000/10);
-	*/
-
-//add the mouse events to all links
-var linkElements = document.getElementsByTagName('a');
-for(var i = 0; i < linkElements.length; i++) {
-	linkElements[i].onmouseover = function() {startLinkLetterSpacing(this);};
-	linkElements[i].onmouseout = function() {stopLinkLetterSpacing();};
-}
-//add the mouse events to all h1s
-var h1Elements = document.getElementsByTagName('h1');
-for(var i = 0; i < h1Elements.length; i++)
-{
-	if(h1Elements[i].id == "backButton")
-		continue;
-	h1Elements[i].onmouseover = function() {startH1Coloring(this);};
-	h1Elements[i].onmouseout = function() {stopH1Coloring();};
-}
-
-var corruptZoneElements = document.getElementsByClassName('corruptZone');
-for(i = 0; i < corruptZoneElements.length; i++)
-{
-	corruptZoneElements[i].onmouseenter = function() {startCorruptZone(this);};
-	corruptZoneElements[i].onmouseleave = function()  {stopCorruptZone();};
-}
-
-initCommentAuthorOwner();
-updateTrashLinkLineCharacters();
-updateTrashLinkLineCharacters(); //do it twice
-initializeScrollLinks();
-formInit();
-
-// fullscreen
-var fullscreenButton = document.getElementById('fullscreen-button');
-var foregroundWrapper = document.getElementById('foregroundWrapper');
-var fullscreen = window.localStorage.getItem('fullscreen') === 'true';
-foregroundWrapper.style.visibility = fullscreen ? 'hidden' : 'visible';
-fullscreenButton.onclick = function() {
-	fullscreen = !fullscreen;
-	foregroundWrapper.style.visibility = fullscreen ? 'hidden' : 'visible';
-	window.localStorage.setItem('fullscreen', fullscreen + '');
-}
-// gallery controls
-var prevAnimationButton = document.getElementById('prev-animation-button');
-var nextAnimationButton = document.getElementById('next-animation-button');
-prevAnimationButton.onclick = function() {
-	if(window.AnimationGallery) {
-		window.AnimationGallery.startAnimation((window.AnimationGallery.animationIndex + window.AnimationGallery.animations.length - 1) % window.AnimationGallery.animations.length);
-	}
-};
-nextAnimationButton.onclick = function() {
-	if(window.AnimationGallery) {
-		window.AnimationGallery.startAnimation((window.AnimationGallery.animationIndex + 1) % window.AnimationGallery.animations.length);
-	}
-};
-
-function onWindowResized()
-{
-	//resize canvas
-	mainWidth = document.body.clientWidth;
-	mainHeight = document.body.clientHeight;
-	canvas1.width = mainWidth;
-	canvas1.height = mainHeight;
-	canvas2.width = mainWidth;
-	canvas2.height = mainHeight;
-	//backgroundContext.fillRect(0,0,mainWidth,mainHeight);
-	//resize trash links
-	updateTrashLinkLineCharacters();
-	//resize scrollLinks (destructive :) )
-	initializeScrollLinks();
-}
-
-function initCommentAuthorOwner() 
-{
-	for(var i = 0; i < commentAuthorOwnerElements.length; i++)
-	{
-		var message = commentAuthorOwnerElements[i].innerHTML;
-		var newMessage = "";
-		for (var j = 0; j < message.length; j++)
-		{
-			var color = HSVtoRGB(commentAuthorOwnerHue, 1.0, 1.0);
-			newMessage += "<span style=\"color:" + rgbToHex(color.r, color.g, color.b) + ";\">" + message[j] + "</span>";
-			commentAuthorOwnerHue = commentAuthorOwnerHue + commentAuthorOwnerColorStep;
-			if(commentAuthorOwnerHue > 1.0)
-			{commentAuthorOwnerHue -= 1.0;}
-		}
-		commentAuthorOwnerElements[i].innerHTML = newMessage;
-	}
-}
-
-function updateCommentAuthorOwner()
-{
-	for(var i = 0; i < commentAuthorOwnerElements.length; i++)
-	{
-		var children = commentAuthorOwnerElements[i].children;
-		for(var j = 0; j < children.length - 1; j++)
-		{
-			children[j].style.color = children[j+1].style.color;
-		}
-		var color = HSVtoRGB(commentAuthorOwnerHue, 1.0, 1.0);
-		children[children.length - 1].style.color = rgbToHex(color.r, color.g, color.b);
-		commentAuthorOwnerHue = commentAuthorOwnerHue + commentAuthorOwnerColorStep;
-		if(commentAuthorOwnerHue > 1.0)
-		{commentAuthorOwnerHue -= 1.0;}
-	}
-}
-
-function formInit()
-{
-	var forms = document.getElementsByTagName("form");
-	for(var i = 0; i < forms.length; i++)
-	{
-		forms[i].onsubmit = onFormSubmit;
-	}
-	var formMessage = document.getElementById("form-message");
-	if(formMessage)
-	{
-		formMessage.onfocus = function() {recaptchaInit(); };
-	}
-}
-
-function recaptchaInit()
-{
-	if(!recaptchaDisplayed)
-	{
-
-		Recaptcha.create("6Lfzn_0SAAAAAAo6e0aKRbE_T5Os8EKrzhRBxDTc",
-			"recaptcha",
-			{
-				theme: "clean",
+	//animations
+	var Animations = function(animations) {
+		var _this = this;
+		this.animations = (animations || []).map(function(animation, i) {
+			var a = {
+				id: i,
+				activator: animation.activator,
+				onDeactivate: animation.onDeactivate,
+				frameLimit: animation.frameLimit,
+				draw: animation.draw,
+				state: Object.assign({
+					start: true
+				}, animation.state)
+			};
+			if(a.activator) {
+				a.activator(
+					function(data) {_this.activate(a, data);},
+					function(data) {_this.deactivate(a, data);});
 			}
-		);
-		recaptchaDisplayed = true;
-	}
-}
-
-function onFormSubmit(event)
-{
-	event.target.submitButton.disabled = true;
-}
-
-
-function startH1Coloring(obj)
-{
-	hoveredH1 = obj;
-	isH1Hovered = true;
-	hoveredH1Rect = hoveredH1.getBoundingClientRect();
-}
-
-function stopH1Coloring()
-{
-	//hoveredH1 = null;
-	isH1Hovered = false;
-	//reset canvas
-	canvas2.width = canvas2.width;
-}
-
-function updateH1HoverColoring()
-{
-	if(isH1Hovered)
-	{
-		for(var i = 0; i< 20; i++)
-		{
-			var xPos = Math.floor(hoveredH1Rect.width * Math.random()) + hoveredH1Rect.left;
-			foregroundContext.beginPath();
-			foregroundContext.moveTo(xPos, hoveredH1Rect.top + window.pageYOffset);
-			foregroundContext.lineTo(xPos, hoveredH1Rect.bottom + window.pageYOffset);
-			foregroundContext.strokeStyle=rgbToHex(backgroundR, backgroundG, backgroundB);
-			foregroundContext.lineWidth = Math.random() * 20;
-			foregroundContext.stroke();
-		}
-	}
-}
-
-function updateH1Colors()
-{
-	var elements = document.getElementsByTagName('h1');
-
-	var saturation = 1.0;
-	var value = 1.0;
-	if(calmmodeEnabled) {
-		saturation = 0.1;
-	}
-	var rgbColor = HSVtoRGB(h1Hue, saturation, value);
-	if(calmmodeEnabled) {
-		rgbColor.r = 255 - rgbColor.r;
-		rgbColor.g = 255 - rgbColor.g;
-		rgbColor.b = 255 - rgbColor.b;
-	}
-
-	for(var i = 0; i < elements.length; i++)
-	{
-		elements[i].style.color = rgbToHex(rgbColor.r, rgbColor.g, rgbColor.b);
-		if(elements[i].id != "backButton")
-			elements[i].style.backgroundColor = rgbToHex(255 - rgbColor.r, 255 - rgbColor.g, 255 - rgbColor.b);
-	}
-	h1Hue += 0.55;
-	if(h1Hue > 1.0)
-		h1Hue -= 1.0;
-}
-
-
-function initializeScrollLinks()
-{
-	var delimiter = "_";
-	var delimiterCount = 20;
-	var letterWidth = document.getElementById("letterSize").clientWidth + 1;
-	var elements = document.getElementsByClassName("scrollLink");
-	for(var i = 0; i < elements.length; i++)
-	{
-		elements[i].setAttribute("data-linkdelay", Math.floor(Math.random() *scrollMaxDelay));
-		var parent = elements[i].parentNode;
-		var parentWidth = parent.clientWidth;
-		var linkWidth = elements[i].offsetWidth;
-		var rightDeltaCharacters = (parentWidth - linkWidth) / letterWidth;
-		var textContent = elements[i].textContent;
-		if(rightDeltaCharacters < 0)
-		{
-			elements[i].textContent = elements[i].textContent.substring(0, elements[i].textContent.length + rightDeltaCharacters);
-		}
-		else
-		{
-			rightDeltaCharacters += 10;
-			rightDeltaCharacters += (textContent.length + delimiterCount) - (rightDeltaCharacters % (textContent.length + delimiterCount));
-			for(var k = textContent.length; k < rightDeltaCharacters; k++)
-			{
-				if(k % (textContent.length + delimiterCount) >= textContent.length)
-				{
-					elements[i].textContent += delimiter;
-				}
-				else
-				{
-					elements[i].textContent += textContent[k % (textContent.length + delimiterCount)];
-				}
+			return a;
+		});
+		this.activeAnimations = this.animations.reduce(function(obj, a) {
+			if(!a.activator) {
+				obj[a.id] = a;
 			}
-		}
-	}
-}
+			return obj;
+		}, {});
 
-function updateScrollLinks()
-{
-	var offsetAmount = 1;
-	var elements = document.getElementsByClassName("scrollLink");
-	for(var i = 0; i < elements.length; i++)
-	{
-		if(isLinkHovered && hoveredLink == elements[i])
-			continue;
+		this.startTime = null;
+		this.lastTime = null;
 
-		var scrollDelay = elements[i].getAttribute("data-linkdelay");
-		if(scrollDelay > 0)
-		{
-			elements[i].setAttribute("data-linkdelay", scrollDelay - 1);
-			continue;
-		}
-		else if(Math.random() < 0.1)
-			elements[i].setAttribute("data-linkdelay", scrollMaxDelay);
-		var textContent = elements[i].textContent;
-		var newContent = "";
-		var offset = offsetAmount;
-		//if(Math.random() < 0.2)
-		//	offset = textContent.length - offsetAmount;
-		for(var j = offset; j < textContent.length + offset; j++)
-		{
-			newContent += elements[i].textContent[j % textContent.length];
-		}
-		elements[i].textContent = newContent;
-	}
-}
+		this.animationPlaying = false;
+	};
 
-function updateTrashLinkLineCharacters()
-{
-	var letterWidth = document.getElementById("letterSize").clientWidth + 1;
-	var elements = document.getElementsByClassName("trashLink");
-	for(var i = 0; i < elements.length; i++)
-	{
-		var nodes = elements[i].childNodes;
-		var parent = elements[i].parentNode;
-		var parentWidth = parent.clientWidth;
-		var linkPosition = nodes[0].offsetWidth;
-		var linkPositionPercent = elements[i].getAttribute("data-link-horiz");
-		var linkTargetPosition = linkPositionPercent * parentWidth;
-		var leftDeltaCharacters = (linkTargetPosition - nodes[0].offsetWidth) / letterWidth;
-		var k = 0;
-		if(leftDeltaCharacters < 0)
-		{
-			nodes[0].textContent = nodes[0].textContent.substring(0, nodes[0].textContent.length + leftDeltaCharacters);
-		}
-		else
-		{
-			for(k = 0; k < leftDeltaCharacters; k++)
-			{
-				nodes[0].textContent += "a";
-			}
+	Animations.prototype.step = function (timestamp) {
+		if(!this.animationPlaying) {
+			return;
 		}
 
-		var linkWidth = nodes[1].offsetWidth;
-		var rightDeltaCharacters = ((parentWidth - (linkTargetPosition + linkWidth)) - nodes[2].offsetWidth) / letterWidth;
-		//console.log(rightDeltaCharacters);
-		if(rightDeltaCharacters < 0)
-		{
-			nodes[2].textContent = nodes[2].textContent.substring(0, nodes[2].textContent.length + rightDeltaCharacters);
+		if(!this.startTime) {
+			this.startTime = timestamp;
+			this.lastTime = this.startTime;
 		}
-		else
-		{
-			for(k = 0; k < rightDeltaCharacters + 10; k++)
-			{
-				nodes[2].textContent += "a";
-			}
-		}
-	}
-}
-
-function updateRandomCharacters()
-{
-	var elements = document.getElementsByClassName("randomCharacters");
-	var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^*_=+,./~`";
-	for(var eIt = 0; eIt < elements.length; eIt++)
-	{
-		var text = elements[eIt].textContent;
-		var newText = "";
-		for( var i = 0, len = text.length; i < len; i++)
-		{
-			newText += possible.charAt(Math.floor(Math.random() * possible.length));
-		}
-
-		elements[eIt].textContent = newText;
-	}
-}
-
-function updateRandomBodyCharacters()
-{
-
-	var bodyParagraph = document.getElementById("bodyParagraph");
-	var text = bodyParagraph.innerHTML;
-	var newText = "";
-	var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^*_=+,./~`";
-
-	//var i = text.length;
-	var inLink = false;
-	var wasLessThan = false;
-	var wasSlash = false;
-	for( var i = 0, len = text.length; i < len; i++)
-	{
-		var character = text[i];
-		if(inLink)
-		{
-			if(wasLessThan === false)
-			{
-				if(character == "<")
-				{
-					wasLessThan = true;
-					newText += character;
-					continue;
-				}
-			}
-			if(wasLessThan)
-			{
-				if(character == "/")
-				{
-					wasSlash = true;
-					newText += character;
-					continue;
-				}
-			}
-			if(wasSlash)
-			{
-				if(character == ">")
-				{
-					inLink = false;
-					wasLessThan = false;
-					wasSlash = false;
-				}
-			}
-			newText += character;
-			continue;
-		}
-		else
-		{
-			if(character == "<")
-			{
-				inLink = true;
-				newText += character;
-				continue;
-			}
-			newText += possible.charAt(Math.floor(Math.random() * possible.length));
-		}
-	}
-
-	bodyParagraph.innerHTML = newText;
-}
-
-function startLinkLetterSpacing(obj)
-{
-	isLinkHovered = true;
-	hoveredLink = obj;
-}
-
-function stopLinkLetterSpacing()
-{
-	isLinkHovered = false;
-	hoveredLink.style.letterSpacing = "normal";
-	linkLetterSpacing = 1;
-}
-
-function updateLinkLetterSpacing()
-{
-	if(isLinkHovered && hoveredLink.className != "scrollLink" && hoveredLink.id != "siteTitle")
-	{
-		linkLetterSpacing += 2;
-		hoveredLink.style.letterSpacing = linkLetterSpacing + "px";
-	}
-}
-
-function startCorruptZone(obj)
-{
-	isCorruptZoneHovered = true;
-	corruptZoneObj = obj;
-
-	corruptZoneOriginalText = [];
-	var children = obj.children;
-	for(var i = 0; i < children.length; i++)
-	{
-		corruptZoneOriginalText.push(children[i].innerHTML);
-	}
-	corruptZoneText = corruptZoneOriginalText.slice(0);
-}
-
-function stopCorruptZone()
-{
-	isCorruptZoneHovered = false;
-	var children = corruptZoneObj.children;
-	for(var i = 0; i < children.length; i++)
-	{
-		children[i].innerHTML = corruptZoneOriginalText[i];
-	}
-}
-
-function updateCorruptZone()
-{
-	if(isCorruptZoneHovered)
-	{
-		var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^*_=+,./~`";
-		var children = corruptZoneObj.children;
-		var randomChild = Math.floor(Math.random() * children.length);
-		var newString = "";
-		var randomCharIndex = Math.floor(corruptZoneText[randomChild].length * Math.random());
-		for(var i = 0; i < corruptZoneText[randomChild].length; i++)
-		{
-			if(i != randomCharIndex)
-			{newString += corruptZoneText[randomChild].charAt(i);}
-			else
-			{newString += possible.charAt(Math.floor(Math.random() * possible.length));}
-		}
-		corruptZoneText[randomChild] = newString;
-		children[randomChild].innerHTML = newString;
-	}
-}
-
-function componentToHex(c) {
-	var hex = c.toString(16);
-	return hex.length == 1 ? "0" + hex : hex;
-}
-
-function changeTitleColor()
-{
-
-	backgroundR += Math.floor((Math.random() - 0.5) * 50);
-	backgroundG += Math.floor((Math.random() - 0.5) * 50);
-	backgroundB += Math.floor((Math.random() - 0.5) * 50);
-
-	var maxBg = 100;
-	backgroundR = Math.max(0, backgroundR);
-	backgroundG = Math.max(0, backgroundG);
-	backgroundB = Math.max(0, backgroundB);
-	backgroundR = Math.min(maxBg, backgroundR);
-	backgroundG = Math.min(maxBg, backgroundG);
-	backgroundB = Math.min(maxBg, backgroundB);
-
-	var calcColorComp;
-	var color1, color2, color3, color4;
-	if(!calmmodeEnabled)
-	{
-		calcColorComp = function() {
-			return Math.floor(Math.random() * 255);
+		var dt = timestamp - this.lastTime;
+		var context = {
+			t: (timestamp - this.startTime),
+			dt: dt
 		};
 
-		titleR = calcColorComp();
-		titleG = calcColorComp();
-		titleB = calcColorComp();
+		var _this = this;
+		Object.keys(this.activeAnimations).forEach(function(animId) {
 
-		color1 = rgbToHex(calcColorComp(), calcColorComp(), calcColorComp());
-		color2 = rgbToHex(calcColorComp(), calcColorComp(), calcColorComp());
-		color3 = rgbToHex(calcColorComp(), calcColorComp(), calcColorComp());
-		color4 = rgbToHex(calcColorComp(), calcColorComp(), calcColorComp());
+			var anim = _this.activeAnimations[animId];
+			if(!anim.frameLimit || anim.state.start || (context.t%(1000/anim.frameLimit)) < context.dt) {
+				anim.draw(context, anim.state);
+				anim.state.start = false;
+			}
+		});
+
+		this.lastTime = timestamp;
+		window.requestAnimationFrame(function() { _this.step.apply(_this, arguments); });
+	};
+
+	Animations.prototype.start = function() {
+		if(this.animationPlaying) {
+			return;
+		}
+
+		var _this = this;
+		window.requestAnimationFrame(function() { _this.step.apply(_this, arguments); });
+		this.animationPlaying = true;
+	};
+
+	Animations.prototype.activate = function(anim, data) {
+		anim.state.start = true;
+		anim.state.activateData = data;
+		this.activeAnimations[anim.id] = anim;
+		this.start();
+	};
+
+	Animations.prototype.deactivate = function(anim, data) {
+		if(anim.onDeactivate) {
+			anim.onDeactivate(anim.state, data);
+		}
+		delete this.activeAnimations[anim.id];
+		if(Object.keys(this.activeAnimations).length === 0) {
+			this.animationPlaying = false;
+		}
+	};
+
+	updateTrashLinkLineCharacters();
+	updateTrashLinkLineCharacters(); //do it twice
+	initializeScrollLinks();
+
+	var animations = new Animations([
+		{
+			draw: drawRandomCharacters,
+			frameLimit: 20,
+			state: { elements:
+				document.getElementsByClassName('randomCharacters')
+			}
+		},
+		{
+			draw: drawScrollLinks,
+			frameLimit: 30,
+			state: { elements:
+				document.getElementsByClassName('scrollLink')
+			}
+		},
+		{
+			draw: drawLetterSpacing,
+			frameLimit: 30,
+			activator: makeAnimationActivator(
+				document.getElementsByTagName('a'),
+				[{event: 'mouseover', predicate: function(event) {
+					return event.target.className !== 'scrollLink' && event.target.id !== 'siteTitle';
+				}}],
+				[{event: 'mouseout', predicate: function(event) {
+					return event.target.className !== 'scrollLink' && event.target.id !== 'siteTitle';
+				}}]),
+			onDeactivate: function(state, data) {
+				data.target.style.letterSpacing = 'normal';
+			}
+		},
+		{
+			draw: drawCorruptZone,
+			frameLimit: 15,
+			activator: makeAnimationActivator(
+				document.getElementsByClassName('corruptZone'),
+				[{event: 'mouseenter'}],
+				[{event: 'mouseleave'}]),
+			onDeactivate: function(state, data) {
+				for(var i = 0; i < state.children.length; i++)
+				{
+					state.children[i].innerHTML = state.originalText[i];
+				}
+			}
+		},
+		{
+			draw: drawH1,
+			frameLimit: 8,
+		},
+		{
+			draw: drawTitle,
+			frameLimit: 30,
+		},
+		{
+			draw: drawCommentAuthorOwner,
+			frameLimit: 10,
+		},
+	]);
+
+	animations.start();
+
+	window.addEventListener('resize', function() {
+		bgCanvas.width = document.body.clientWidth;
+		bgCanvas.height = document.body.clientHeight;
+		fgCanvas.width = document.body.clientWidth;
+		fgCanvas.height = document.body.clientHeight;
+
+		//resize trash links
+		updateTrashLinkLineCharacters();
+		//resize scrollLinks (destructive :) )
+		initializeScrollLinks();
+	});
+
+	// fullscreen
+	var fullscreenButton = document.getElementById('fullscreen-button');
+	var foregroundWrapper = document.getElementById('foregroundWrapper');
+	var fullscreen = window.localStorage.getItem('fullscreen') === 'true';
+	foregroundWrapper.style.visibility = fullscreen ? 'hidden' : 'visible';
+	fullscreenButton.addEventListener('click', function() {
+		fullscreen = !fullscreen;
+		foregroundWrapper.style.visibility = fullscreen ? 'hidden' : 'visible';
+		window.localStorage.setItem('fullscreen', fullscreen + '');
+	});
+
+	// gallery controls
+	var prevAnimationButton = document.getElementById('prev-animation-button');
+	var nextAnimationButton = document.getElementById('next-animation-button');
+	prevAnimationButton.addEventListener('click', function() {
+		if(window.AnimationGallery) {
+			window.AnimationGallery.startAnimation((window.AnimationGallery.animationIndex + window.AnimationGallery.animations.length - 1) % window.AnimationGallery.animations.length);
+		}
+	});
+	nextAnimationButton.addEventListener('click', function() {
+		if(window.AnimationGallery) {
+			window.AnimationGallery.startAnimation((window.AnimationGallery.animationIndex + 1) % window.AnimationGallery.animations.length);
+		}
+	});
+
+	function drawRandomCharacters(context, state) {
+		var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^*_=+,./~`";
+		for(var eIt = 0; eIt < state.elements.length; eIt++)
+		{
+			var text = state.elements[eIt].textContent;
+			var newText = "";
+			for( var i = 0, len = text.length; i < len; i++)
+			{
+				newText += possible.charAt(Math.floor(Math.random() * possible.length));
+			}
+
+			state.elements[eIt].textContent = newText;
+		}
 	}
-	else {
+
+	function drawLetterSpacing(context, state) {
+		if(state.start) {
+			state.letterSpacing = 3;
+		}
+
+		state.activateData.target.style.letterSpacing = state.letterSpacing + "px";
+		state.letterSpacing += 2;
+	}
+
+	function drawCorruptZone(context, state) {
+		if(state.start) {
+			state.element = state.activateData.target;
+			state.originalText = [];
+			state.children = state.element.children;
+			for(var i = 0; i < state.children.length; i++)
+			{
+				state.originalText.push(state.children[i].innerHTML);
+			}
+			state.text = state.originalText.slice(0);
+		}
+
+		var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^*_=+,./~`";
+		var randomChild = Math.floor(Math.random() * state.children.length);
+		var newString = "";
+		var randomCharIndex = Math.floor(state.text[randomChild].length * Math.random());
+		for(var i = 0; i < state.text[randomChild].length; i++)
+		{
+			if(i != randomCharIndex) {
+				newString += state.text[randomChild].charAt(i);
+			}
+			else {
+				newString += possible.charAt(Math.floor(Math.random() * possible.length));
+			}
+		}
+		state.text[randomChild] = newString;
+		state.children[randomChild].innerHTML = newString;
+	}
+
+	function drawH1(context, state) {
+		if(state.start) {
+			state.hue = 0.0;
+			state.elements = document.getElementsByTagName('h1');
+		}
+
+		var color = AnimationGallery.helpers.HSVtoRGB(state.hue, 0.1, 1.0);
+		color.r = 255 - color.r;
+		color.g = 255 - color.g;
+		color.b = 255 - color.b;
+
+		for(var i = 0; i < state.elements.length; i++)
+		{
+			state.elements[i].style.color = AnimationGallery.helpers.rgbStr(color.r, color.g, color.b);
+			if(state.elements[i].id != "backButton")
+				state.elements[i].style.backgroundColor = AnimationGallery.helpers.rgbStr(255 - color.r, 255 - color.g, 255 - color.b);
+		}
+		state.hue = (state.hue + 0.55)%1;
+	}
+
+	function drawTitle(context, state) {
+		if(state.start) {
+			state.element = document.getElementById('siteTitle');
+			state.titleColor = {
+				r: 0,
+				g: 0,
+				b: 0
+			};
+			state.bgColor = {
+				r: 0,
+				g: 0,
+				b: 0
+			};
+		}
+
+		state.bgColor.r = Math.max(50, Math.min(150, state.bgColor.r + Math.floor((Math.random() - 0.5) * 50)));
+		state.bgColor.g = Math.max(50, Math.min(150, state.bgColor.g + Math.floor((Math.random() - 0.5) * 50)));
+		state.bgColor.b = Math.max(50, Math.min(150, state.bgColor.b + Math.floor((Math.random() - 0.5) * 50)));
 
 		var colorRange = 10;
-		calcColorComp = function(c) {
+		var calcColorComp = function(c) {
 			return Math.floor(255 - c + ((Math.random() - 0.5) * colorRange));
 		};
 
-		titleR = calcColorComp(colorRange / 2);
-		titleG = calcColorComp(colorRange / 2);
-		titleB = calcColorComp(colorRange / 2);
+		state.titleColor.r = calcColorComp(colorRange / 2);
+		state.titleColor.g = calcColorComp(colorRange / 2);
+		state.titleColor.b = calcColorComp(colorRange / 2);
 
-		color1 = rgbToHex(calcColorComp(backgroundR), calcColorComp(backgroundG), calcColorComp(backgroundB));
-		color2 = rgbToHex(calcColorComp(backgroundG), calcColorComp(backgroundB), calcColorComp(backgroundR));
-		color3 = rgbToHex(calcColorComp(backgroundB), calcColorComp(backgroundR), calcColorComp(backgroundG));
-		color4 = rgbToHex(calcColorComp(backgroundR), calcColorComp(backgroundB), calcColorComp(backgroundG));
+		state.element.style.color = AnimationGallery.helpers.rgbStr(state.titleColor.r, state.titleColor.g, state.titleColor.b);
+
+		var bgColors = [
+			[state.bgColor.r, state.bgColor.g, state.bgColor.b],
+			[state.bgColor.g, state.bgColor.b, state.bgColor.r],
+			[state.bgColor.b, state.bgColor.r, state.bgColor.g],
+			[state.bgColor.r, state.bgColor.b, state.bgColor.g],
+		].map(function(c) {
+			return AnimationGallery.helpers.rgbStr(
+				calcColorComp(c[0]),
+				calcColorComp(c[1]),
+				calcColorComp(c[2]));
+		});
+
+		state.element.style.textShadow = " -15px 0 "+bgColors[0]+", 0 15px "+bgColors[1]+", 15px 0 "+bgColors[2]+", 0 -15px "+bgColors[3];
 	}
 
-	titleDiv.style.color = rgbToHex(titleR, titleG, titleB);
-	titleDiv.style.textShadow=" -15px 0 "+color1+", 0 15px "+color2+", 15px 0 "+color3+", 0 -15px "+color4;
-}
+	function drawCommentAuthorOwner(context, state) {
+		if(state.start) {
+			state.elements = document.getElementsByClassName('commentAuthorOwner');
+			state.hue = 0.0;
+			state.hueStep = 0.05;
+			for(var i = 0; i < state.elements.length; i++)
+			{
+				var message = state.elements[i].innerHTML;
+				var newMessage = "";
+				for (var j = 0; j < message.length; j++)
+				{
+					var color = AnimationGallery.helpers.hsvStr(state.hue, 1.0, 1.0);
+					newMessage += "<span style=\"color:" + color + ";\">" + message[j] + "</span>";
+					state.hue = (state.hue + state.hueStep)%1;
+				}
+				state.elements[i].innerHTML = newMessage;
+			}
+		}
 
-function rgbToHex(r, g, b) {
-	return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
-}
+		for(var i = 0; i < state.elements.length; i++)
+		{
+			var children = state.elements[i].children;
+			for(var j = 0; j < children.length - 1; j++)
+			{
+				children[j].style.color = children[j+1].style.color;
+			}
+			var color = AnimationGallery.helpers.hsvStr(state.hue, 1.0, 1.0);
+			children[children.length - 1].style.color = color;
+			state.hue = (state.hue + state.hueStep)%1;
+		}
+	}
 
-function HSVtoRGB(h, s, v) {
-	var r, g, b, i, f, p, q, t;
-	if (h && s === undefined && v === undefined) {
-		s = h.s; v = h.v; h = h.h;
+	function makeAnimationActivator(elements, activateOptions, deactivateOptions) {
+		return function(activate, deactivate) {
+			for(var i = 0; i < elements.length; i++) {
+				activateOptions.forEach(function(opts) {
+					elements[i].addEventListener(opts.event, function(event) {
+						if(!opts.predicate || opts.predicate(event)) {
+							activate(event);
+						}
+					});
+				});
+				deactivateOptions.forEach(function(opts) {
+					elements[i].addEventListener(opts.event, function(event) {
+						if(!opts.predicate || opts.predicate(event)) {
+							deactivate(event);
+						}
+					});
+				});
+			}
+		};
 	}
-	i = Math.floor(h * 6);
-	f = h * 6 - i;
-	p = v * (1 - s);
-	q = v * (1 - f * s);
-	t = v * (1 - (1 - f) * s);
-	switch (i % 6) {
-		case 0: r = v; g = t; b = p; break;
-		case 1: r = q; g = v; b = p; break;
-		case 2: r = p; g = v; b = t; break;
-		case 3: r = p; g = q; b = v; break;
-		case 4: r = t; g = p; b = v; break;
-		case 5: r = v; g = p; b = q; break;
+
+	function updateTrashLinkLineCharacters()
+	{
+		var letterWidth = document.getElementById("letterSize").clientWidth + 1;
+		var elements = document.getElementsByClassName("trashLink");
+		for(var i = 0; i < elements.length; i++)
+		{
+			var nodes = elements[i].childNodes;
+			var parent = elements[i].parentNode;
+			var parentWidth = parent.clientWidth;
+			//var linkPosition = nodes[0].offsetWidth;
+			var linkPositionPercent = elements[i].getAttribute("data-link-horiz");
+			var linkTargetPosition = linkPositionPercent * parentWidth;
+			var leftDeltaCharacters = (linkTargetPosition - nodes[0].offsetWidth) / letterWidth;
+			var k = 0;
+			if(leftDeltaCharacters < 0)
+			{
+				nodes[0].textContent = nodes[0].textContent.substring(0, nodes[0].textContent.length + leftDeltaCharacters);
+			}
+			else
+			{
+				for(k = 0; k < leftDeltaCharacters; k++)
+				{
+					nodes[0].textContent += "a";
+				}
+			}
+
+			var linkWidth = nodes[1].offsetWidth;
+			var rightDeltaCharacters = ((parentWidth - (linkTargetPosition + linkWidth)) - nodes[2].offsetWidth) / letterWidth;
+			//console.log(rightDeltaCharacters);
+			if(rightDeltaCharacters < 0)
+			{
+				nodes[2].textContent = nodes[2].textContent.substring(0, nodes[2].textContent.length + rightDeltaCharacters);
+			}
+			else
+			{
+				for(k = 0; k < rightDeltaCharacters + 10; k++)
+				{
+					nodes[2].textContent += "a";
+				}
+			}
+		}
 	}
-	return {
-		r: Math.floor(r * 255),
-		g: Math.floor(g * 255),
-		b: Math.floor(b * 255)
-	};
-}
+
+	var scrollLinkMaxDelay = 60;
+	function initializeScrollLinks() {
+		var elements = document.getElementsByClassName('scrollLink');
+		var delimiter = "_";
+		var delimiterCount = 20;
+		var letterWidth = document.getElementById('letterSize').clientWidth + 1;
+		for(var i = 0; i < elements.length; i++)
+		{
+			elements[i].setAttribute("data-linkdelay", Math.floor(Math.random() * scrollLinkMaxDelay));
+			var parent = elements[i].parentNode;
+			var parentWidth = parent.clientWidth;
+			var linkWidth = elements[i].offsetWidth;
+			var rightDeltaCharacters = (parentWidth - linkWidth) / letterWidth;
+			var textContent = elements[i].textContent;
+			if(rightDeltaCharacters < 0)
+			{
+				elements[i].textContent = elements[i].textContent.substring(0, elements[i].textContent.length + rightDeltaCharacters);
+			}
+			else
+			{
+				rightDeltaCharacters += 10;
+				rightDeltaCharacters += (textContent.length + delimiterCount) - (rightDeltaCharacters % (textContent.length + delimiterCount));
+				for(var k = textContent.length; k < rightDeltaCharacters; k++)
+				{
+					if(k % (textContent.length + delimiterCount) >= textContent.length)
+					{
+						elements[i].textContent += delimiter;
+					}
+					else
+					{
+						elements[i].textContent += textContent[k % (textContent.length + delimiterCount)];
+					}
+				}
+			}
+		}
+	}
+
+	function drawScrollLinks(context, state) {
+		var offsetAmount = 1;
+		for(var i = 0; i < state.elements.length; i++)
+		{
+			if(AnimationGallery.linkHovered && AnimationGallery.linkHovered.target === state.elements[i]) {
+				continue;
+			}
+
+			var scrollDelay = state.elements[i].getAttribute("data-linkdelay");
+			if(scrollDelay > 0) {
+				state.elements[i].setAttribute("data-linkdelay", scrollDelay - 1);
+				continue;
+			}
+			else if(Math.random() < 0.1) {
+				state.elements[i].setAttribute("data-linkdelay", scrollLinkMaxDelay);
+			}
+
+			var textContent = state.elements[i].textContent;
+			var newContent = "";
+			var offset = offsetAmount;
+			//if(Math.random() < 0.2)
+			//	offset = textContent.length - offsetAmount;
+			for(var j = offset; j < textContent.length + offset; j++)
+			{
+				newContent += state.elements[i].textContent[j % textContent.length];
+			}
+			state.elements[i].textContent = newContent;
+		}
+	}
+})(window, document);

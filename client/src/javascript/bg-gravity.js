@@ -11,45 +11,11 @@
 		this.gallery.ctx.fillStyle = '#000';
 		this.gallery.ctx.fillRect(0,0,this.gallery.width,this.gallery.height);
 
-		this.bodies = [];
-		this.bodyCount = 200;
-		// put bodies in a circle
-		for(var i = 0; i < this.bodyCount; i++) {
-			var angle = (i/this.bodyCount)*2*Math.PI;
-			//var size = 100 * Math.random();
-			this.bodies.push({
-				position: {
-					x: 5*Math.cos(angle),
-					y: 5*Math.sin(angle),
-				},
-				velocity: {
-					x: 3*Math.cos(angle + Math.PI/2),
-					y: 3*Math.sin(angle + Math.PI/2)
-				},
-				acceleration: {
-					x: 0,
-					y: 0
-				},
-				mass: 10/*size*/,
-				radius: 0,
-				color: {
-					h: i/this.bodyCount,
-					s: 0.8,
-					v: 0.9
-				},
-				//trail: 'pulse',
-				//trail: 'rainbow',
-				trailOptions: {
-					// pulse
-					//t: Math.random() * 2 * Math.PI,
-					//rate: 1/100,
-					//rainbow
-					t: 0,
-					rate: 1/10000
-				}
-				//thickness: size/10
-			});
+		var sideCount = Math.floor(Math.random()*11);
+		if(sideCount > 8) {
+			sideCount = 198;
 		}
+		this.bodies = this.createBodiesPolygon(sideCount+2,5,3,200);
 
 		this.wells = [{
 			position: {
@@ -196,12 +162,74 @@
 		});
 	};
 
+	GravityAnimation.prototype.createBodiesPolygon = function(sides, size, velocity, count) {
+		var bodies = [];
+		for(var i = 0; i < sides; i++) {
+			var angle1 = (i/sides)*2*Math.PI;
+			var p1 = {
+				x: size*Math.cos(angle1),
+				y: size*Math.sin(angle1),
+			};
+			var angle2 = ((i+1)/sides)*2*Math.PI;
+			var p2 = {
+				x: size*Math.cos(angle2),
+				y: size*Math.sin(angle2),
+			};
+			var angleBisector = ((i+0.5)/sides)*2*Math.PI;
+			var normal = {
+				x: Math.cos(angleBisector+Math.PI/2),
+				y: Math.sin(angleBisector+Math.PI/2),
+			};
+
+			var edgeBodyCount = count/sides;
+			for(var j = 0; j < edgeBodyCount; j++) {
+
+				var edgeT = j/edgeBodyCount;
+				bodies.push({
+					position: {
+						x: this.gallery.helpers.lerp(p1.x, p2.x, edgeT),
+						y: this.gallery.helpers.lerp(p1.y, p2.y, edgeT),
+					},
+					velocity: {
+						x: velocity*normal.x,
+						y: velocity*normal.y,
+					},
+					acceleration: {
+						x: 0,
+						y: 0
+					},
+					mass: 10/*size*/,
+					radius: 0,
+					color: {
+						h: (i*edgeBodyCount+j)/count,
+						s: 0.8,
+						v: 0.9
+					},
+					//trail: 'pulse',
+					//trail: 'rainbow',
+					trailOptions: {
+						// pulse
+						//t: Math.random() * 2 * Math.PI,
+						//rate: 1/100,
+						//rainbow
+						t: 0,
+						rate: 1/10000
+					}
+					//thickness: size/10
+				});
+			}
+		}
+
+		return bodies;
+	};
+
+
 	function calcGravityAcceleration(b1, b2) {
 		var dx = b1.position.x - b2.position.x;
 		var dy = b1.position.y - b2.position.y;
 		var distanceSquare = Math.pow(dx, 2) + Math.pow(dy, 2);
 		var force = 0;
-		if(distanceSquare > 0.05) {
+		if(distanceSquare > 0.1) {
 			force = b2.mass / distanceSquare;
 		}
 		var direction = Math.atan2(dy, dx);

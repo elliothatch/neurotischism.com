@@ -4,5 +4,9 @@
 	"certPath": "server/certs",
 	"jwtCertPath": "server/jwtcerts",
 	"clientPath": "client",
-	"logLevel": "warn"
+	"logLevel": "warn",
+	"mongodb": {
+		"database": "neurotischism",
+		"user": "neurotischism"
+	}
 }

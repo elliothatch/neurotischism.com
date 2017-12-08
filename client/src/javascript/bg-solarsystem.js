@@ -21,7 +21,7 @@
 		var ringCount = 30;
 		for(var i = 0; i < ringCount; i++) {
 			var ringAngle = i*2*Math.PI/ringCount;
-			var spinOffset = i*this.gallery.helpers.lerp(-1,1,this.gallery.mouseX/this.gallery.width);
+			var spinOffset = i*this.gallery.helpers.lerp(-0.25,0.25,this.gallery.mouseX/this.gallery.width);
 
 			var radius = this.gallery.height/2*0.9;
 			//var xRadius = radius*(Math.cos(2*t/1000+spinOffset)/2 + 0.5) + 5;

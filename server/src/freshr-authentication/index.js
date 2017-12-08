@@ -50,11 +50,14 @@ module.exports = function(options) {
 		throw new Error('Freshr-authentication: JWT private or public key not found.');
 	}
 
-	if(!options.mongodbHost) {
-		options.mongodbHost = '127.0.0.1';
+	if(!options.mongodb) {
+		options.mongodb = {};
 	}
-	if(!options.mongodbDatabase) {
-		options.mongodbDatabase = 'freshr-authentication';
+	if(!options.host) {
+		options.mongodb.host = '127.0.0.1';
+	}
+	if(!options.mongodb.database) {
+		options.mongodb.database = 'freshr-authentication';
 	}
 
 	if(!options.matchPatterns) {
@@ -63,10 +66,10 @@ module.exports = function(options) {
 
 	//TODO: maybe give the user control over the database (pass in db, manage auto-reconnect?)
 	//TODO: auto-reconnect
-	var dbUrl = 'mongodb://' + options.mongodbHost + '/' + options.mongodbDatabase;
+	var dbUrl = 'mongodb://' + options.mongodb.host + '/' + options.mongodb.database;
 	//wrapper for pass by reference, I guess
 	var dbWrap = {};
-	connectMongoDb(dbUrl).then(function(db) {
+	connectMongoDb(dbUrl, options.mongodb.user, options.mongodb.password).then(function(db) {
 		dbWrap.db = db;
 		return db.collection('users').ensureIndexAsync({username: 1}, {unique: true});
 	}).catch(function(err) {
@@ -99,7 +102,7 @@ function makeExpressRouter(options, dbWrap) {
 
 		var tokenPayload;
 
-		dbWrap.db.collection('users').findOne({
+		dbWrap.db.collection('freshr-authentication-users').findOne({
 			username: req.body.username,
 		}).then(function(user) {
 			if(!user) {
@@ -158,7 +161,7 @@ function makeExpressRouter(options, dbWrap) {
 					if(!user.username || !user.password || !user.email || (user.role !== 'admin' && user.role !== 'user')) {
 						throw new CustomErrors.BadRequestError('User must have a username, password, email, and role (admin or user)');
 					}
-					return dbWrap.db.collection('users').insertOneAsync(user);
+					return dbWrap.db.collection('freshr-authentication-users').insertOneAsync(user);
 				}).then(function(result) {
 					var queryString = querystring.stringify({username: user.username, role: user.role, timestamp: user.timestamp});
 					res.redirect(req.url.substring(0, req.url.lastIndexOf('/') + '/users?' + queryString));
@@ -230,14 +233,25 @@ function matchUrlPatterns(url, matchPatterns) {
 	return false;
 }
 
-function connectMongoDb(url) {
+function connectMongoDb(url, user, password) {
+	var errHandled = false;
 	return MongoClient.connectAsync(url)
 		.then(function(db) {
 			//TODO: provide result to user instead of writing directly to stdout?
-			console.log('Freshr authenticate: Connected to mongo database "' + url + '"');
-			return db;
+			console.log('freshr-authentication: Connected to mongo database "' + url + '"');
+			return db.authenticate(user, password)
+				.then(function() {
+					console.log('freshr-authentication: Authenticated as ' + user);
+					return db;
+				}).catch(function(err) {
+					console.log('freshr-authentication: Failed to authenticate as ' + user);
+					errHandled = true;
+					throw error;
+				});
 		}).catch(function(error) {
-			console.error('Freshr authenticate: Failed to connect to mongo database "' + url + '"');
+			if(!errHandled) {
+				console.error('freshr-authentication: Failed to connect to mongo database "' + url + '"');
+			}
 			throw error;
 		});
 }

@@ -17,12 +17,14 @@ module.exports = function(options) {
 
 	var comments = freshrComments({
 		whitelist: ['/blog/*', '/games/*', '/not-games/*'],
-		authorPasswords: {'[neurotischism': 'this is mine'}
+		authorPasswords: {'[neurotischism': 'this is mine'},
+		mongodb: options.mongodb,
 	});
 
 	var authentication = freshrAuthentication({
 		jwtCertPath: options.jwtCertPath,
-		matchPatterns: [{path: '/~config', roles: ['admin']}]
+		matchPatterns: [{path: '/~config', roles: ['admin']}],
+		mongodb: options.mongodb,
 	});
 
 	/*

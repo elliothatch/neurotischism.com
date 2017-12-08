@@ -1,3 +1,5 @@
+var querystring = require('querystring');
+
 var Promise = require('bluebird');
 var express = require('express');
 var Moment = require('moment-timezone');
@@ -39,11 +41,14 @@ var CustomErrors = require('../util/custom-errors');
  */
 module.exports = function(options) {
 	options = Object.assign({}, options);
-	if(!options.mongodbHost) {
-		options.mongodbHost = '127.0.0.1';
+	if(!options.mongodb) {
+		options.mongodb = {};
 	}
-	if(!options.mongodbDatabase) {
-		options.mongodbDatabase = 'freshr-comments';
+	if(!options.host) {
+		options.mongodb.host = '127.0.0.1';
+	}
+	if(!options.mongodb.database) {
+		options.mongodb.database = 'freshr-comments';
 	}
 
 	if(!options.matchPatterns) {
@@ -56,10 +61,10 @@ module.exports = function(options) {
 
 	//TODO: maybe give the user control over the database (pass in db, manage auto-reconnect?)
 	//TODO: auto-reconnect
-	var dbUrl = 'mongodb://' + options.mongodbHost + '/' + options.mongodbDatabase;
+	var dbUrl = 'mongodb://' + options.mongodb.host + '/' + options.mongodb.database;
 	//wrapper for pass by reference, I guess
 	var dbWrap = {};
-	connectMongoDb(dbUrl).then(function(db) {
+	connectMongoDb(dbUrl, options.mongodb.user, options.mongodb.password).then(function(db) {
 		dbWrap.db = db;
 	});
 
@@ -99,7 +104,7 @@ function makeExpressRouter(options, dbWrap) {
 			} else if(!comment.author || !comment.email || !comment.message) {
 				throw new CustomErrors.BadRequestError('Comment must have an author, email, and message');
 			}
-			dbWrap.db.collection('comments').insertOneAsync(comment)
+			dbWrap.db.collection('freshr-comments-comments').insertOneAsync(comment)
 				.then(function(result) {
 					//TODO: add query parameter to mark comment success/failed
 					res.redirect(req.url);
@@ -147,7 +152,7 @@ function makeFreshrHandler(options, dbWrap) {
 			return next();
 		}
 
-		dbWrap.db.collection('comments').find({
+		dbWrap.db.collection('freshr-comments-comments').find({
 			url: context.url
 		}).project({ url: false})
 		.toArrayAsync().then(function(comments) {
@@ -180,16 +185,27 @@ function matchUrlPatterns(url, matchPatterns) {
 	return false;
 }
 
-function connectMongoDb(url) {
+function connectMongoDb(url, user, password) {
+	var errHandled = false;
 	return MongoClient.connectAsync(url)
 		.then(function(db) {
 			//TODO: provide result to user instead of writing directly to stdout?
-			console.log('Freshr comments: Connected to mongo database "' + url + '"');
-			return db;
-	}).catch(function(error) {
-		console.error('Freshr comments: Failed to connect to mongo database "' + url + '"');
-		throw error;
-	});
+			console.log('freshr-authentication: Connected to mongo database "' + url + '"');
+			return db.authenticate(user, password)
+				.then(function() {
+					console.log('freshr-authentication: Authenticated as ' + user);
+					return db;
+				}).catch(function(err) {
+					console.log('freshr-authentication: Failed to authenticate as ' + user);
+					errHandled = true;
+					throw error;
+				});
+		}).catch(function(error) {
+			if(!errHandled) {
+				console.error('freshr-authentication: Failed to connect to mongo database "' + url + '"');
+			}
+			throw error;
+		});
 }
 
 

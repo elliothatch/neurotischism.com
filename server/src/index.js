@@ -9,7 +9,8 @@ var configOptions = {
 	certPath: config.get('certPath'),
 	jwtCertPath: config.get('jwtCertPath'),
 	clientPath: path.resolve(config.get('clientPath')),
-	logLevel: config.get('logLevel')
+	logLevel: config.get('logLevel'),
+	mongodb: config.get('mongodb'),
 };
 
 server.start(Object.assign({}, configOptions, parseArgs(process.argv.slice(2))));

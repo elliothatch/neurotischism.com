@@ -41,6 +41,22 @@ function start(options) {
 
 	console.log(JSON.stringify(options));
 
+	// load passwords
+	if(options.mongodb && !options.mongodb.password) {
+		try {
+			var passwords = JSON.parse(fs.readFileSync('passwords'));
+			options.mongodb.password = passwords.mongodb;
+		}
+		catch(err) {
+			if(err.code === 'ENOENT') {
+				console.warn('No password file found.');
+			}
+			else {
+				console.error('Failed to load password file: ', err.message);
+			}
+		}
+	}
+
 	var usingSSL = false;
 	app = express();
 	if(options.certPath === undefined) {
@@ -75,7 +91,7 @@ function start(options) {
 	app.use(cookieParser());
 
 	app.use(logger({name: 'neurotischism', reqName: loggerName, level: options.logLevel}));
-	app.use(routes({loggerName: loggerName, clientPath: options.clientPath, jwtCertPath: options.jwtCertPath, socketServer: socketServer}));
+	app.use(routes({loggerName: loggerName, clientPath: options.clientPath, jwtCertPath: options.jwtCertPath, socketServer: socketServer, mongodb: options.mongodb}));
 
 	if(usingSSL) {
 		var httpsPortStr = '';

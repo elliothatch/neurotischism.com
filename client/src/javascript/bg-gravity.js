@@ -11,11 +11,9 @@
 		this.gallery.ctx.fillStyle = '#000';
 		this.gallery.ctx.fillRect(0,0,this.gallery.width,this.gallery.height);
 
-		var sideCount = Math.floor(Math.random()*11);
-		if(sideCount > 8) {
-			sideCount = 198;
-		}
-		this.bodies = this.createBodiesPolygon(sideCount+2,5,3,200);
+		var sideCountOptions = [2,3,4,5,200];
+		var sideCount = sideCountOptions[Math.floor(Math.random()*sideCountOptions.length)];
+		this.bodies = this.createBodiesPolygon(sideCount,5,3,200);
 
 		this.wells = [{
 			position: {

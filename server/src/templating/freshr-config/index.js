@@ -1,7 +1,10 @@
 var express = require('express');
+var fs = require('fs');
+var Path = require('path');
 var BuildManager = require('./build');
 var Ip = require('ip');
 var PublicIp = require('public-ip');
+var jsonwebtoken = require('jsonwebtoken');
 
 /* Constructs a freshr-config instance which has two properties:
  * exoressRouter - an express middleware which accepts a POST to `/` containing JSON of configuration fields that should be updated, then redirects
@@ -11,6 +14,16 @@ var PublicIp = require('public-ip');
  */
 module.exports = function(options) {
 	options = Object.assign({}, options);
+
+	if(options.jwtCertPath) {
+		try {
+			options.jwtPrivateKey = fs.readFileSync(Path.join(options.jwtCertPath, 'key.pem'));
+			options.jwtPublicKey = fs.readFileSync(Path.join(options.jwtCertPath, 'cert.pem'));
+		}
+		catch(err) {
+			console.error(err);
+		}
+	}
 
 	options.socketServer.of('/~config').use(makeSocketHandler(options));
 
@@ -176,6 +189,17 @@ function makeSocketHandler(options) {
 	});
 
 	return function(socket, next) {
+		try {
+			var token = jsonwebtoken.verify(socket.request.cookies.jwt, options.jwtPublicKey, {
+				algorithm: 'RS256'
+			});
+			if(token.role !== 'admin') {
+				throw new Error('Insufficient permissions. Only users with "admin" role can access config');
+			}
+		}
+		catch(err) {
+			return next(err);
+		}
 		socket.on('files/src', function(data) {
 			socket.emit('files/src', BuildManager.getFileEntry(options.clientPath, 'src'));
 		});

@@ -12,6 +12,7 @@ var cookieParser = require('cookie-parser');
 var compress = require('compression');
 
 var io = require('socket.io');
+var ioCookieParser = require('socket.io-cookie-parser');
 
 var routes = require('./routes');
 var logger = require('./util/logger');
@@ -84,6 +85,7 @@ function start(options) {
 		}
 	}
 	socketServer = io(httpsServer);
+	socketServer.use(ioCookieParser());
 
 	app.use(compress());
 	app.use(bodyParser.urlencoded({extended: false}));

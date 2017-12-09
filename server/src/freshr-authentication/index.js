@@ -106,7 +106,9 @@ function makeExpressRouter(options, dbWrap) {
 			username: req.body.username,
 		}).then(function(user) {
 			if(!user) {
-				throw new CustomErrors.UnauthorizedError('User "' + req.body.username + '" not found');
+				var url = req.originalUrl.split('?').shift();
+				req.query.errormsg = 'User "' + req.body.username + '" not found';
+				return res.redirect(url + '?' + querystring.stringify(req.query));
 			}
 			tokenPayload = {
 				username: user.username,
@@ -117,7 +119,9 @@ function makeExpressRouter(options, dbWrap) {
 			return bcrypt.compare(req.body.password, user.password);
 		}).then(function(result) {
 			if(!result) {
-				throw new CustomErrors.UnauthorizedError('username and password did not match');
+				var url = req.originalUrl.split('?').shift();
+				req.query.errormsg = 'Username and password did not match';
+				return res.redirect(url + '?' + querystring.stringify(req.query));
 			}
 
 			var token = jsonwebtoken.sign(tokenPayload, options.jwtPrivateKey, {
@@ -246,7 +250,7 @@ function connectMongoDb(url, user, password) {
 				}).catch(function(err) {
 					console.log('freshr-authentication: Failed to authenticate as ' + user);
 					errHandled = true;
-					throw error;
+					throw err;
 				});
 		}).catch(function(error) {
 			if(!errHandled) {

@@ -13,14 +13,83 @@
 
 	EyeAnimation.prototype.draw = function(t, deltaT)
 	{
+		this.gallery.ctx.fillStyle = '#000';
+		//this.gallery.ctx.fillStyle = '#fff';
+		this.gallery.ctx.fillRect(0,0,this.gallery.width,this.gallery.height);
+
 		var linkTransitionTime = 0.2;
-		this.gallery.canvas.width = this.gallery.width;
 		if(this.gallery.linkHovered) {
 			this.transitionT = Math.min(this.transitionT + deltaT/1000 / linkTransitionTime, 1);
 		}
 		else {
 			this.transitionT = Math.max(this.transitionT - deltaT/1000 / linkTransitionTime, 0);
 		}
+
+		//top lid
+		//var lidColor = this.gallery.helpers.HSVtoRGB(Math.random(), 0.8, 0.8);
+		var eyeT = t/600 / (2*Math.PI) + 0.5;
+		var blinkPeriod = 4;
+		//if(this.gallery.linkHovered && eyeT % blinkPeriod > 1) {
+		//	eyeT = (eyeT % 1) + blinkPeriod-1;
+		//}
+		var blinkHeight = this.gallery.height*0.35;
+		var squintHeight = 40;
+		var eyePos = {
+			left: 50,
+			right: this.gallery.width - 50,
+			top: -this.gallery.height/3,
+			bottom: this.gallery.height + this.gallery.height/3,
+			centerX: this.gallery.width/2,
+			centerY: this.gallery.height/2,
+
+			lidTop: -Math.cos(eyeT*2*Math.PI)*blinkHeight*1.1+(blinkHeight*1.1-squintHeight),
+			lidTopBlink: -Math.cos(eyeT*2*Math.PI)*squintHeight-this.gallery.height,
+		};
+
+		this.gallery.ctx.beginPath();
+		this.gallery.ctx.moveTo(eyePos.left, eyePos.centerY);
+		this.gallery.ctx.fillStyle = '#fff';
+		//this.gallery.ctx.fillStyle = 'rgb(237, 251, 255)';
+		//this.gallery.ctx.fillStyle = 'rgb(255, 240, 240)';
+
+		//this.gallery.ctx.fillStyle = this.gallery.helpers.hsvStr((t%1000)/1000,0.1,1);
+		this.gallery.ctx.quadraticCurveTo(
+			eyePos.centerX,
+			eyePos.top,
+			eyePos.right,
+			eyePos.centerY
+		);
+
+		this.gallery.ctx.quadraticCurveTo(
+			eyePos.centerX,
+			eyePos.bottom,
+			eyePos.left,
+			eyePos.centerY
+		);
+
+		this.gallery.ctx.closePath();
+		this.gallery.ctx.fill();
+		/*
+		if(eyeT % blinkPeriod <= 1) {
+			this.gallery.ctx.quadraticCurveTo(
+				eyePos.centerX,
+				eyePos.lidTop,
+				eyePos.left,
+				eyePos.centerY
+			);
+		}
+		else {
+			this.gallery.ctx.quadraticCurveTo(
+				eyePos.centerX,
+				this.gallery.helpers.lerp(
+					eyePos.lidTopBlink,
+					eyePos.lidTopBlink*1.2,
+					this.transitionT)+this.gallery.height,
+				eyePos.centerY
+			);
+		}*/
+
+
 		//var pupilRadius = 70;
 		//var innerIrisRadius = 100;
 		//var outerRadius = 250;
@@ -100,27 +169,20 @@
 		//ctx.fillStyle = "#000000";
 		//ctx.arc()
 
-		//top lid
-		//var lidColor = this.gallery.helpers.HSVtoRGB(Math.random(), 0.8, 0.8);
-		var eyeT = t/600 / (2*Math.PI) + 0.5;
-		var blinkPeriod = 4;
-		//if(this.gallery.linkHovered && eyeT % blinkPeriod > 1) {
-		//	eyeT = (eyeT % 1) + blinkPeriod-1;
-		//}
-		var blinkHeight = this.gallery.height*0.35;
-		var squintHeight = 40;
-		var lidColor = this.gallery.helpers.HSVtoRGB(0, 0.0, 1.0);
+		//var lidColor = 'rgb(164, 198, 219)';
+		//var lidColor = 'rgb(180, 219, 164)';
+		var lidColor = '#ccc';
 		//bottom lid
 		this.gallery.ctx.strokeStyle = this.gallery.helpers.rgbStr(0,0,0);
-		this.gallery.ctx.fillStyle = this.gallery.helpers.rgbStr(lidColor.r, lidColor.g, lidColor.b);
+		this.gallery.ctx.fillStyle = lidColor;
 		this.gallery.ctx.beginPath();
-		this.gallery.ctx.moveTo(0, this.gallery.height/2);
-		this.gallery.ctx.quadraticCurveTo(this.gallery.width/2, this.gallery.height+this.gallery.height/3, this.gallery.width, this.gallery.height/2);
+		this.gallery.ctx.moveTo(eyePos.left, eyePos.centerY);
+		this.gallery.ctx.quadraticCurveTo(this.gallery.width/2, this.gallery.height+this.gallery.height/3, eyePos.right, this.gallery.height/2);
 		if(eyeT % blinkPeriod <= 1) {
-			this.gallery.ctx.quadraticCurveTo(this.gallery.width/2, this.gallery.height-(-Math.cos(eyeT*2*Math.PI)*(blinkHeight/2) + (blinkHeight/2-squintHeight)), 0, this.gallery.height/2);
+			this.gallery.ctx.quadraticCurveTo(this.gallery.width/2, this.gallery.height-(-Math.cos(eyeT*2*Math.PI)*(blinkHeight/2) + (blinkHeight/2-squintHeight)), eyePos.left, this.gallery.height/2);
 		} else {
 			var controlPoint = this.gallery.height-(-Math.cos(eyeT*2*Math.PI)*squintHeight);
-			this.gallery.ctx.quadraticCurveTo(this.gallery.width/2, this.gallery.helpers.lerp(controlPoint, controlPoint*1.2, this.transitionT), 0, this.gallery.height/2);
+			this.gallery.ctx.quadraticCurveTo(this.gallery.width/2, this.gallery.helpers.lerp(controlPoint, controlPoint*1.2, this.transitionT), eyePos.left, this.gallery.height/2);
 		}
 
 		//[-b+b-s, b+b-s]
@@ -132,16 +194,16 @@
 		this.gallery.ctx.fill();
 
 		this.gallery.ctx.strokeStyle = this.gallery.helpers.rgbStr(0,0,0);
-		this.gallery.ctx.fillStyle = this.gallery.helpers.rgbStr(lidColor.r, lidColor.g, lidColor.b);
+		this.gallery.ctx.fillStyle = lidColor;
 		this.gallery.ctx.beginPath();
-		this.gallery.ctx.moveTo(0, this.gallery.height/2);
+		this.gallery.ctx.moveTo(eyePos.left, eyePos.centerY);
 		//top lid
-		this.gallery.ctx.quadraticCurveTo(this.gallery.width/2, -this.gallery.height/3, this.gallery.width, this.gallery.height/2);
+		this.gallery.ctx.quadraticCurveTo(this.gallery.width/2, -this.gallery.height/3, eyePos.right, this.gallery.height/2);
 		if(eyeT % blinkPeriod <= 1) {
-			this.gallery.ctx.quadraticCurveTo(this.gallery.width/2, -Math.cos(eyeT*2*Math.PI)*blinkHeight*1.1+(blinkHeight*1.1-squintHeight), 0, this.gallery.height/2);
+			this.gallery.ctx.quadraticCurveTo(this.gallery.width/2, -Math.cos(eyeT*2*Math.PI)*blinkHeight*1.1+(blinkHeight*1.1-squintHeight), eyePos.left, this.gallery.height/2);
 		} else {
 			var controlPoint = -Math.cos(eyeT*2*Math.PI)*squintHeight;
-			this.gallery.ctx.quadraticCurveTo(this.gallery.width/2, this.gallery.helpers.lerp(controlPoint-this.gallery.height, (controlPoint-this.gallery.height)*1.2, this.transitionT)+this.gallery.height, 0, this.gallery.height/2);
+			this.gallery.ctx.quadraticCurveTo(this.gallery.width/2, this.gallery.helpers.lerp(controlPoint-this.gallery.height, (controlPoint-this.gallery.height)*1.2, this.transitionT)+this.gallery.height, eyePos.left, this.gallery.height/2);
 		}
 		//this.gallery.ctx.quadraticCurveTo(this.gallery.width/2, Math.sin(t/100)*40, 0, this.gallery.height/2);
 		this.gallery.ctx.closePath();

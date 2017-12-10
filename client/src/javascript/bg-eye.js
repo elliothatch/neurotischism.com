@@ -171,7 +171,9 @@
 
 		//var lidColor = 'rgb(164, 198, 219)';
 		//var lidColor = 'rgb(180, 219, 164)';
-		var lidColor = '#ccc';
+		//var lidColor = '#ccc';
+		//var lidColor = this.gallery.helpers.hsvStr(Math.random(), 0.8, 0.8);
+		var lidColor = this.gallery.helpers.hsvStr((t%1000)/1000,0.4,1);
 		//bottom lid
 		this.gallery.ctx.strokeStyle = this.gallery.helpers.rgbStr(0,0,0);
 		this.gallery.ctx.fillStyle = lidColor;

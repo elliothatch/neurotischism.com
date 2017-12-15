@@ -2,8 +2,8 @@
 	var AnimationGallery = window.AnimationGallery;
 
 	var bgCanvas = document.getElementById('backgroundCanvas');
-	bgCanvas.width = document.body.clientWidth;
-	bgCanvas.height = document.body.clientHeight;
+	bgCanvas.width = window.innerWidth;
+	bgCanvas.height = window.innerHeight;
 	var bgContext = bgCanvas.getContext('2d');
 
 	var fgCanvas = document.getElementById('foregroundCanvas');
@@ -401,7 +401,6 @@
 
 			var linkWidth = nodes[1].offsetWidth;
 			var rightDeltaCharacters = ((parentWidth - (linkTargetPosition + linkWidth)) - nodes[2].offsetWidth) / letterWidth;
-			//console.log(rightDeltaCharacters);
 			if(rightDeltaCharacters < 0)
 			{
 				nodes[2].textContent = nodes[2].textContent.substring(0, nodes[2].textContent.length + rightDeltaCharacters);

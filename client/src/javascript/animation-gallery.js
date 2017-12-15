@@ -73,7 +73,9 @@
 		hsvStr: hsvStr,
 		lerp: lerp,
 		HSVtoRGB: HSVtoRGB,
-		HSVtoRGBStr: HSVtoRGBStr
+		HSVtoRGBStr: HSVtoRGBStr,
+		lerpHsv: lerpHsv,
+		lerpGradientHsv: lerpGradientHsv,
 	};
 	function rgbStr(r, g, b) {
 		return "rgb("+r+","+g+","+b+")";
@@ -112,6 +114,54 @@
 	function HSVtoRGBStr(h,s,v) {
 		var color = HSVtoRGB(h,s,v);
 		return rgbStr(color.r, color.g, color.b);
+	}
+
+	// {color, t}
+	function lerpGradientHsv(stops, t) {
+		if(t > 1) {
+			t = 1;
+		}
+		var s2Index = stops.findIndex(function(s) { return s.t > t; });
+		if(s2Index === -1) {
+			s2Index = stops.length-1;
+		}
+		var s1 = stops[s2Index-1];
+		var s2 = stops[s2Index];
+		var t2 = (t - s1.t)/(s2.t - s1.t);
+		return lerpHsv(s1.h, s1.s, s1.v, s2.h, s2.s, s2.v, t2);
+	}
+	function lerpHsv(h1, s1, v1, h2, s2, v2, t) {
+		// Hue interpolation
+		var h;
+		var t2 = t;
+		var d = h2 - h1;
+		if (h1 > h2)
+		{
+			// Swap (h1, h2)
+			var h3 = h2;
+			h2 = h1;
+			h1 = h3;
+
+			d = -d;
+			t2 = 1 - t;
+		}
+
+		if (d > 0.5) // 180deg
+		{
+			h1 = h1 + 1; // 360deg
+			h = ( h1 + t2 * (h2 - h1) ) % 1; // 360deg
+		}
+		if (d <= 0.5) // 180deg
+		{
+			h = h1 + t2 * d;
+		}
+
+		// Interpolates the rest
+		return {
+			h: h,
+			s: s1 + t * (s2-s1),
+			v: v1 + t * (v2-v1)
+		};
 	}
 
 	//an animation must be a class constructor which takes this AnimationGallery as a parameter and produces an object with init() and draw(t, deltaT) functions

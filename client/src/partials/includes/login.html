@@ -1,11 +1,13 @@
 <div class="login">
-	<h2>Login</h2>
-	<div>
-		<form method="post" action="/~authentication/login?redirect={{query.redirect}}">
-			<div><label for="login-username">Username</label><input id="login-username" type="text" name="username" required></div>
-			<div><label for="login-password">Password</label><input id="login-password" type="password" name="password"></div>
-			<button class="login-submit-button" type="submit" name="loginSubmitButton" value="Submit">Login</button></div>
-		</form>
+	<div class="card">
+		<h2 class="card-title">Login</h2>
+		<div class="card-body">
+			<form method="post" action="/~authentication/login?redirect={{query.redirect}}">
+				<div class="input-wrap"><label for="login-username">Username</label><input id="login-username" type="text" name="username" required></div>
+				<div class="input-wrap"><label for="login-password">Password</label><input id="login-password" type="password" name="password"></div>
+				<div class="submit"><button class="login-submit-button" type="submit" name="loginSubmitButton" value="Submit">Login</button></div>
+			</form>
+		<p class="error">{{query.errormsg}}</p>
+		</div>
 	</div>
-	<p class="error">{{query.errormsg}}</p>
 </div>

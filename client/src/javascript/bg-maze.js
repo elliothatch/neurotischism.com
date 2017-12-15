@@ -19,7 +19,8 @@
 		this.gallery.ctx.fillRect(0, 0, this.gallery.width, this.gallery.height);
 
 		this.particleColor = this.particleColors[1];
-		this.gridSize = 3;
+		//this.gridSize = 3;
+		this.gridSize = 9;
 		this.mazeWidth = this.gallery.width/this.gridSize;
 		this.mazeHeight = this.gallery.height/this.gridSize;
 		this.maze = generateMaze(this.mazeWidth, this.mazeHeight);

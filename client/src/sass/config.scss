@@ -41,6 +41,7 @@ $color-error: mat-color($mat-red, 500);
 $color-warn: mat-color($mat-yellow, 500);
 $color-success: mat-color($mat-fresh-green, 500);
 
+
 $page-content-width: 800px;
 
 /* Base */
@@ -360,6 +361,48 @@ $task-result-border-width: 15px;
 	100% {
 		-webkit-transform: rotate(360deg);
 		transform: rotate(360deg);
+	}
+}
+
+.login {
+	width: 350px;
+	margin: 0 auto;
+	margin-top: 50px;
+
+	.card-body {
+		padding: 0px;
+	}
+
+	form {
+		div {
+			display: flex;
+			padding: 10px 0;
+
+			&.input-wrap {
+				//background: mat-color($theme-accent, lighter);
+				label {
+					display: table-cell;
+					text-align: center;
+					width: 100px;
+					padding-top: 4px;
+					padding-left: 10px;
+					padding-right: 5px;
+				}
+
+				input {
+					flex: 2;
+					margin-right: 10px;
+				}
+			}
+		}
+
+		.submit {
+			display: flex;
+			justify-content: space-around;
+			button {
+				margin-right: 15px;
+			}
+		}
 	}
 }
 

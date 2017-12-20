@@ -44,6 +44,7 @@
 
 		this.gallery.ctx.fillStyle = fillColor;
 		this.gallery.ctx.strokeStyle = strokeColor;
+		this.gallery.ctx.lineWidth = 1;
 
 		this.gallery.ctx.beginPath();
 

@@ -18,6 +18,7 @@
 
 	SunsetAnimation.prototype.draw = function(t, deltaT)
 	{
+		var _this = this;
 		//t+=15000;
 		this.gallery.ctx.fillStyle = '#000';
 		this.gallery.ctx.fillRect(0,0,this.gallery.width,this.gallery.height);
@@ -25,13 +26,50 @@
 		//var rows = this.makeRowsCircle(this.gallery.width/2, this.gallery.height/2, 310, '#f00', '#ff0');
 		var circleX = this.gallery.width/2 + sigmoid((this.gallery.mouseX - this.gallery.width/2)/this.gallery.width/2, this.gallery.width*0.8, 3);
 		var circleY = this.gallery.height + this.gallery.height*0.4*Math.cos(t/1000*0.3 + Math.PI/8);
-		var rows = this.makeRowsCircle(circleX, circleY, this.gallery.width * 0.2, '#f00', '#ff0');
-		var moonY = this.gallery.height*0.4*Math.cos(t/1000*0.3 + Math.PI/8);
-		//make moon
+		var circleSize = Math.min(350, this.gallery.width * 0.4);
+		var rows = this.makeRowsCircle(circleX, circleY, circleSize, '#f00', '#ff0');
+
+		// sky
+		//var nightX = Math.exp(0.1*(this.gallery.width/2 - this.gallery.mouseX));
+		var nightX;
+		if(t < 5000) {
+			nightX = -this.gallery.height*100;
+		}
+		else {
+			nightX = sigmoid((this.gallery.width/2 - this.gallery.mouseX)/this.gallery.width/2, 500, 3);
+		}
+		var nightY = this.gallery.height*(0.6*Math.cos(t/1000*0.3 + Math.PI/8) - 0.1);
+
+		var nightGradientT = Math.max(0,nightY) / this.gallery.height;
+		var starColorStops = {
+			t: function(r, i, rc) {
+				return Math.max(0, nightGradientT + r/_this.rowCount);
+			},
+			stops: [
+				[
+					{ t: 0, h: 0.7, s: 0.5, v: 0.5},
+					{ t: 0.4, h: 0.8, s: 0.1, v: 1},
+					{ t: 0.45, h: 0.0, s: 0, v: 1},
+					{ t: 0.6, h: 0.12, s: 0.4, v: 1},
+					{ t: 0.8, h: 0.12, s: 0.3, v: 1},
+					{ t: 1, h: 0.12, s: 0.2, v: 1},
+				],
+				[
+					{ t: 0, h: 0.7, s: 0.5, v: 0.5},
+					{ t: 0.4, h: 0.8, s: 0.1, v: 1},
+					{ t: 0.45, h: 0.0, s: 0, v: 1},
+					{ t: 0.6, h: 0.7, s: 0.1, v: 1},
+					{ t: 1, h: 0.7, s: 0.2, v: 1},
+				],
+			]
+
+		};
 
 		var starColors = [
-			'#fff',
-			'#aaf',
+			{t: starColorStops.t, stops: starColorStops.stops[0]},
+			{t: starColorStops.t, stops: starColorStops.stops[1]},
+			//'#fff',
+			//'#aaf',
 		];
 
 		var starSizes = [
@@ -39,17 +77,17 @@
 			[this.gallery.width * 0.05, this.gallery.width * 0.05*0.4],
 		];
 		
-		var _this = this;
-		//var nightX = Math.exp(0.1*(this.gallery.width/2 - this.gallery.mouseX));
-		var nightX = sigmoid((this.gallery.width/2 - this.gallery.mouseX)/this.gallery.width/2, 500, 3);
-		var nightY = this.gallery.height*(0.6*Math.cos(t/1000*0.3 + Math.PI/8) - 0.1);
 		var stars = [
+			this.createStar(nightX - this.gallery.width*0.05, nightY - this.gallery.height*0.45,  starSizes[0][0], starSizes[0][1], Math.PI/4*Math.sin(-t/1500) + Math.PI/3, starColors[0]),
 			this.createStar(nightX + this.gallery.width*0.1, nightY - this.gallery.height*0.2,  starSizes[0][0], starSizes[0][1], Math.PI/4*Math.sin(-t/1500) - 2*Math.PI/3, starColors[0]),
-			this.createStar(nightX + this.gallery.width*0.2, nightY - this.gallery.height*0.01, starSizes[0][0], starSizes[0][1], Math.PI/4*Math.sin(t/2000), starColors[0]),
+			this.createStar(nightX + this.gallery.width*0.2, nightY - this.gallery.height*0.01, starSizes[0][0], starSizes[0][1], Math.PI/4*Math.sin(t/2000) + 1, starColors[0]),
 			this.createStar(nightX + this.gallery.width*0.25, nightY - this.gallery.height*0.4, starSizes[0][0], starSizes[0][1], Math.PI/4*Math.sin(-t/1500) - Math.PI/3, starColors[0]),
 			this.createStar(nightX + this.gallery.width*0.7, nightY - this.gallery.height*0.25, starSizes[0][0], starSizes[0][1], Math.PI/4*Math.sin(-t/4000), starColors[0]),
-			this.createStar(nightX + this.gallery.width*0.95, nightY - this.gallery.height*0.35, starSizes[0][0], starSizes[0][1], Math.PI/4*Math.sin(-t/4000), starColors[0]),
+			this.createStar(nightX + this.gallery.width*0.75, nightY - this.gallery.height*0.45, starSizes[0][0], starSizes[0][1], Math.PI/4*Math.sin(t/1000) - 1, starColors[0]),
+			this.createStar(nightX + this.gallery.width*0.95, nightY - this.gallery.height*0.35, starSizes[0][0], starSizes[0][1], Math.PI/4*Math.sin(-t/4000) - Math.PI/2, starColors[0]),
+			this.createStar(nightX + this.gallery.width*1.05, nightY - this.gallery.height*0.1, starSizes[0][0], starSizes[0][1], Math.PI/4*Math.sin(-t/4000), starColors[0]),
 
+			this.createStar(nightX - this.gallery.width*0.05, nightY - this.gallery.height*0.1,  starSizes[1][0], starSizes[1][1], Math.PI/4*Math.sin(-t/1500) + 4*Math.PI/3, starColors[1]),
 			this.createStar(nightX + this.gallery.width*0.4, nightY - this.gallery.height*0.3,  starSizes[1][0], starSizes[1][1], Math.PI/4*Math.sin(-t/3000)+Math.PI/3, starColors[1]),
 			this.createStar(nightX + this.gallery.width*0.9, nightY - this.gallery.height*0.15, starSizes[1][0], starSizes[1][1], Math.PI/4*Math.sin(t/3000)+ Math.PI/3, starColors[1]),
 		];
@@ -57,11 +95,25 @@
 			_this.mergeRows(rows, star);
 		});
 
-		var moon = this.createMoon(nightX + this.gallery.width * 0.6, nightY - this.gallery.height*0.2, 150, Math.PI/8*Math.sin(t/1000) - Math.PI/3, '#ff0');
+		var moonColors = {
+			t: function(r, i, rc) {
+				return Math.max(0, nightGradientT + r/_this.rowCount);
+			},
+			stops: [
+				{ t: 0, h: 0.7, s: 0.5, v: 0.5},
+				{ t: 0.1, h: 0.7, s: 0.2, v: 1},
+				{ t: 0.3, h: 0.7, s: 0, v: 1},
+				{ t: 0.5, h: 0.12, s: 0, v: 1},
+				{ t: 0.6, h: 0.12, s: 0.5, v: 1},
+				{ t: 0.8, h: 0.12, s: 0.9, v: 1},
+				{ t: 1, h: 0.12, s: 0.5, v: 1},
+			]
+		};
+
+		var moonSize = Math.min(this.gallery.height*0.15, this.gallery.width*0.25);
+		var moon = this.createMoon(nightX + this.gallery.width * 0.6, nightY - this.gallery.height*0.2, moonSize, Math.PI/8*Math.sin(t/1000) - Math.PI/3, moonColors);
 		this.mergeRows(rows, moon);
 
-
-		var _this = this;
 		var waveHeight = 100;
 		var waveY = (_this.gallery.height+waveHeight)*(t%3000)/3000-waveHeight;
 		rows.forEach(function(row, i) {
@@ -88,9 +140,9 @@
 		//this.gallery.ctx.beginPath();
 		//this.gallery.ctx.moveTo(0,0);
 		//star.forEach(function(s) {
-			//s.segments.forEach(function(segment) { 
-				//_this.gallery.ctx.lineTo(segment.x, s.row*_this.rowHeight);
-			//});
+		//s.segments.forEach(function(segment) { 
+		//_this.gallery.ctx.lineTo(segment.x, s.row*_this.rowHeight);
+		//});
 		//});
 		////this.gallery.ctx.closePath();
 		//this.gallery.ctx.stroke();
@@ -108,7 +160,6 @@
 		//{ t: 1, h: 0, s: 1, v: 0.8},
 		//];
 
-		var _this = this;
 		var cyPercent = cy / this.gallery.height;
 		var gradient1t = cyPercent-0.1;
 		var gradient2t = (1-cyPercent-0.05);
@@ -130,9 +181,9 @@
 		});
 		var fgStops = [
 			{t: 0, h: 0.16, s: 1, v: 1},
-			{t: 0.33, h: 0.12, s: 0.9, v: 0.9},
-			{t: 0.5, h: 0.9, s: 0.7, v: 0.3},
-			{t: 1, h: 0.12, s: 0.9, v: 0.9},
+			{t: 0.5, h: 0.12, s: 0.9, v: 0.9},
+			{t: 0.8, h: 0.9, s: 0.7, v: 0.3},
+			{t: 1, h: 0.9, s: 0.7, v: 0.3},
 		];
 		for(var i = 0; i < this.rowCount; i++) {
 			var y = i*(this.rowHeight+this.rowSpacing);
@@ -141,8 +192,8 @@
 			//var bgColor = this.gallery.helpers.rgbStr(Math.floor(this.gallery.helpers.lerp(0, 255, i/this.rowCount)), 0, 0);
 			var bgColorHsv = this.gallery.helpers.lerpGradientHsv(bgStops, i/this.rowCount);
 			bgColor = this.gallery.helpers.hsvStr(bgColorHsv.h, bgColorHsv.s, bgColorHsv.v);
-			var fgOuterColor = this.gallery.helpers.hsvStr(0.1, 1, 0.9);
-			var fgColorHsv = this.gallery.helpers.lerpGradientHsv(fgStops, cy/(this.gallery.width*2));
+			//var fgOuterColor = this.gallery.helpers.hsvStr(0.1, 1, 0.9);
+			var fgColorHsv = this.gallery.helpers.lerpGradientHsv(fgStops, cy/(this.gallery.height + radius*2));
 			fgColor = this.gallery.helpers.hsvStr(fgColorHsv.h, fgColorHsv.s, fgColorHsv.v);
 			if(Math.abs(yDist) < radius) {
 				rows.push([
@@ -235,7 +286,7 @@
 		var verticies = [];
 		var points = 50;
 		var cx = radius/3;
-		var cy = radius/3
+		var cy = radius/3;
 		for(var i = 0; i < points; i++) {
 			// base circle
 			var x1 = radius*Math.cos(i/points*Math.PI*2);
@@ -285,9 +336,10 @@
 		var _this = this;
 		var rows = [];
 		var rowCount = Math.ceil((maxY - minY)/totalRowHeight);
+		var i;
 
 		var firstRowIdx = Math.floor(minY/totalRowHeight);
-		for(var i = 0; i < rowCount; i++) {
+		for(i = 0; i < rowCount; i++) {
 			rows.push({row: firstRowIdx + i, points: []});
 		}
 
@@ -305,7 +357,7 @@
 				v1 = v2;
 				v2 = temp;
 			}
-			for(var i = 0; i < row2Idx - row1Idx; i++) {
+			for(i = 0; i < row2Idx - row1Idx; i++) {
 			//for(var i = 0; i < 1; i++) {
 				var row = rows[i+(row1Idx-firstRowIdx)];
 				var pointX = _this.gallery.helpers.lerp(v1.x, v2.x, i/(row2Idx-row1Idx));
@@ -321,7 +373,7 @@
 		});
 
 		// turn points into ranges
-		return rows.map(function(r) {
+		return rows.map(function(r, idx) {
 			var ranges = [];
 			for(var i = 0; i < r.points.length; i+=2) {
 				if(i === r.points.length-1) {
@@ -331,10 +383,16 @@
 
 				ranges.push([r.points[i], r.points[i+1]]);
 			}
+			var rowColor = color;
+			if(typeof color !== 'string') {
+				// assume it is {t(r,i,rc), stops} where t(i,rc) is a function that takes the row number, inner row index and length and returns a t value [0,1]
+				var colorHsv = _this.gallery.helpers.lerpGradientHsv(color.stops, color.t(r.row, idx, rows.length));
+				rowColor = _this.gallery.helpers.hsvStr(colorHsv.h, colorHsv.s, colorHsv.v);
+			}
 			return {
 				row: r.row,
 				ranges: ranges,
-				color: color
+				color: rowColor,
 			};
 		}).map(function(r) {
 			// remove small ranges and gaps
@@ -356,7 +414,7 @@
 
 	function sigmoid(x, a, c) {
 		return (a*2)/(1+Math.exp(-c*x))-a;
-	};
+	}
 
 	window.AnimationGallery.addAnimation('sunset', SunsetAnimation);
 })(window);

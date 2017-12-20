@@ -33,7 +33,7 @@ class ConfigComponent extends React.Component {
 				</div>
 				<div className="ip-display">
 					{[{name: 'Local URL', ip: this.props.config.serverLocalIp}, {name: 'Public URL', ip: this.props.config.serverPublicIp}].map(ipObj => {
-						var url = ipObj.ip && 'http://' + ipObj.ip + ':' + this.props.config.serverPort;
+						var url = ipObj.ip && `${window.location.protocol}${ipObj.ip}://${this.props.config.serverPort}`;
 						return <div key={ipObj.name}>
 							<span>{ipObj.name}: {ipObj.ip ? url : 'unknown'}</span>
 							<QRComponent text={url} />

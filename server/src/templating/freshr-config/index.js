@@ -151,6 +151,7 @@ function makeSocketHandler(options) {
 		'javascript/bg-targeting.js',
 		'javascript/bg-warp.js',
 		'javascript/bg-sunset.js',
+		'javascript/bg-pendulum.js',
 		'javascript/config.js',
 		'javascript/default.js',
 	];

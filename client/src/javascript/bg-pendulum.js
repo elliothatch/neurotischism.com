@@ -8,8 +8,9 @@
 		this.gallery.ctx.fillStyle = '#000';
 		this.gallery.ctx.fillRect(0,0,this.gallery.width,this.gallery.height);
 
-		this.pendulumLength = 0.9*this.gallery.height;
-		this.pendulumPeriod = 1/4;
+		this.pendulumOffset = 0.1*this.gallery.height;
+		this.pendulumLength = 0.8*this.gallery.height + this.pendulumOffset;
+		this.pendulumPeriod = 1/3;
 		this.pendulumAmplitude = Math.PI/6;
 	};
 
@@ -40,7 +41,7 @@
 			
 		var pendulumP1 = {
 			x: this.gallery.width / 2,
-			y: 0
+			y: -this.pendulumOffset
 		};
 		var pendulumP2 = {
 			x: pendulumP1.x + (length - pendulumRadius + outlineWidth/2) * Math.sin(theta),

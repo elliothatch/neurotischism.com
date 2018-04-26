@@ -194,11 +194,13 @@
 	prevAnimationButton.addEventListener('click', function() {
 		if(window.AnimationGallery) {
 			window.AnimationGallery.startAnimation((window.AnimationGallery.animationIndex + window.AnimationGallery.animations.length - 1) % window.AnimationGallery.animations.length);
+			window.sessionStorage.setItem('animation-index', '' + window.AnimationGallery.animationIndex);
 		}
 	});
 	nextAnimationButton.addEventListener('click', function() {
 		if(window.AnimationGallery) {
 			window.AnimationGallery.startAnimation((window.AnimationGallery.animationIndex + 1) % window.AnimationGallery.animations.length);
+			window.sessionStorage.setItem('animation-index', '' + window.AnimationGallery.animationIndex);
 		}
 	});
 

@@ -15,6 +15,7 @@
 		this.animations = [];
 		this.animationIndex = 0;
 		this.animationRunning = false;
+		this.animationMap = {};
 
 		this.startTime = null;
 		this.lastTime = null;
@@ -168,6 +169,7 @@
 	AnimationGallery.prototype.addAnimation = function(name, animation) {
 		var anim = new animation(this);
 		this.animations.push(anim);
+		this.animationMap[name] = anim;
 	};
 
 	AnimationGallery.prototype.startAnimation = function(index) {

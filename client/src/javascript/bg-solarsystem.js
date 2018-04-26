@@ -19,9 +19,11 @@
 
 	SolarSystemAnimation.prototype.drawSun = function(x, y, t) {
 		var ringCount = 30;
+		var mouseSpinT = (Math.pow(this.gallery.mouseX/this.gallery.width - 0.5, 2) + Math.pow(this.gallery.mouseY/this.gallery.height - 0.5, 2) + 0.5) % 1;
+
 		for(var i = 0; i < ringCount; i++) {
 			var ringAngle = i*2*Math.PI/ringCount;
-			var spinOffset = i*this.gallery.helpers.lerp(-0.25,0.25,this.gallery.mouseX/this.gallery.width);
+			var spinOffset = i*this.gallery.helpers.lerp(-0.25,0.25, mouseSpinT);
 
 			var radius = this.gallery.height/2*0.9;
 			//var xRadius = radius*(Math.cos(2*t/1000+spinOffset)/2 + 0.5) + 5;

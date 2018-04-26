@@ -12,18 +12,18 @@
 
 	FlowerAnimation.prototype.draw = function(t, deltaT)
 	{
-		this.gallery.ctx.fillStyle = '#fff';
+		this.gallery.ctx.fillStyle = this.gallery.helpers.rgbStr(255, 255, 130);
 		this.gallery.ctx.fillRect(0,0,this.gallery.width,this.gallery.height);
 
 		var layerAngleOffset = 0;
 		for(var i = this.layerCount-1; i >= 0; i--) {
 			var petalCount = 2*i+3;
 			for(var j = 0; j < petalCount; j++) {
-				var petalLength = 100+i*80; // + 500*this.gallery.mouseY/this.gallery.height;
+				var petalLength = 100+i*80; //+ 500*(this.gallery.mouseY/this.gallery.height - 0.5);
 				var petalOffset = Math.PI*2/petalCount;
 				var strokeColor = this.gallery.helpers.HSVtoRGBStr(0, 0.75 + 0.25*Math.sin(i), 1);
 				var fillColor = this.gallery.helpers.HSVtoRGBStr(0, 0.5 + 0.25*Math.sin(i), 1);
-				var petalWidthRatio = 1+Math.sin(Math.PI*4*this.gallery.mouseX/this.gallery.width);
+				var petalWidthRatio = 0.33 + 0.5*(1+Math.sin(Math.PI*4*this.gallery.mouseX/this.gallery.width))/2;
 
 				this.drawPetal(this.gallery.mouseX, this.gallery.mouseY, petalLength, petalWidthRatio, j*petalOffset+layerAngleOffset+ Math.sin(t*(this.layerCount-i)/5000), strokeColor, fillColor);
 			}

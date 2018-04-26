@@ -5,6 +5,7 @@
 $primaryTextColor: white;
 $darkTextColor: black;
 $primaryBackgroundColor: black;
+$secondaryBackgroundColor: rgba(0,0,0, 0.7);
 $lightBackgroundColor: #dddddd;
 
 $pageContentWidth: 500px;
@@ -171,6 +172,9 @@ a:visited { color: #205caa; }
   min-width: 320px;
   margin: 0 40px 0 40px;
   //margin:auto;
+
+  background-color: $secondaryBackgroundColor;
+  opacity: 50%;
 }
 
 /*@media all and (min-width: 320px + 40px + 40px) {

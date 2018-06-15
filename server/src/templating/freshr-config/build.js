@@ -1,5 +1,5 @@
+const Rx = require('rxjs');
 var Path = require('path');
-var Observable = require('rxjs/Rx').Observable;
 var Promise = require('bluebird');
 var fs = require('fs-extra');
 var minimatch = require('minimatch');
@@ -276,7 +276,7 @@ function buildProject(clientPath, taskDefinitions, tasks) {
 		]
 	};
 
-	return Observable.create(function(buildEventsObserver) {
+	return Rx.Observable.create(function(buildEventsObserver) {
 		var rootLogger = new TaskLogger(rootTask, buildEventsObserver, []);
 		buildEventsObserver.next({eType: 'start', tasks: rootLogger.serializeTaskStructure()});
 
@@ -306,16 +306,17 @@ function buildProject(clientPath, taskDefinitions, tasks) {
 
 				//resolve is to convert non-bluebird promises, so we can use bluebird helpers
 				buildPromise = Promise.all(task.files.map(function(f) {
-					var inputs = f.inputs && f.inputs.map(function(inF) { return Path.join(clientPath, inF);});
-					var outputs = f.outputs && f.outputs.map(function(outF) { return Path.join(clientPath, outF);});
-					var options = Object.assign(Object.assign({}, task.options), f.options); //copy the overall options, then overwrite file specific options
-					return Promise.resolve(taskDefinition.func(inputs, outputs, options, logger))
-						.then(function(result) {
-							return { success: true, data: result};
-						}).catch(function(error) {
-							logger.error(error && error.message, error);
-							return { success: false, data: error};
-						});
+					return Promise.try(() => {
+						var inputs = f.inputs && f.inputs.map(function(inF) { return Path.join(clientPath, inF);});
+						var outputs = f.outputs && f.outputs.map(function(outF) { return Path.join(clientPath, outF);});
+						var options = Object.assign(Object.assign({}, task.options), f.options); //copy the overall options, then overwrite file specific options
+						return taskDefinition.func(inputs, outputs, options, logger);
+					}).then(function(result) {
+						return { success: true, data: result};
+					}).catch(function(error) {
+						logger.error(error && error.message, error);
+						return { success: false, data: error};
+					});
 				})).then(function(results) {
 					return {success: results.filter(function(r) { return !r.success;}).length === 0, data: results};
 				});
@@ -491,6 +492,8 @@ function compileReactRollupFunc(inputs, outputs, options, logger) {
 					'node_modules/react/**',
 					'node_modules/react-dom/**',
 					'node_modules/prop-types/**',
+					'node_modules/can-promise/**',
+					'node_modules/window-or-global/**',
 				]
 			}),
 			rollupNodeGlobals(),

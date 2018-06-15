@@ -66,10 +66,12 @@ module.exports = function(options) {
 
 	//TODO: maybe give the user control over the database (pass in db, manage auto-reconnect?)
 	//TODO: auto-reconnect
-	var dbUrl = 'mongodb://' + options.mongodb.host + '/' + options.mongodb.database;
+	const user = encodeURIComponent(options.mongodb.user);
+	const password = encodeURIComponent(options.mongodb.password);
+	var dbUrl = `mongodb://${user}:${password}@${options.mongodb.host}/${options.mongodb.database}?authMechanism=DEFAULT`;
 	//wrapper for pass by reference, I guess
 	var dbWrap = {};
-	connectMongoDb(dbUrl, options.mongodb.user, options.mongodb.password).then(function(db) {
+	connectMongoDb(dbUrl).then(function(db) {
 		dbWrap.db = db;
 		return db.collection('users').ensureIndexAsync({username: 1}, {unique: true});
 	}).catch(function(err) {
@@ -237,24 +239,15 @@ function matchUrlPatterns(url, matchPatterns) {
 	return false;
 }
 
-function connectMongoDb(url, user, password) {
+function connectMongoDb(url) {
 	var errHandled = false;
 	return MongoClient.connectAsync(url)
-		.then(function(db) {
-			//TODO: provide result to user instead of writing directly to stdout?
-			console.log('freshr-authentication: Connected to mongo database "' + url + '"');
-			return db.authenticate(user, password)
-				.then(function() {
-					console.log('freshr-authentication: Authenticated as ' + user);
-					return db;
-				}).catch(function(err) {
-					console.log('freshr-authentication: Failed to authenticate as ' + user);
-					errHandled = true;
-					throw err;
-				});
+		.then(function(client) {
+			console.log('freshr-authentication: Connected to mongo database');
+			return client.db();
 		}).catch(function(error) {
 			if(!errHandled) {
-				console.error('freshr-authentication: Failed to connect to mongo database "' + url + '"');
+				console.error('freshr-authentication: Failed to connect to mongo database');
 			}
 			throw error;
 		});

@@ -8,6 +8,30 @@
 		this.gallery.ctx.fillStyle = '#000';
 		this.gallery.ctx.fillRect(0,0,this.gallery.width,this.gallery.height);
 
+		const aspectRatio = 1.618;
+		const screenAspectRatio = this.gallery.width/this.gallery.height;
+
+		this.eyeWidth = this.gallery.width - 100;
+
+		if(screenAspectRatio > aspectRatio) {
+			//this.gallery.width = this.gallery.height*aspectRatio;
+			this.eyeWidth = this.gallery.height*aspectRatio;
+		} else if(screenAspectRatio < aspectRatio) {
+			this.gallery.height = this.gallery.width/aspectRatio;
+		}
+
+		this.eyeHeight = this.gallery.height - 100;
+
+		//this.eyeWidth = this.gallery.width - 100;
+		//this.eyeHeight = this.gallery.height - 100;
+
+		//if(screenAspectRatio > aspectRatio) {
+			//this.eyeWidth = this.eyeHeight*aspectRatio;
+		//} else if(screenAspectRatio < aspectRatio) {
+			//this.eyeHeight = this.eyeWidth/aspectRatio;
+		//}
+		
+
 		this.transitionT = 0;
 	};
 
@@ -35,8 +59,8 @@
 		var blinkHeight = this.gallery.height*0.35;
 		var squintHeight = 40;
 		var eyePos = {
-			left: 50,
-			right: this.gallery.width - 50,
+			left: this.gallery.width/2 - this.eyeWidth/2,
+			right: this.gallery.width/2 + this.eyeWidth/2,
 			top: -this.gallery.height/3,
 			bottom: this.gallery.height + this.gallery.height/3,
 			centerX: this.gallery.width/2,

@@ -1,3 +1,4 @@
+const RxOp = require('rxjs/operators');
 var express = require('express');
 var fs = require('fs');
 var Path = require('path');
@@ -152,6 +153,7 @@ function makeSocketHandler(options) {
 		'javascript/bg-warp.js',
 		'javascript/bg-sunset.js',
 		'javascript/bg-pendulum.js',
+		'javascript/bg-melt.js',
 		'javascript/config.js',
 		'javascript/default.js',
 	];
@@ -184,9 +186,14 @@ function makeSocketHandler(options) {
 		]}
 	];
 	
-	BuildManager.buildProject(options.clientPath, taskDefinitions, tasks).filter(function(e) {return e.eType === 'task/log';}).subscribe(function(event) {
-		if(event.level === 'error' || (event.log && event.log.level === 'error')) {
-			console.log(event);
+	console.log('Building project');
+	BuildManager.buildProject(options.clientPath, taskDefinitions, tasks).pipe(
+		RxOp.filter(function(e) {return e.eType === 'task/log';}
+		)).subscribe({
+		next: function(event) {
+			if(event.level === 'error' || (event.log && event.log.level === 'error')) {
+				console.log(event);
+			}
 		}
 	});
 
@@ -209,6 +216,7 @@ function makeSocketHandler(options) {
 			socket.emit('task-definitions', taskDefinitionsSerialized);
 		});
 		socket.on('build', function(data) {
+			console.log('Building project');
 			BuildManager.buildProject(options.clientPath, taskDefinitions, tasks).subscribe(function(event) {
 				var eType = event.eType;
 				delete event.eType;

@@ -37,6 +37,7 @@
 		<script src="/javascript/bg-sunset.js"></script>
 		<script src="/javascript/bg-pendulum.js"></script>
 		<script src="/javascript/bg-melt.js"></script>
+		<script src="/javascript/bg-oscilloscope.js"></script>
 		<script async type="text/javascript" src="https://www.google.com/recaptcha/api/js/recaptcha_ajax.js"></script>
 		<script>
 			//window.AnimationGallery.startAnimation(window.AnimationGallery.animations.length - 1);
@@ -52,6 +53,7 @@
 				'sunset',
 				'pendulum',
 				//'melt'
+				'oscilloscope'
 			];
 			// only expose more finished animations by overwriting the animation array
 			window.AnimationGallery.animations = animations.map(function(animName) {
@@ -59,7 +61,7 @@
 			});
 
 			var animationIndex = parseInt(window.sessionStorage.getItem('animation-index'), 10);
-			//animationIndex = animations.length-1; //TODO: remove
+			animationIndex = animations.length-1; //TODO: remove
 			if(isNaN(animationIndex) || typeof animationIndex !== 'number') {
 				animationIndex = Math.floor(Math.random()*animations.length)
 				window.sessionStorage.setItem('animation-index', '' + animationIndex);

@@ -71,6 +71,7 @@
 
 	AnimationGallery.prototype.helpers = {
 		rgbStr: rgbStr,
+		rgbaStr: rgbaStr,
 		hsvStr: hsvStr,
 		lerp: lerp,
 		HSVtoRGB: HSVtoRGB,
@@ -80,6 +81,9 @@
 	};
 	function rgbStr(r, g, b) {
 		return "rgb("+r+","+g+","+b+")";
+	}
+	function rgbaStr(r, g, b, a) {
+		return "rgb("+r+","+g+","+b+","+a+")";
 	}
 	function hsvStr(h, s, v){
 		var rgb = HSVtoRGB(h,s,v);

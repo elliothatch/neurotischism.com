@@ -155,6 +155,7 @@ function makeSocketHandler(options) {
 		'javascript/bg-pendulum.js',
 		'javascript/bg-melt.js',
 		'javascript/bg-oscilloscope.js',
+		'javascript/bg-radial.js',
 		'javascript/config.js',
 		'javascript/default.js',
 	];

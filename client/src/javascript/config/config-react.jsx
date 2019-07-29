@@ -1,6 +1,6 @@
 import TaskDisplay from "./TaskDisplay";
 import FileExplorer from "./FileExplorer";
-import QRComponent from "./QRcomponent";
+import QRComponent from "./QRComponent";
 import TaskDefinitionDisplay from "./TaskDefinitionDisplay";
 
 import React from 'react';

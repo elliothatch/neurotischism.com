@@ -77,7 +77,7 @@ module.exports = function(options, middleware) {
 
 	var router = express.Router();
 
-	router.use('/~config', config.expressRouter);
+	// router.use('/~config', config.expressRouter);
 
 	router.get('/*', function(req, res, next) {
 		var path = req.path;

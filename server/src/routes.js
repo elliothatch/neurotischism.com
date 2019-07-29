@@ -2,8 +2,8 @@ var path = require('path');
 var express = require('express');
 
 var templating = require('./templating/routes');
-var freshrComments = require('./freshr-comments');
-var freshrAuthentication = require('./freshr-authentication');
+// var freshrComments = require('./freshr-comments');
+// var freshrAuthentication = require('./freshr-authentication');
 
 /* options (object):
  *   - clientPath {string}: path to client directory, which should contain site/layouts/partials
@@ -15,17 +15,17 @@ module.exports = function(options) {
 
 	var router = express.Router();
 
-	var comments = freshrComments({
-		whitelist: ['/blog/*', '/games/*', '/not-games/*'],
-		authorPasswords: {'[neurotischism': 'this is mine'},
-		mongodb: options.mongodb,
-	});
+	// var comments = freshrComments({
+		// whitelist: ['/blog/*', '/games/*', '/not-games/*'],
+		// authorPasswords: {'[neurotischism': 'this is mine'},
+		// mongodb: options.mongodb,
+	// });
 
-	var authentication = freshrAuthentication({
-		jwtCertPath: options.jwtCertPath,
-		matchPatterns: [{path: '/~config', roles: ['admin']}],
-		mongodb: options.mongodb,
-	});
+	// var authentication = freshrAuthentication({
+		// jwtCertPath: options.jwtCertPath,
+		// matchPatterns: [{path: '/~config', roles: ['admin']}],
+		// mongodb: options.mongodb,
+	// });
 
 	/*
 	var innerRouter = express.Router();
@@ -46,9 +46,10 @@ module.exports = function(options) {
 	});
 	*/
 
-	router.use(authentication.expressRouter);
-	router.use('/comments', comments.expressRouter);
-	router.use(templating(options, [comments.freshrHandler, authentication.freshrHandler]));
+	// router.use(authentication.expressRouter);
+	// router.use('/comments', comments.expressRouter);
+	// router.use(templating(options, [comments.freshrHandler, authentication.freshrHandler]));
+	router.use(templating(options, []));
 	router.use(express.static(path.join(__dirname, '../../client/dist')));
 	router.use(express.static(path.join(__dirname, '../../client/src/pages')));
 	//TODO: make these part of react plugin express router

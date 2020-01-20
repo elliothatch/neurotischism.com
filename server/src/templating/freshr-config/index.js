@@ -157,8 +157,11 @@ function makeSocketHandler(options) {
 		'javascript/bg-oscilloscope.js',
 		'javascript/bg-radial.js',
 		'javascript/bg-bubbles.js',
+		'javascript/bg-nausea.js',
 		'javascript/config.js',
 		'javascript/default.js',
+
+		'svg/black-dresses-web.svg',
 	];
 
 	var tasks = [

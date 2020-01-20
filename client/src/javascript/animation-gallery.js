@@ -14,6 +14,7 @@
 		//private
 		this.animations = [];
 		this.animationIndex = 0;
+		this.animationName = '';
 		this.animationRunning = false;
 		this.animationMap = {};
 
@@ -56,7 +57,7 @@
 		}
 		var deltaT = timestamp - this.lastTime;
 		this.linkT += deltaT;
-		this.animations[this.animationIndex].draw((timestamp - this.startTime), deltaT);
+		this.animations[this.animationIndex].anim.draw((timestamp - this.startTime), deltaT);
 		this.lastTime = timestamp;
 		var _this = this;
 		window.requestAnimationFrame(function() { _this.step.apply(_this, arguments); });
@@ -76,6 +77,7 @@
 		lerp: lerp,
 		HSVtoRGB: HSVtoRGB,
 		HSVtoRGBStr: HSVtoRGBStr,
+		HSVAtoRGBAStr: HSVAtoRGBAStr,
 		lerpHsv: lerpHsv,
 		lerpGradientHsv: lerpGradientHsv,
 	};
@@ -120,6 +122,12 @@
 		var color = HSVtoRGB(h,s,v);
 		return rgbStr(color.r, color.g, color.b);
 	}
+
+	function HSVAtoRGBAStr(h,s,v,a) {
+		var color = HSVtoRGB(h,s,v);
+		return rgbaStr(color.r, color.g, color.b, a);
+	}
+
 
 	// {color, t}
 	function lerpGradientHsv(stops, t) {
@@ -172,14 +180,24 @@
 	//an animation must be a class constructor which takes this AnimationGallery as a parameter and produces an object with init() and draw(t, deltaT) functions
 	AnimationGallery.prototype.addAnimation = function(name, animation) {
 		var anim = new animation(this);
-		this.animations.push(anim);
+		this.animations.push({name: name, anim});
 		this.animationMap[name] = anim;
 	};
 
-	AnimationGallery.prototype.startAnimation = function(index) {
+	AnimationGallery.prototype.startAnimation = function(idx) {
+		let index = idx;
+		if(typeof index === 'string') {
+			index = this.animations.findIndex(({name, anim}) => name === index);
+		}
+
+		if(index == null || index < 0 || index >= this.animations.length) {
+			throw new Error(`animation '${idx}' does not exist`);
+		}
+
 		this.animationIndex = index;
+		this.animationName = this.animations[index].name;
 		this.ctx.globalCompositeOperation = 'source-over';
-		this.animations[this.animationIndex].init();
+		this.animations[this.animationIndex].anim.init();
 		var _this = this;
 		if(!this.animationRunning) {
 			this.animationRunning = true;

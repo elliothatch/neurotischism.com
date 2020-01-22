@@ -1,6 +1,7 @@
 (function(window, document) {
 	var AnimationGallery = window.AnimationGallery;
 
+	/*
 	var bgCanvas = document.getElementById('backgroundCanvas');
 	bgCanvas.width = window.innerWidth;
 	bgCanvas.height = window.innerHeight;
@@ -10,6 +11,7 @@
 	fgCanvas.width = document.body.clientWidth;
 	fgCanvas.height = document.body.clientHeight;
 	var fgContext = bgCanvas.getContext('2d');
+	*/
 
 	//animations
 	var Animations = function(animations) {
@@ -166,10 +168,12 @@
 	animations.start();
 
 	window.addEventListener('resize', function() {
+		/*
 		bgCanvas.width = document.body.clientWidth;
 		bgCanvas.height = document.body.clientHeight;
 		fgCanvas.width = document.body.clientWidth;
 		fgCanvas.height = document.body.clientHeight;
+		*/
 
 		//resize trash links
 		updateTrashLinkLineCharacters();

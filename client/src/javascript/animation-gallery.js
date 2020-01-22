@@ -35,7 +35,6 @@
 			_this.mouseY = event.touches[0].clientY;
 		}, false);
 
-
 		//init links
 		var links = document.getElementsByTagName('a');
 
@@ -49,6 +48,17 @@
 			});
 		}
 	};
+
+	AnimationGallery.prototype.resize = function(width, height) {
+		const prevFrame = this.ctx.getImageData(0, 0, this.width, this.height);
+		this.width = width;
+		this.height = height;
+
+		this.canvas.width = width;
+		this.canvas.height = height;
+
+		this.ctx.putImageData(prevFrame, 0, 0);
+	}
 
 	AnimationGallery.prototype.step = function (timestamp) {
 		if(!this.startTime) {
@@ -197,6 +207,8 @@
 		this.animationIndex = index;
 		this.animationName = this.animations[index].name;
 		this.ctx.globalCompositeOperation = 'source-over';
+		this.width = window.innerWidth;
+		this.height = window.innerHeight;
 		this.animations[this.animationIndex].anim.init();
 		var _this = this;
 		if(!this.animationRunning) {

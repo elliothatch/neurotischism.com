@@ -82,6 +82,10 @@
 
 			window.sessionStorage.setItem('background', '' + animationName);
 
+			window.AnimationGallery.resize(document.body.clientWidth, document.body.clientHeight);
+			window.addEventListener('resize', () => {
+				window.AnimationGallery.resize(document.body.clientWidth, document.body.clientHeight);
+			});
 			window.AnimationGallery.startAnimation(animationName);
 			/*
 			animations.map(function(animName, i) {

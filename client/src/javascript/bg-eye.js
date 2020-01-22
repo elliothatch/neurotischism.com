@@ -13,17 +13,19 @@
 
 		this.eyeWidth = this.gallery.width - 100;
 
+		this.height = this.gallery.height;
+
 		if(screenAspectRatio > aspectRatio) {
-			//this.gallery.width = this.gallery.height*aspectRatio;
+			//this.gallery.width = this.height*aspectRatio;
 			this.eyeWidth = this.gallery.height*aspectRatio;
 		} else if(screenAspectRatio < aspectRatio) {
-			this.gallery.height = this.gallery.width/aspectRatio;
+			this.height = this.gallery.width/aspectRatio;
 		}
 
-		this.eyeHeight = this.gallery.height - 100;
+		this.eyeHeight = this.height - 100;
 
 		//this.eyeWidth = this.gallery.width - 100;
-		//this.eyeHeight = this.gallery.height - 100;
+		//this.eyeHeight = this.height - 100;
 
 		//if(screenAspectRatio > aspectRatio) {
 			//this.eyeWidth = this.eyeHeight*aspectRatio;
@@ -49,6 +51,8 @@
 			this.transitionT = Math.max(this.transitionT - deltaT/1000 / linkTransitionTime, 0);
 		}
 
+		this.gallery.ctx.save();
+		this.gallery.ctx.translate(0, this.gallery.height/2 - this.height/2);
 		//top lid
 		//var lidColor = this.gallery.helpers.HSVtoRGB(Math.random(), 0.8, 0.8);
 		var eyeT = t/600 / (2*Math.PI) + 0.5;
@@ -56,18 +60,18 @@
 		//if(this.gallery.linkHovered && eyeT % blinkPeriod > 1) {
 		//	eyeT = (eyeT % 1) + blinkPeriod-1;
 		//}
-		var blinkHeight = this.gallery.height*0.35;
+		var blinkHeight = this.height*0.35;
 		var squintHeight = 40;
 		var eyePos = {
 			left: this.gallery.width/2 - this.eyeWidth/2,
 			right: this.gallery.width/2 + this.eyeWidth/2,
-			top: -this.gallery.height/3,
-			bottom: this.gallery.height + this.gallery.height/3,
+			top: -this.height/3,
+			bottom: this.height + this.height/3,
 			centerX: this.gallery.width/2,
-			centerY: this.gallery.height/2,
+			centerY: this.height/2,
 
 			lidTop: -Math.cos(eyeT*2*Math.PI)*blinkHeight*1.1+(blinkHeight*1.1-squintHeight),
-			lidTopBlink: -Math.cos(eyeT*2*Math.PI)*squintHeight-this.gallery.height,
+			lidTopBlink: -Math.cos(eyeT*2*Math.PI)*squintHeight-this.height,
 		};
 
 		this.gallery.ctx.beginPath();
@@ -108,7 +112,7 @@
 				this.gallery.helpers.lerp(
 					eyePos.lidTopBlink,
 					eyePos.lidTopBlink*1.2,
-					this.transitionT)+this.gallery.height,
+					this.transitionT)+this.height,
 				eyePos.centerY
 			);
 		}*/
@@ -118,9 +122,9 @@
 		//var innerIrisRadius = 100;
 		//var outerRadius = 250;
 
-		var pupilRadius = this.gallery.height*0.9*0.07;
-		var innerIrisRadius = this.gallery.height*0.9*0.100;
-		var outerRadius = this.gallery.height*0.9*0.250;
+		var pupilRadius = this.height*0.9*0.07;
+		var innerIrisRadius = this.height*0.9*0.100;
+		var outerRadius = this.height*0.9*0.250;
 
 		pupilRadius = this.gallery.helpers.lerp(pupilRadius, pupilRadius * 1.6, this.transitionT);
 		innerIrisRadius = this.gallery.helpers.lerp(innerIrisRadius, innerIrisRadius * 1.6, this.transitionT);
@@ -130,12 +134,17 @@
 		//var g = Math.floor((0.5*Math.sin(angle) + 0.5) * 255);
 		//var b = Math.floor((1.0) * 255);
 
-		var lookDirection = Math.atan2(this.gallery.mouseY-this.gallery.height/2, this.gallery.mouseX-this.gallery.width/2);
-		var lookDistance = Math.pow(Math.pow(this.gallery.mouseX-this.gallery.width/2,2) + Math.pow(this.gallery.mouseY-this.gallery.height/2,2), 2/5);
+		var lookDirection = Math.atan2(
+			this.gallery.mouseY-this.gallery.height/2,
+			this.gallery.mouseX-this.gallery.width/2);
+		var lookDistance = Math.min(
+			Math.pow(Math.pow(this.gallery.mouseX-this.gallery.width/2,2) + Math.pow(this.gallery.mouseY-this.gallery.height/2,2), 2/5),
+			(eyePos.bottom - eyePos.top)/10
+		);
 		//iris and pupil
 		var pupilCenter = {
 			x: this.gallery.width/2 + lookDistance*Math.cos(lookDirection) + Math.random()*this.transitionT*15,
-			y: this.gallery.height/2 + lookDistance*Math.sin(lookDirection) + Math.random()*this.transitionT*15
+			y: this.height/2 + lookDistance*Math.sin(lookDirection) + Math.random()*this.transitionT*15
 		};
 
 		this.gallery.ctx.strokeStyle = '#000';
@@ -203,12 +212,12 @@
 		this.gallery.ctx.fillStyle = lidColor;
 		this.gallery.ctx.beginPath();
 		this.gallery.ctx.moveTo(eyePos.left, eyePos.centerY);
-		this.gallery.ctx.quadraticCurveTo(this.gallery.width/2, this.gallery.height+this.gallery.height/3, eyePos.right, this.gallery.height/2);
+		this.gallery.ctx.quadraticCurveTo(this.gallery.width/2, this.height+this.height/3, eyePos.right, this.height/2);
 		if(eyeT % blinkPeriod <= 1) {
-			this.gallery.ctx.quadraticCurveTo(this.gallery.width/2, this.gallery.height-(-Math.cos(eyeT*2*Math.PI)*(blinkHeight/2) + (blinkHeight/2-squintHeight)), eyePos.left, this.gallery.height/2);
+			this.gallery.ctx.quadraticCurveTo(this.gallery.width/2, this.height-(-Math.cos(eyeT*2*Math.PI)*(blinkHeight/2) + (blinkHeight/2-squintHeight)), eyePos.left, this.height/2);
 		} else {
-			var controlPoint = this.gallery.height-(-Math.cos(eyeT*2*Math.PI)*squintHeight);
-			this.gallery.ctx.quadraticCurveTo(this.gallery.width/2, this.gallery.helpers.lerp(controlPoint, controlPoint*1.2, this.transitionT), eyePos.left, this.gallery.height/2);
+			var controlPoint = this.height-(-Math.cos(eyeT*2*Math.PI)*squintHeight);
+			this.gallery.ctx.quadraticCurveTo(this.gallery.width/2, this.gallery.helpers.lerp(controlPoint, controlPoint*1.2, this.transitionT), eyePos.left, this.height/2);
 		}
 
 		//[-b+b-s, b+b-s]
@@ -224,19 +233,19 @@
 		this.gallery.ctx.beginPath();
 		this.gallery.ctx.moveTo(eyePos.left, eyePos.centerY);
 		//top lid
-		this.gallery.ctx.quadraticCurveTo(this.gallery.width/2, -this.gallery.height/3, eyePos.right, this.gallery.height/2);
+		this.gallery.ctx.quadraticCurveTo(this.gallery.width/2, -this.height/3, eyePos.right, this.height/2);
 		if(eyeT % blinkPeriod <= 1) {
-			this.gallery.ctx.quadraticCurveTo(this.gallery.width/2, -Math.cos(eyeT*2*Math.PI)*blinkHeight*1.1+(blinkHeight*1.1-squintHeight), eyePos.left, this.gallery.height/2);
+			this.gallery.ctx.quadraticCurveTo(this.gallery.width/2, -Math.cos(eyeT*2*Math.PI)*blinkHeight*1.1+(blinkHeight*1.1-squintHeight), eyePos.left, this.height/2);
 		} else {
 			var controlPoint = -Math.cos(eyeT*2*Math.PI)*squintHeight;
-			this.gallery.ctx.quadraticCurveTo(this.gallery.width/2, this.gallery.helpers.lerp(controlPoint-this.gallery.height, (controlPoint-this.gallery.height)*1.2, this.transitionT)+this.gallery.height, eyePos.left, this.gallery.height/2);
+			this.gallery.ctx.quadraticCurveTo(this.gallery.width/2, this.gallery.helpers.lerp(controlPoint-this.height, (controlPoint-this.height)*1.2, this.transitionT)+this.height, eyePos.left, this.height/2);
 		}
-		//this.gallery.ctx.quadraticCurveTo(this.gallery.width/2, Math.sin(t/100)*40, 0, this.gallery.height/2);
+		//this.gallery.ctx.quadraticCurveTo(this.gallery.width/2, Math.sin(t/100)*40, 0, this.height/2);
 		this.gallery.ctx.closePath();
 		this.gallery.ctx.stroke();
 		this.gallery.ctx.fill();
 
-
+		this.gallery.ctx.restore();
 	};
 
 	window.AnimationGallery.addAnimation('eye', EyeAnimation);

@@ -12,8 +12,6 @@
 		this.rowHeight = 10;
 		this.rowSpacing = 2;
 		this.segmentSpacing = 2;
-		this.rowCount = this.gallery.height / (this.rowHeight+this.rowSpacing);
-
 	};
 
 	SunsetAnimation.prototype.draw = function(t, deltaT)
@@ -22,6 +20,8 @@
 		//t+=15000;
 		this.gallery.ctx.fillStyle = '#000';
 		this.gallery.ctx.fillRect(0,0,this.gallery.width,this.gallery.height);
+
+		this.rowCount = this.gallery.height / (this.rowHeight+this.rowSpacing);
 
 		//var rows = this.makeRowsCircle(this.gallery.width/2, this.gallery.height/2, 310, '#f00', '#ff0');
 		var circleX = this.gallery.width/2 + sigmoid((this.gallery.mouseX - this.gallery.width/2)/this.gallery.width/2, this.gallery.width*0.8, 3);

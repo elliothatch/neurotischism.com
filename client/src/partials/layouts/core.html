@@ -6,6 +6,7 @@
 		<canvas id="foregroundCanvas"></canvas>
 		<div id="letterSize">a</div>
 		<div class="animation-controls">
+			<span id="animation-name"></span>
 			<button id="prev-animation-button">&lt;</button>
 			<button id="next-animation-button">&gt;</button>
 			<button id="fullscreen-button">[=]</button>
@@ -40,7 +41,6 @@
 		<script src="/javascript/bg-oscilloscope.js"></script>
 		<script src="/javascript/bg-radial.js"></script>
 		<script src="/javascript/bg-bubbles.js"></script>
-		<script src="/javascript/bg-nausea.js"></script>
 		<!-- <script async type="text/javascript" src="https://www.google.com/recaptcha/api/js/recaptcha_ajax.js"></script> -->
 		<script>
 			//window.AnimationGallery.startAnimation(window.AnimationGallery.animations.length - 1);
@@ -50,7 +50,7 @@
 				'eye',
 				'rings',
 				'flower',
-				'solarsystem',
+				'globe',
 				'gravity',
 				'warp',
 				'sunset',
@@ -59,7 +59,6 @@
 				'oscilloscope',
                 'radial',
                 //'bubbles',
-                'nausea',
 			];
 			// only expose more finished animations by overwriting the animation array
 			window.AnimationGallery.animations = animations.map(function(animName) {
@@ -87,6 +86,8 @@
 				window.AnimationGallery.resize(document.body.clientWidth, document.body.clientHeight);
 			});
 			window.AnimationGallery.startAnimation(animationName);
+			var animationNameDisplay = document.getElementById('animation-name');
+			animationNameDisplay.textContent = window.AnimationGallery.animationName;
 			/*
 			animations.map(function(animName, i) {
 				return setTimeout(function() {

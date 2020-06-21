@@ -207,6 +207,7 @@
 		this.animationIndex = index;
 		this.animationName = this.animations[index].name;
 		this.ctx.globalCompositeOperation = 'source-over';
+		this.canvas.style.background = '#ffffff';
 		this.width = window.innerWidth;
 		this.height = window.innerHeight;
 		this.animations[this.animationIndex].anim.init();

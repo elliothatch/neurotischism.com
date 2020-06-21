@@ -141,10 +141,12 @@
 			Math.pow(Math.pow(this.gallery.mouseX-this.gallery.width/2,2) + Math.pow(this.gallery.mouseY-this.gallery.height/2,2), 2/5),
 			(eyePos.bottom - eyePos.top)/10
 		);
+
+		const shakeScale = this.gallery.helpers.lerp(0, 15, this.eyeWidth/1000)*this.transitionT;
 		//iris and pupil
 		var pupilCenter = {
-			x: this.gallery.width/2 + lookDistance*Math.cos(lookDirection) + Math.random()*this.transitionT*15,
-			y: this.height/2 + lookDistance*Math.sin(lookDirection) + Math.random()*this.transitionT*15
+			x: this.gallery.width/2 + lookDistance*Math.cos(lookDirection) + Math.random()*shakeScale,
+			y: this.height/2 + lookDistance*Math.sin(lookDirection) + Math.random()*shakeScale,
 		};
 
 		this.gallery.ctx.strokeStyle = '#000';

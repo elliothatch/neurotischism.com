@@ -20,7 +20,7 @@
 		this.gallery.ctx.fillRect(0,0,this.gallery.width,this.gallery.height);
         const period = 60000;
         const theta = t/period / 2*Math.PI;
-        this.drawOverlay(theta, 2*Math.PI/(60*7), 7, 400);
+        this.drawOverlay(theta, 2*Math.PI/(60*6), 6, 400);
 	};
 
 
@@ -38,6 +38,13 @@
         var windowTheta = loopTheta/frameCount;
 
         // draw background
+		// this.gallery.ctx.fillStyle = 'black';
+		// this.gallery.ctx.beginPath();
+		// this.gallery.ctx.moveTo(center.x, center.y);
+		// this.gallery.ctx.arc(center.x, center.y, radius, 0, Math.PI*2);
+		// this.gallery.ctx.closePath();
+		// this.gallery.ctx.fill();
+
         for(var i = 0; i < frameCount; i++) {
             const frameInnerRadius = i*(radius/frameCount);
             const frameOuterRadius = (i+1)*(radius/frameCount);
@@ -58,6 +65,16 @@
                 this.gallery.ctx.closePath();
                 // this.gallery.ctx.stroke();
                 this.gallery.ctx.fill();
+
+                // expanding white effect
+				// this.gallery.ctx.fillStyle = 'white';
+                // this.gallery.ctx.beginPath();
+                // this.gallery.ctx.moveTo(center.x, center.y);
+                // this.gallery.ctx.lineTo(frameInnerRadius*Math.cos(currentTheta)+center.x, frameInnerRadius*Math.sin(currentTheta)+center.y);
+                // this.gallery.ctx.lineTo(frameInnerRadius*Math.cos(nextTheta)+center.x, frameInnerRadius*Math.sin(nextTheta)+center.y);
+                // this.gallery.ctx.lineTo(center.x, center.y);
+                // this.gallery.ctx.closePath();
+                // this.gallery.ctx.fill();
             }
         }
 

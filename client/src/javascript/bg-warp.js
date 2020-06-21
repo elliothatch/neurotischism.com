@@ -4,6 +4,8 @@
 	};
 
 	WarpAnimation.prototype.init = function() {
+		this.gallery.canvas.style.background = '#000000';
+
 		this.gallery.ctx.fillStyle = '#000';
 		this.gallery.ctx.fillRect(0,0,this.gallery.width,this.gallery.height);
 		//var aspectRatio = this.gallery.width / this.gallery.height;

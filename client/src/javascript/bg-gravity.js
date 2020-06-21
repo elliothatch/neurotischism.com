@@ -8,6 +8,8 @@
 	};
 
 	GravityAnimation.prototype.init = function() {
+		this.gallery.canvas.style.background = '#000000';
+
 		this.gallery.ctx.fillStyle = '#000';
 		this.gallery.ctx.fillRect(0,0,this.gallery.width,this.gallery.height);
 
@@ -43,6 +45,10 @@
 			timeScale: 1/1000,
 			debug: false,
 			bodyGravity: true,
+			wallForce: {
+				maxDistance: 20, // pixels
+				force: 10,
+			},
 			/*edges: {
 				x: [-15*aspectRatio,15*aspectRatio],
 				y: [-15,15]
@@ -65,7 +71,7 @@
 	GravityAnimation.prototype.physicsStep = function(simulation, deltaT) {
 		var dt = deltaT * simulation.timeScale;
 		// calc new accelerations
-		simulation.bodies.forEach(function(body) {
+		simulation.bodies.forEach((body) => {
 			var wells = simulation.wells;
 			if(simulation.bodyGravity) {
 				wells = wells.concat(simulation.bodies);
@@ -73,14 +79,41 @@
 
 			body.acceleration.x = 0;
 			body.acceleration.y = 0;
-			wells.forEach(function(well) {
+
+			if(simulation.wallForce) {
+				const x = body.position.x * simulation.scale + this.gallery.width/2;
+				const y = body.position.y * simulation.scale + this.gallery.height/2;
+
+				const leftDistance = simulation.wallForce.maxDistance - x;
+				const rightDistance = x + simulation.wallForce.maxDistance - this.gallery.width;
+				if(leftDistance > 0) {
+					body.acceleration.x = simulation.wallForce.force * leftDistance * leftDistance;
+				}
+				else if(rightDistance > 0) {
+					body.acceleration.x = -simulation.wallForce.force * rightDistance * rightDistance;
+				}
+
+				const topDistance = simulation.wallForce.maxDistance - y;
+				const bottomDistance = y + simulation.wallForce.maxDistance - this.gallery.height;
+				if(topDistance > 0) {
+					body.acceleration.y = simulation.wallForce.force * topDistance * topDistance;
+				}
+				else if(bottomDistance > 0) {
+					body.acceleration.y = -simulation.wallForce.force * bottomDistance * bottomDistance;
+				}
+			}
+
+			wells.forEach((well) => {
 				if(body === well) {
 					return;
 				}
 				var acceleration = calcGravityAcceleration(body, well);
-				body.acceleration.x += acceleration.x*dt;
-				body.acceleration.y += acceleration.y*dt;
+				body.acceleration.x += acceleration.x;
+				body.acceleration.y += acceleration.y;
 			});
+
+			body.acceleration.x *= dt;
+			body.acceleration.y *= dt;
 		});
 
 		// update velocities and positions

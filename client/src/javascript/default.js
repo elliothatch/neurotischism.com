@@ -193,17 +193,20 @@
 	});
 
 	// gallery controls
+	var animationNameDisplay = document.getElementById('animation-name');
 	var prevAnimationButton = document.getElementById('prev-animation-button');
 	var nextAnimationButton = document.getElementById('next-animation-button');
 	prevAnimationButton.addEventListener('click', function() {
 		if(window.AnimationGallery) {
 			window.AnimationGallery.startAnimation((window.AnimationGallery.animationIndex + window.AnimationGallery.animations.length - 1) % window.AnimationGallery.animations.length);
+			animationNameDisplay.textContent = window.AnimationGallery.animationName;
 			window.sessionStorage.setItem('background', '' + window.AnimationGallery.animationName);
 		}
 	});
 	nextAnimationButton.addEventListener('click', function() {
 		if(window.AnimationGallery) {
 			window.AnimationGallery.startAnimation((window.AnimationGallery.animationIndex + 1) % window.AnimationGallery.animations.length);
+			animationNameDisplay.textContent = window.AnimationGallery.animationName;
 			window.sessionStorage.setItem('background', '' + window.AnimationGallery.animationName);
 		}
 	});

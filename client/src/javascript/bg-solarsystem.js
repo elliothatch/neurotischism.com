@@ -43,5 +43,5 @@
 		}
 	};
 
-	window.AnimationGallery.addAnimation('solarsystem', SolarSystemAnimation);
+	window.AnimationGallery.addAnimation('globe', SolarSystemAnimation);
 })(window);

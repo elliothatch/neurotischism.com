@@ -5,7 +5,7 @@
   "main": "server/src/index.js",
   "scripts": {
     "start": "node server/src/index.js",
-    "build": "node node_modules/node-sass/bin/node-sass client/src/sass/main.scss client/dist/css/main.css",
+    "build": "node node_modules/sass/sass.js client/src/sass/main.scss client/dist/css/main.css",
     "build-config": "node node_modules/node-sass/bin/node-sass --watch client/src/sass/config.scss client/dist/css/config.css",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -53,13 +53,13 @@
     "rollup-plugin-replace": "^2.0.0",
     "rxjs": "^6.2.1",
     "safe-json-stringify": "^1.2.0",
+    "sass": "^1.26.9",
     "socket.io": "^2.1.1",
     "socket.io-cookie-parser": "^1.0.0"
   },
   "devDependencies": {
     "eslint": "^4.19.1",
     "eslint-plugin-react": "^7.9.1",
-    "node-sass": "^4.13.1",
     "rollup-plugin-node-globals": "^1.2.1"
   }
 }

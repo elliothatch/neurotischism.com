@@ -4,7 +4,7 @@ var Promise = require('bluebird');
 var fs = require('fs-extra');
 var minimatch = require('minimatch');
 
-var sass = require('node-sass');
+var sass = require('sass');
 var babel = require('babel-core');
 
 var rollup = require('rollup');

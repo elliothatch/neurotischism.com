@@ -393,7 +393,7 @@ a:visited { color: #205caa; }
 .animation-controls {
 	position: absolute;
 	z-index: 1001;
-	top: 10px;
+	top: 0px;
 	right: 0px;
 
 	span {
@@ -432,6 +432,11 @@ a:visited { color: #205caa; }
 		border-color: $primaryBackgroundColor;
 		border-width: 2px;
 		border-radius: 0px;
+	}
+
+	div {
+		float: right;
+		clear: right;
 	}
 }
 
@@ -492,4 +497,14 @@ a:visited { color: #205caa; }
 			}
 		}
 	}
+}
+
+#link-copied-text, #link-copied-url {
+	opacity: 0;
+	transition: opacity 4s ease-in-out;
+}
+
+#link-copied-text.visible, #link-copied-url.visible {
+	opacity: 1;
+	transition: none;
 }

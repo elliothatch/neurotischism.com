@@ -6,10 +6,17 @@
 		<canvas id="foregroundCanvas"></canvas>
 		<div id="letterSize">a</div>
 		<div class="animation-controls">
-			<span id="animation-name"></span>
-			<button id="prev-animation-button">&lt;</button>
-			<button id="next-animation-button">&gt;</button>
-			<button id="fullscreen-button">[=]</button>
+			<div>
+				<span id="link-copied-text">Gallery link copied to clipboard!</span>
+				<button id="link-copy-button">🔗</button>
+				<span id="animation-name"></span>
+				<button id="prev-animation-button">&lt;</button>
+				<button id="next-animation-button">&gt;</button>
+				<button id="fullscreen-button">[=]</button>
+			</div>
+			<div>
+				<span id="link-copied-url"></span>
+			</div>
 		</div>
 		<div id="foregroundWrapper">
 			{{> includes/header.html}}
@@ -69,7 +76,8 @@
 			});
 
 			var url = new URL(window.location);
-			var animationName = new URLSearchParams(url.search).get('background');
+			var params = new URLSearchParams(url.search);
+			var animationName = params.get('background');
 			if(!animationName || !animations.includes(animationName)) {
 				animationName = window.sessionStorage.getItem('background');
 			}
@@ -77,6 +85,13 @@
 			if(!animationName || !animations.includes(animationName)) {
 				// no animation selected
 				animationName = animations[Math.floor(Math.random()*animations.length)];
+			}
+
+			var fullscreen = params.get('fullscreen');
+			if(fullscreen != undefined) {
+					window.sessionStorage.setItem('fullscreen', fullscreen + '');
+					var foregroundWrapper = document.getElementById('foregroundWrapper');
+					foregroundWrapper.style.visibility = fullscreen ? 'hidden' : 'visible';
 			}
 
 			window.sessionStorage.setItem('background', '' + animationName);

@@ -184,12 +184,12 @@
 	// fullscreen
 	var fullscreenButton = document.getElementById('fullscreen-button');
 	var foregroundWrapper = document.getElementById('foregroundWrapper');
-	var fullscreen = window.localStorage.getItem('fullscreen') === 'true';
+	var fullscreen = window.sessionStorage.getItem('fullscreen') === 'true';
 	foregroundWrapper.style.visibility = fullscreen ? 'hidden' : 'visible';
 	fullscreenButton.addEventListener('click', function() {
 		fullscreen = !fullscreen;
 		foregroundWrapper.style.visibility = fullscreen ? 'hidden' : 'visible';
-		window.localStorage.setItem('fullscreen', fullscreen + '');
+		window.sessionStorage.setItem('fullscreen', fullscreen + '');
 	});
 
 	// gallery controls
@@ -208,6 +208,30 @@
 			window.AnimationGallery.startAnimation((window.AnimationGallery.animationIndex + 1) % window.AnimationGallery.animations.length);
 			animationNameDisplay.textContent = window.AnimationGallery.animationName;
 			window.sessionStorage.setItem('background', '' + window.AnimationGallery.animationName);
+		}
+	});
+
+	var linkCopyButton = document.getElementById('link-copy-button');
+	var linkCopiedText = document.getElementById('link-copied-text');
+	var linkCopiedUrl = document.getElementById('link-copied-url');
+
+	linkCopyButton.addEventListener('click', function() {
+		if(window.AnimationGallery) {
+			const queryParams = new URLSearchParams({
+				'background': window.AnimationGallery.animationName,
+				'fullscreen': true,
+			});
+
+			const pageUrl = `${window.location.protocol}//${window.location.host}?${queryParams}`;
+			linkCopiedUrl.textContent = pageUrl;
+			linkCopiedUrl.classList.add('visible');
+			linkCopiedText.classList.add('visible');
+			navigator.clipboard.writeText(pageUrl);
+
+			window.setTimeout(function() {
+				linkCopiedUrl.classList.remove('visible');
+				linkCopiedText.classList.remove('visible');
+			}, 1000);
 		}
 	});
 

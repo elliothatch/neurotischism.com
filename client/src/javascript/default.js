@@ -181,6 +181,10 @@
 		initializeScrollLinks();
 	});
 
+	var sourceCodeButton = document.getElementById('source-code-button');
+	var sourceCodeElement = document.getElementById('gallery-source-code');
+	var showSourceCode = false;
+
 	// fullscreen
 	var fullscreenButton = document.getElementById('fullscreen-button');
 	var foregroundWrapper = document.getElementById('foregroundWrapper');
@@ -190,7 +194,32 @@
 		fullscreen = !fullscreen;
 		foregroundWrapper.style.visibility = fullscreen ? 'hidden' : 'visible';
 		window.sessionStorage.setItem('fullscreen', fullscreen + '');
+
+		if(!fullscreen) {
+			showSourceCode = false;
+			sourceCodeElement.style.visibility = 'hidden';
+		}
 	});
+
+	sourceCodeButton.addEventListener('click', function() {
+		if(window.AnimationGallery) {
+			showSourceCode = !showSourceCode;
+			if(showSourceCode) {
+				sourceCodeElement.textContent = '';
+				fullscreen = true;
+				foregroundWrapper.style.visibility = fullscreen ? 'hidden' : 'visible';
+				window.sessionStorage.setItem('fullscreen', fullscreen + '');
+				const sourceUrl = `${window.location.protocol}//${window.location.host}/javascript/bg-${window.AnimationGallery.animationName}.js`;
+				fetch(sourceUrl)
+				.then((response) => response.text())
+				.then((text) => {
+					sourceCodeElement.textContent = text;
+				});
+			}
+			sourceCodeElement.style.visibility = showSourceCode ? 'visible' : 'hidden';
+		}
+	});
+
 
 	// gallery controls
 	var animationNameDisplay = document.getElementById('animation-name');
@@ -198,6 +227,9 @@
 	var nextAnimationButton = document.getElementById('next-animation-button');
 	prevAnimationButton.addEventListener('click', function() {
 		if(window.AnimationGallery) {
+			showSourceCode = false;
+			sourceCodeElement.style.visibility = 'hidden';
+
 			window.AnimationGallery.startAnimation((window.AnimationGallery.animationIndex + window.AnimationGallery.animations.length - 1) % window.AnimationGallery.animations.length);
 			animationNameDisplay.textContent = window.AnimationGallery.animationName;
 			window.sessionStorage.setItem('background', '' + window.AnimationGallery.animationName);
@@ -205,6 +237,9 @@
 	});
 	nextAnimationButton.addEventListener('click', function() {
 		if(window.AnimationGallery) {
+			showSourceCode = false;
+			sourceCodeElement.style.visibility = 'hidden';
+
 			window.AnimationGallery.startAnimation((window.AnimationGallery.animationIndex + 1) % window.AnimationGallery.animations.length);
 			animationNameDisplay.textContent = window.AnimationGallery.animationName;
 			window.sessionStorage.setItem('background', '' + window.AnimationGallery.animationName);

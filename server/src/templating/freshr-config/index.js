@@ -146,7 +146,7 @@ function makeSocketHandler(options) {
 		'javascript/bg-rings.js',
 		'javascript/bg-light.js',
 		'javascript/bg-scan.js',
-		'javascript/bg-solarsystem.js',
+		'javascript/bg-globe.js',
 		'javascript/bg-tree.js',
 		'javascript/bg-gravity.js',
 		'javascript/bg-targeting.js',

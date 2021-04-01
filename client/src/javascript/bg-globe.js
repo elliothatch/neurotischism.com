@@ -1,15 +1,15 @@
 (function(window) {
 
-	var SolarSystemAnimation = function(gallery) {
+	var GlobeAnimation = function(gallery) {
 		this.gallery = gallery;
 	};
 
-	SolarSystemAnimation.prototype.init = function() {
+	GlobeAnimation.prototype.init = function() {
 		this.gallery.ctx.fillStyle = '#000';
 		this.gallery.ctx.fillRect(0,0,this.gallery.width,this.gallery.height);
 	};
 
-	SolarSystemAnimation.prototype.draw = function(t, deltaT)
+	GlobeAnimation.prototype.draw = function(t, deltaT)
 	{
 		this.gallery.ctx.fillStyle = '#000';
 		this.gallery.ctx.fillRect(0,0,this.gallery.width,this.gallery.height);
@@ -17,7 +17,7 @@
 		this.drawSun(this.gallery.width/2, this.gallery.height/2, t);
 	};
 
-	SolarSystemAnimation.prototype.drawSun = function(x, y, t) {
+	GlobeAnimation.prototype.drawSun = function(x, y, t) {
 		var ringCount = 30;
 		var mouseSpinT = (Math.pow(this.gallery.mouseX/this.gallery.width - 0.5, 2) + Math.pow(this.gallery.mouseY/this.gallery.height - 0.5, 2) + 0.5) % 1;
 
@@ -43,5 +43,5 @@
 		}
 	};
 
-	window.AnimationGallery.addAnimation('globe', SolarSystemAnimation);
+	window.AnimationGallery.addAnimation('globe', GlobeAnimation);
 })(window);

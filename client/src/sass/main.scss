@@ -258,7 +258,7 @@ a:visited { color: #205caa; }
     position:absolute;
     left: 0px;
     /*margin: 0px 1000px 0px -100px;*/
-    width: 105%;
+    width: 100%;
   }
 
   #gamePostBody
@@ -298,6 +298,10 @@ a:visited { color: #205caa; }
   min-height: 56px;
   background-color: white;*/
   padding: 40px 80px 20px 80px;
+
+	@media(max-width: 576px) {
+  	  padding-left: 40px;
+	}
 }
 
 #siteTitle,
@@ -309,6 +313,14 @@ a:visited { color: #205caa; }
   font-size: 64pt;
   font-weight: bold;
   text-shadow: -15px 0 white, 0 15px white, 15px 0 white, 0 -15px white;
+
+	@media(max-width: 576px) {
+  	  font-size: 36pt;
+	}
+
+	@media(max-width: 376px) {
+  	  font-size: 24pt;
+	}
 
   /*
   color: #333;
@@ -526,10 +538,12 @@ a:visited { color: #205caa; }
 
 #link-copied-text, #link-copied-url {
 	opacity: 0;
-	transition: opacity 4s ease-in-out;
+	visibility: hidden;
+	transition: opacity 4s ease-in-out, visibility 0s ease 4s;
 }
 
 #link-copied-text.visible, #link-copied-url.visible {
 	opacity: 1;
+	visibility: visible;
 	transition: none;
 }

@@ -105,11 +105,18 @@
 			});
 
 
-			const reduceMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
-			if(!reduceMotionQuery || reduceMotionQuery.matches) {
+
+			let pauseBackground = window.sessionStorage.getItem('pauseBackground');
+			if(pauseBackground == undefined) {
+				const reduceMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+				if(!reduceMotionQuery || reduceMotionQuery.matches) {
+					window.sessionStorage.setItem('pauseBackground', 'true');
+					pauseBackground = 'true';
+				}
+			}
+
+			if(pauseBackground === 'true') {
 				window.AnimationGallery.displayAnimationStill(animationName);
-				var toggleAnimationPlaybackButton = document.getElementById('toggle-animation-playback-button');
-				toggleAnimationPlaybackButton.textContent = '⏵︎';
 			}
 			else {
 				window.AnimationGallery.startAnimation(animationName);

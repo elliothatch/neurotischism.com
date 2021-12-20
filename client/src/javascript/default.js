@@ -252,7 +252,6 @@
 	var animationNameDisplay = document.getElementById('animation-name');
 	var prevAnimationButton = document.getElementById('prev-animation-button');
 	var nextAnimationButton = document.getElementById('next-animation-button');
-	var toggleAnimationPlaybackButton = document.getElementById('toggle-animation-playback-button');
 
 	prevAnimationButton.addEventListener('click', function() {
 		if(window.AnimationGallery) {
@@ -286,15 +285,20 @@
 		}
 	});
 
+	var toggleAnimationPlaybackButton = document.getElementById('toggle-animation-playback-button');
+	var pauseBackground = window.sessionStorage.getItem('pauseBackground') === 'true';
+
 	toggleAnimationPlaybackButton.addEventListener('click', function() {
 		if(window.AnimationGallery) {
 			if(window.AnimationGallery.animationRunning) {
 				window.AnimationGallery.pauseAnimation();
 				toggleAnimationPlaybackButton.textContent = '⏵︎';
+				window.sessionStorage.setItem('pauseBackground', 'true');
 			}
 			else {
 				window.AnimationGallery.resumeAnimation();
 				toggleAnimationPlaybackButton.textContent = '⏸︎';
+				window.sessionStorage.setItem('pauseBackground', 'false');
 			}
 		}
 	})

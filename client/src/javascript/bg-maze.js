@@ -6,17 +6,18 @@
 		this.countWeights = [1, 1/100];
 		this.particleHoverStepCounts  = [3, 200];
 
-		this.particleColors = [
-			{ hue: 1, hueOffset: 0, saturation: 0.8, value: 0.8 },
-			{ hue: 0.1 + (1-0.1)*Math.random(), hueOffset: Math.random(), saturation: 0.8, value: 0.8 }
-		]
-
 	}
 
 	MazeAnimation.prototype.init = function() {
 		//this.gallery.canvas.style.background = '#555';
 		this.gallery.ctx.fillStyle = '#555';
 		this.gallery.ctx.fillRect(0, 0, this.gallery.width, this.gallery.height);
+
+
+		this.particleColors = [
+			{ hue: 1, hueOffset: 0, saturation: 0.8, value: 0.8 },
+			{ hue: 0.1 + (1-0.1)*Math.random(), hueOffset: Math.random(), saturation: 0.8, value: 0.8 }
+		]
 
 		this.particleColor = this.particleColors[1];
 		//this.gridSize = 3;
@@ -29,6 +30,8 @@
 		this.particleHoverStepCount  = this.particleHoverStepCounts[this.mode];
 		this.particlesCount = Math.floor(this.countWeight * (this.gallery.width+this.gallery.height));
 		this.particleHueSpeed = 0.001;
+		this.firstDraw = true;
+		this.avgDeltaT = 0;
 		for(var i = 0; i < this.particlesCount; i++) {
 			this.particles.push({
 				direction: Math.floor(Math.random()*4),
@@ -67,6 +70,12 @@
 
 	MazeAnimation.prototype.draw = function(t, deltaT)
 	{
+		this.avgDeltaT = (this.avgDeltaT * 10 + deltaT) / 11
+		// if framerate is really bad, start removing particles
+		if(!this.firstDraw && deltaT > 1000/10 && this.avgDeltaT > 1000/10) {
+			this.particlesCount = Math.floor(this.particlesCount * 0.9);
+			this.particles.length = this.particlesCount;
+		}
 		var _this = this;
 		this.particles.forEach(function(p) {
 
@@ -77,6 +86,20 @@
 			if(_this.gallery.linkHovered && _this.mode === 1) {
 				stepDrawCount = _this.particleHoverStepCount;
 			}
+			if(_this.avgDeltaT > 1000/30) {
+				// if the average framerate drops, limit the number of renders
+				// stepDrawCount = Math.max(1, Math.floor(stepDrawCount/(_this.avgDeltaT / (1000/60))));
+				stepDrawCount = 1;
+			}
+
+			if(_this.firstDraw) {
+				if(_this.mode === 0) {
+					stepDrawCount = 10;
+				} else if(_this.mode === 1) {
+					stepDrawCount = 400;
+				}
+			}
+
 			for(var i = 0; i < stepDrawCount; i++) {
 				_this.gallery.ctx.fillStyle = _this.gallery.helpers.HSVtoRGBStr(p.hue * _this.particleColor.hue + _this.particleColor.hueOffset, _this.particleColor.saturation, _this.particleColor.value);
 				_this.gallery.ctx.strokeStyle = _this.gallery.helpers.HSVtoRGBStr(p.hue * _this.particleColor.hue + _this.particleColor.hueOffset, _this.particleColor.saturation, _this.particleColor.value);
@@ -106,6 +129,12 @@
 						stepCount = _this.particleHoverStepCount;
 					}
 
+					if(_this.avgDeltaT > 1000/30) {
+						// if the average framerate drops, limit the number of renders
+						// stepDrawCount = Math.max(1, Math.floor(stepDrawCount/(_this.avgDeltaT / (1000/60))));
+						stepCount = 1;
+					}
+
 				for(var j = 0; j < stepCount; j++) {
 					//move
 					//randomly pick available direction, not including backwards
@@ -126,7 +155,7 @@
 				}
 			}
 		});
-
+		this.firstDraw = false;
 	}
 
 	//maze is 2d array of [u,r,d,l, visited] bools, true if no wall

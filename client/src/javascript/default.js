@@ -14,7 +14,8 @@
 	*/
 
 	//animations
-	var Animations = function(animations) {
+	// reducedMotionAnimations only render one frame and then deactivate if the user has requested reduced motion
+	var Animations = function(animations, reducedMotionAnimations) {
 		var _this = this;
 		this.animations = (animations || []).map(function(animation, i) {
 			var a = {
@@ -25,7 +26,8 @@
 				draw: animation.draw,
 				state: Object.assign({
 					start: true
-				}, animation.state)
+				}, animation.state),
+				playOnce: animation.playOnce
 			};
 			if(a.activator) {
 				a.activator(
@@ -34,6 +36,28 @@
 			}
 			return a;
 		});
+
+		const reduceMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+		this.animations.push(...reducedMotionAnimations.map(function(animation, i) {
+			var a = {
+				id: animations.length + i,
+				activator: animation.activator,
+				onDeactivate: animation.onDeactivate,
+				frameLimit: animation.frameLimit,
+				draw: animation.draw,
+				state: Object.assign({
+					start: true
+				}, animation.state),
+				playOnce: !reduceMotionQuery || reduceMotionQuery.matches
+			};
+			if(a.activator) {
+				a.activator(
+					function(data) {_this.activate(a, data);},
+					function(data) {_this.deactivate(a, data);});
+			}
+			return a;
+		}));
 		this.activeAnimations = this.animations.reduce(function(obj, a) {
 			if(!a.activator) {
 				obj[a.id] = a;
@@ -66,13 +90,14 @@
 		Object.keys(this.activeAnimations).forEach(function(animId) {
 
 			var anim = _this.activeAnimations[animId];
-			if(!anim.frameLimit || anim.state.start || (context.t%(1000/anim.frameLimit)) < context.dt) {
+			if(anim.state.start || (!anim.playOnce && (!anim.frameLimit || (context.t%(1000/anim.frameLimit)) < context.dt))) {
 				anim.draw(context, anim.state);
 				anim.state.start = false;
 			}
 		});
 
 		this.lastTime = timestamp;
+
 		window.requestAnimationFrame(function() { _this.step.apply(_this, arguments); });
 	};
 
@@ -109,13 +134,6 @@
 
 	var animations = new Animations([
 		{
-			draw: drawRandomCharacters,
-			frameLimit: 20,
-			state: { elements:
-				document.getElementsByClassName('randomCharacters')
-			}
-		},
-		{
 			draw: drawScrollLinks,
 			frameLimit: 30,
 			state: { elements:
@@ -145,10 +163,19 @@
 				[{event: 'mouseenter'}],
 				[{event: 'mouseleave'}]),
 			onDeactivate: function(state, data) {
-				for(var i = 0; i < state.children.length; i++)
-				{
-					state.children[i].innerHTML = state.originalText[i];
+				if(state.children) {
+					for(var i = 0; i < state.children.length; i++)
+					{
+						state.children[i].innerHTML = state.originalText[i];
+					}
 				}
+			}
+		}],
+		[{
+			draw: drawRandomCharacters,
+			frameLimit: 20,
+			state: { elements:
+				document.getElementsByClassName('randomCharacters')
 			}
 		},
 		{
@@ -162,7 +189,7 @@
 		{
 			draw: drawCommentAuthorOwner,
 			frameLimit: 10,
-		},
+		}
 	]);
 
 	animations.start();
@@ -225,12 +252,20 @@
 	var animationNameDisplay = document.getElementById('animation-name');
 	var prevAnimationButton = document.getElementById('prev-animation-button');
 	var nextAnimationButton = document.getElementById('next-animation-button');
+	var toggleAnimationPlaybackButton = document.getElementById('toggle-animation-playback-button');
+
 	prevAnimationButton.addEventListener('click', function() {
 		if(window.AnimationGallery) {
 			showSourceCode = false;
 			sourceCodeElement.style.visibility = 'hidden';
 
-			window.AnimationGallery.startAnimation((window.AnimationGallery.animationIndex + window.AnimationGallery.animations.length - 1) % window.AnimationGallery.animations.length);
+			if(window.AnimationGallery.animationRunning) {
+				window.AnimationGallery.startAnimation((window.AnimationGallery.animationIndex + window.AnimationGallery.animations.length - 1) % window.AnimationGallery.animations.length);
+			}
+			else {
+				window.AnimationGallery.displayAnimationStill((window.AnimationGallery.animationIndex + window.AnimationGallery.animations.length - 1) % window.AnimationGallery.animations.length);
+			}
+
 			animationNameDisplay.textContent = window.AnimationGallery.animationName;
 			window.sessionStorage.setItem('background', '' + window.AnimationGallery.animationName);
 		}
@@ -240,11 +275,29 @@
 			showSourceCode = false;
 			sourceCodeElement.style.visibility = 'hidden';
 
-			window.AnimationGallery.startAnimation((window.AnimationGallery.animationIndex + 1) % window.AnimationGallery.animations.length);
+			if(window.AnimationGallery.animationRunning) {
+				window.AnimationGallery.startAnimation((window.AnimationGallery.animationIndex + 1) % window.AnimationGallery.animations.length);
+			}
+			else {
+				window.AnimationGallery.displayAnimationStill((window.AnimationGallery.animationIndex + 1) % window.AnimationGallery.animations.length);
+			}
 			animationNameDisplay.textContent = window.AnimationGallery.animationName;
 			window.sessionStorage.setItem('background', '' + window.AnimationGallery.animationName);
 		}
 	});
+
+	toggleAnimationPlaybackButton.addEventListener('click', function() {
+		if(window.AnimationGallery) {
+			if(window.AnimationGallery.animationRunning) {
+				window.AnimationGallery.pauseAnimation();
+				toggleAnimationPlaybackButton.textContent = '⏵︎';
+			}
+			else {
+				window.AnimationGallery.resumeAnimation();
+				toggleAnimationPlaybackButton.textContent = '⏸︎';
+			}
+		}
+	})
 
 	var linkCopyButton = document.getElementById('link-copy-button');
 	var linkCopiedText = document.getElementById('link-copied-text');
@@ -325,7 +378,7 @@
 
 	function drawH1(context, state) {
 		if(state.start) {
-			state.hue = 0.0;
+			state.hue = Math.random();
 			state.elements = document.getElementsByTagName('h1');
 		}
 
@@ -347,14 +400,14 @@
 		if(state.start) {
 			state.element = document.getElementById('siteTitle');
 			state.titleColor = {
-				r: 0,
-				g: 0,
-				b: 0
+				r: 255,
+				g: 255,
+				b: 255
 			};
 			state.bgColor = {
-				r: 0,
-				g: 0,
-				b: 0
+				r: Math.random() * 100 + 50,
+				g: Math.random() * 100 + 50,
+				b: Math.random() * 100 + 50,
 			};
 		}
 

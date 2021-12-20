@@ -19,6 +19,16 @@
 
 	ScanlineAnimation.prototype.draw = function(t, deltaT)
 	{
+		var timeStep = 1000/30;
+
+		// draw missed frames
+		for(var currentT = t - deltaT; currentT < t; currentT += timeStep) {
+			this.drawScanlines();
+		}
+	};
+
+	ScanlineAnimation.prototype.drawScanlines = function()
+	{
 		this.y1 = (this.y1 + 3) % this.gallery.height;
 
 		this.color.r += Math.floor((Math.random() - 0.5) * 50);

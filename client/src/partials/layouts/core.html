@@ -15,6 +15,7 @@
 				<button id="prev-animation-button">&lt;</button>
 				<button id="next-animation-button">&gt;</button>
 				<button id="fullscreen-button">[=]</button>
+				<button id="toggle-animation-playback-button">⏸︎</button>
 			</div>
 			<div>
 				<span id="link-copied-url"></span>
@@ -102,7 +103,18 @@
 			window.addEventListener('resize', () => {
 				window.AnimationGallery.resize(document.body.clientWidth, document.body.clientHeight);
 			});
-			window.AnimationGallery.startAnimation(animationName);
+
+
+			const reduceMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+			if(!reduceMotionQuery || reduceMotionQuery.matches) {
+				window.AnimationGallery.displayAnimationStill(animationName);
+				var toggleAnimationPlaybackButton = document.getElementById('toggle-animation-playback-button');
+				toggleAnimationPlaybackButton.textContent = '⏵︎';
+			}
+			else {
+				window.AnimationGallery.startAnimation(animationName);
+			}
+
 			var animationNameDisplay = document.getElementById('animation-name');
 			animationNameDisplay.textContent = window.AnimationGallery.animationName;
 			/*

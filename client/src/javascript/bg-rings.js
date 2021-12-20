@@ -1,5 +1,5 @@
 (function(window) {
-
+	let screenshotTaken = false;
 	var RingsAnimation = function(gallery) {
 		this.gallery = gallery;
 	};
@@ -68,6 +68,26 @@
 			*/
 			ringCurrentRadius = ringOuterRadius + ringGap;
 		}
+
+		// TODO: move into take screenshot function or w/e
+		// if(!screenshotTaken && t > 500) {
+		// 	screenshotTaken = true;
+
+		// 	this.gallery.canvas.toBlob((blob) => {
+		// 		let newImg = document.createElement('img'),
+		// 			url = URL.createObjectURL(blob);
+		// 		console.log(url);
+
+		// 		newImg.onload = function() {
+		// 			// no longer need to read the blob so it's revoked
+		// 			URL.revokeObjectURL(url);
+		// 		};
+
+		// 		newImg.src = url;
+		// 		document.body.appendChild(newImg);
+
+		// 	});
+		// }
 	};
 
 	window.AnimationGallery.addAnimation('rings', RingsAnimation);

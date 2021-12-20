@@ -20,6 +20,7 @@
 
 		this.startTime = null;
 		this.lastTime = null;
+		this.pauseTime = null;
 
 		//init
 		this.canvas.width = this.width;
@@ -70,7 +71,10 @@
 		this.animations[this.animationIndex].anim.draw((timestamp - this.startTime), deltaT);
 		this.lastTime = timestamp;
 		var _this = this;
-		window.requestAnimationFrame(function() { _this.step.apply(_this, arguments); });
+
+		if(this.animationRunning) {
+			window.requestAnimationFrame(function() { _this.step.apply(_this, arguments); });
+		}
 	};
 
 	//a bg can specify:
@@ -211,11 +215,52 @@
 		this.width = window.innerWidth;
 		this.height = window.innerHeight;
 		this.animations[this.animationIndex].anim.init();
+		this.startTime = null;
 		var _this = this;
 		if(!this.animationRunning) {
 			this.animationRunning = true;
 			window.requestAnimationFrame(function() { _this.step.apply(_this, arguments); });
 		}
+	};
+
+	AnimationGallery.prototype.pauseAnimation = function() {
+		this.animationRunning = false;
+		this.pauseTime = this.lastTime;
+	}
+
+	/** tries to resume the last animation if it was paused. */
+	AnimationGallery.prototype.resumeAnimation = function() {
+		if(this.animationRunning === false
+		&& this.animationIndex >= 0
+		&& this.animationIndex < this.animations.length ) {
+			this.animationRunning = true;
+			var _this = this;
+			window.requestAnimationFrame(function() {
+				var pausedDuration = arguments[0] - _this.pauseTime;
+				_this.lastTime += pausedDuration;
+				_this.startTime += pausedDuration;
+				_this.step.apply(_this, arguments);
+			});
+		}
+	};
+
+	AnimationGallery.prototype.displayAnimationStill = function(idx, timestamp) {
+		this.mouseX = Math.random()*this.width;
+		this.mouseY = Math.random()*this.height;
+
+		// kind of hacky but...
+		// pretend an animation is already running, so startAnimation doesn't call step
+		this.animationRunning = true;
+		this.startAnimation(idx);
+		this.animationRunning = false;
+		// then manually draw a frame
+		if(timestamp == undefined) {
+			timestamp = Math.random() * 1000*20;
+		}
+
+		this.animations[this.animationIndex].anim.draw((timestamp), 2000);
+		this.lastTime = timestamp;
+		this.pauseAnimation();
 	};
 
 	window.AnimationGallery = new AnimationGallery('backgroundCanvas');

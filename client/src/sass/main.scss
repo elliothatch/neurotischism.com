@@ -110,6 +110,14 @@ h1 {
   padding-right:1000px;
   margin-bottom:20px;
 
+	@media(max-width: 576px) {
+		/* margin trick breaks on mobile browsers */
+		margin-left: 0;
+		margin-right:  0;
+		padding-left: 0;
+		padding-right: 0;
+	}
+
 	a {
 		color: inherit;
 		background-color: inherit;
